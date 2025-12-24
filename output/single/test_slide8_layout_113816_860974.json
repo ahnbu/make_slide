@@ -1,0 +1,362 @@
+[
+    {
+        "text": "기존 시장 지배자는 수익 잠식과 막대한 지원 비용 때문에 ‘무료’ 경쟁에 대응하기 \n어렵지만, 결국 무료가 필연적이라면 먼저 도달하는 것이 유리합니다.",
+        "bbox": [
+            56,
+            36,
+            172,
+            938
+        ],
+        "style": {
+            "color": "#001d2d",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            206,
+            179,
+            5171,
+            371
+        ]
+    },
+    {
+        "text": "선두 기업의 역설: 시장 진입자(구글)에게",
+        "bbox": [
+            242,
+            115,
+            273,
+            425
+        ],
+        "style": {
+            "color": "#001d2d",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            659,
+            774,
+            1777,
+            99
+        ]
+    },
+    {
+        "text": "무료는 비용 부담이 적은 공격 무기지만, 기존 \n강자(야후)에게는 수백만 유료/무료 고객 \n지원 비용과 기존 수익 잠식을 감수해야 하는 \n고통스러운 방어 수단임.",
+        "bbox": [
+            275,
+            115,
+            456,
+            456
+        ],
+        "style": {
+            "color": "#001d2d",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            659,
+            880,
+            1954,
+            579
+        ]
+    },
+    {
+        "text": "큐블러-로스 모델: MS는 무료 OS 리눅스에",
+        "bbox": [
+            527,
+            115,
+            558,
+            442
+        ],
+        "style": {
+            "color": "#001d2d",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            659,
+            1686,
+            1874,
+            99
+        ]
+    },
+    {
+        "text": "대해 ‘부정 → 분노 → 협상 → 우울 → 수용’의 \n5단계를 거치며 결국 공존을 인정함.",
+        "bbox": [
+            560,
+            115,
+            642,
+            431
+        ],
+        "style": {
+            "color": "#001d2d",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            659,
+            1792,
+            1811,
+            262
+        ]
+    },
+    {
+        "text": "전략적 결단: 야후는 막대한 비용을 감수하고",
+        "bbox": [
+            711,
+            115,
+            743,
+            450
+        ],
+        "style": {
+            "color": "#001d2d",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            659,
+            2275,
+            1920,
+            102
+        ]
+    },
+    {
+        "text": "‘무제한 무료’ 경쟁에 동참함으로써 시장 \n점유율을 지켜낼 수 있었음. ‘무료’가 시장의 \n종착점이라면, 주저하는 것은 곧 패배를 의미.",
+        "bbox": [
+            744,
+            115,
+            878,
+            449
+        ],
+        "style": {
+            "color": "#001d2d",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            659,
+            2380,
+            1914,
+            428
+        ]
+    },
+    {
+        "text": "The ‘Free’ Storage War (2004-2007)",
+        "bbox": [
+            241,
+            501,
+            274,
+            826
+        ],
+        "style": {
+            "color": "#001d2d",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            2872,
+            771,
+            1863,
+            105
+        ]
+    },
+    {
+        "text": "April \n2004",
+        "bbox": [
+            361,
+            526,
+            417,
+            570
+        ],
+        "style": {
+            "color": "#ffffff",
+            "font_weight": "bold",
+            "align": "center"
+        },
+        "bbox_px": [
+            3015,
+            1155,
+            252,
+            179
+        ]
+    },
+    {
+        "text": "Google launches Gmail \nwith 1GB Free Storage.",
+        "bbox": [
+            346,
+            604,
+            401,
+            755
+        ],
+        "style": {
+            "color": "#001d2d",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            3462,
+            1107,
+            865,
+            176
+        ]
+    },
+    {
+        "text": "Yahoo announces \nunlimited free storage, \nmatching the inevitable \nendpoint.",
+        "bbox": [
+            346,
+            815,
+            464,
+            969
+        ],
+        "style": {
+            "color": "#001d2d",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            4672,
+            1107,
+            882,
+            377
+        ]
+    },
+    {
+        "text": "Yahoo Mail reluctantly \nincreases storage from \n4MB to 100MB, then 1GB.",
+        "bbox": [
+            685,
+            626,
+            773,
+            796
+        ],
+        "style": {
+            "color": "#001d2d",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            3588,
+            2192,
+            974,
+            281
+        ]
+    },
+    {
+        "text": "2004",
+        "bbox": [
+            867,
+            542,
+            893,
+            584
+        ],
+        "style": {
+            "color": "#001d2d",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            3107,
+            2774,
+            240,
+            83
+        ]
+    },
+    {
+        "text": "2005",
+        "bbox": [
+            867,
+            656,
+            893,
+            698
+        ],
+        "style": {
+            "color": "#001d2d",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            3760,
+            2774,
+            240,
+            83
+        ]
+    },
+    {
+        "text": "2006",
+        "bbox": [
+            867,
+            771,
+            893,
+            812
+        ],
+        "style": {
+            "color": "#001d2d",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            4420,
+            2774,
+            235,
+            83
+        ]
+    },
+    {
+        "text": "2007",
+        "bbox": [
+            867,
+            885,
+            893,
+            926
+        ],
+        "style": {
+            "color": "#001d2d",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            5073,
+            2774,
+            235,
+            83
+        ]
+    },
+    {
+        "text": "빌 게이츠는 중국의 불법 복제를 막기보다, 시장 지배력을 위한 장기적 투자로 간주했음.",
+        "bbox": [
+            945,
+            36,
+            976,
+            517
+        ],
+        "style": {
+            "color": "#001d2d",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            206,
+            3024,
+            2757,
+            99
+        ]
+    },
+    {
+        "text": "NotebookLM",
+        "bbox": [
+            972,
+            921,
+            988,
+            984
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "right"
+        },
+        "bbox_px": [
+            5280,
+            3110,
+            361,
+            51
+        ]
+    }
+]

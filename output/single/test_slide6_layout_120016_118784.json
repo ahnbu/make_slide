@@ -1,0 +1,262 @@
+[
+    {
+        "text": "프리미엄 모델은 전체 사용자의 5%가 나머지 95%를 지원하는 구조로,\n사용자를 ‘시간이 많은 그룹’과 ‘돈이 많은 그룹’으로 분할하여 수익을 창출합니다.",
+        "bbox": [
+            62,
+            39,
+            172,
+            935
+        ],
+        "style": {
+            "color": "#112330",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            223,
+            198,
+            5136,
+            352
+        ]
+    },
+    {
+        "text": "5% 규칙:",
+        "bbox": [
+            247,
+            40,
+            276,
+            126
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            229,
+            790,
+            493,
+            92
+        ]
+    },
+    {
+        "text": "디지털 상품은 한계 비용이 0에 가깝기 때문에, 소수의\n유료 사용자만으로도 대다수의 무료 사용자에게\n서비스를 제공하는 것이 경제적으로 가능함.",
+        "bbox": [
+            300,
+            40,
+            427,
+            455
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            229,
+            960,
+            2379,
+            406
+        ]
+    },
+    {
+        "text": "사용자 분할 (User Segmentation):",
+        "bbox": [
+            470,
+            40,
+            498,
+            335
+        ],
+        "style": {
+            "color": "#112330",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            229,
+            1504,
+            1691,
+            89
+        ]
+    },
+    {
+        "text": "• 무료 사용자 (95%): 시간이 많고 돈이 적음.\n불편함을 감수하거나 광고를 시청. (해적 포함)",
+        "bbox": [
+            523,
+            45,
+            608,
+            435
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            257,
+            1673,
+            2235,
+            272
+        ]
+    },
+    {
+        "text": "• 유료 사용자 (5%): 돈이 많고 시간이 적음. 편리함,\n기능, 시간 절약, 위험 감소를 위해 기꺼이 비용을\n지불.",
+        "bbox": [
+            617,
+            45,
+            745,
+            455
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            257,
+            1974,
+            2350,
+            409
+        ]
+    },
+    {
+        "text": "무료 사용자는 잠재적 유료 고객이자, 네트워크 효과를\n창출하는 중요한 자산임.",
+        "bbox": [
+            779,
+            40,
+            865,
+            452
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            229,
+            2492,
+            2361,
+            275
+        ]
+    },
+    {
+        "text": "95% Free Users",
+        "bbox": [
+            771,
+            528,
+            801,
+            656
+        ],
+        "style": {
+            "color": "#112330",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            3027,
+            2467,
+            733,
+            96
+        ]
+    },
+    {
+        "text": "특징: Time Rich, Money Poor\n역할: Network Effect,\nPotential Leads",
+        "bbox": [
+            814,
+            528,
+            918,
+            725
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            3027,
+            2604,
+            1129,
+            332
+        ]
+    },
+    {
+        "text": "5% Paid Users",
+        "bbox": [
+            771,
+            765,
+            801,
+            883
+        ],
+        "style": {
+            "color": "#136166",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            4385,
+            2467,
+            676,
+            96
+        ]
+    },
+    {
+        "text": "특징: Money Rich, Time Poor\n역할: Revenue Generation,\nFunding the entire service",
+        "bbox": [
+            814,
+            765,
+            918,
+            958
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            4385,
+            2604,
+            1106,
+            332
+        ]
+    },
+    {
+        "text": "비디지털 상품의 ‘무료 샘플’과 달리, 프리미엄은 무료 사용자에게도 지속적인 가치를 제공함.",
+        "bbox": [
+            950,
+            40,
+            977,
+            528
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            229,
+            3040,
+            2797,
+            86
+        ]
+    },
+    {
+        "text": "NotebookLM",
+        "bbox": [
+            973,
+            921,
+            991,
+            992
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "right"
+        },
+        "bbox_px": [
+            5280,
+            3113,
+            407,
+            57
+        ]
+    }
+]

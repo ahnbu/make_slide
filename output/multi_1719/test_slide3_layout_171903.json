@@ -1,0 +1,362 @@
+[
+    {
+        "text": "'무료'는 단순한 가격이 아닌 비이성적 흥분을 유발하는 감정적 버튼이며,\n'1원'과 '0원' 사이에는 거대한 심리적 장벽이 존재합니다.",
+        "bbox": [
+            48,
+            35,
+            126,
+            915
+        ],
+        "style": {
+            "color": "#0F2533",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            200,
+            153,
+            5045,
+            249
+        ]
+    },
+    {
+        "text": "페니 갭 (The Penny Gap)",
+        "bbox": [
+            232,
+            35,
+            276,
+            304
+        ],
+        "style": {
+            "color": "#0F2533",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            200,
+            742,
+            1542,
+            140
+        ]
+    },
+    {
+        "text": "'무료'의 비이성적 매력: 초콜릿 실험",
+        "bbox": [
+            232,
+            462,
+            276,
+            777
+        ],
+        "style": {
+            "color": "#0F2533",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            2648,
+            742,
+            1805,
+            140
+        ]
+    },
+    {
+        "text": "가격이 0이 아닌 이상, 소비자는 '지불할\n가치가 있는가?'라는 심리적 거래 비용을\n계산함.",
+        "bbox": [
+            316,
+            95,
+            444,
+            400
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            544,
+            1011,
+            1748,
+            409
+        ]
+    },
+    {
+        "text": "Scenario 1 (Paid vs. Paid)",
+        "bbox": [
+            328,
+            461,
+            360,
+            680
+        ],
+        "style": {
+            "color": "#0F2533",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            2642,
+            1049,
+            1255,
+            102
+        ]
+    },
+    {
+        "text": "Scenario 2 (Paid vs. Free)",
+        "bbox": [
+            328,
+            751,
+            360,
+            969
+        ],
+        "style": {
+            "color": "#0F2533",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            4305,
+            1049,
+            1249,
+            102
+        ]
+    },
+    {
+        "text": "73%",
+        "bbox": [
+            407,
+            494,
+            436,
+            541
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            2832,
+            1302,
+            269,
+            92
+        ]
+    },
+    {
+        "text": "69%",
+        "bbox": [
+            426,
+            890,
+            455,
+            935
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            5102,
+            1363,
+            257,
+            92
+        ]
+    },
+    {
+        "text": "31%",
+        "bbox": [
+            435,
+            785,
+            465,
+            830
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            4500,
+            1392,
+            257,
+            96
+        ]
+    },
+    {
+        "text": "'무료'의 힘: 가격이 0이 되면 이 장벽이\n사라지면서 수요가 비선형적으로 폭발함.\n아마존 무료 배송 사례에서 20센트의\n배송비 유무가 구매 행동을 완전히\n바꾸었음.",
+        "bbox": [
+            478,
+            95,
+            696,
+            400
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            544,
+            1529,
+            1748,
+            697
+        ]
+    },
+    {
+        "text": "가격 1¢ 인하",
+        "bbox": [
+            567,
+            677,
+            601,
+            753
+        ],
+        "style": {
+            "color": "#666666",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            3881,
+            1814,
+            435,
+            108
+        ]
+    },
+    {
+        "text": "27%",
+        "bbox": [
+            656,
+            606,
+            685,
+            651
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            3474,
+            2099,
+            257,
+            92
+        ]
+    },
+    {
+        "text": "'무료'는 의사결정 과정을 단축시키고,\n손실에 대한 두려움 없이 제품을 경험하게\n하는 가장 강력한 샘플링 도구임.",
+        "bbox": [
+            730,
+            95,
+            854,
+            400
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            544,
+            2336,
+            1748,
+            396
+        ]
+    },
+    {
+        "text": "Lindt Truffle\n(15¢)",
+        "bbox": [
+            851,
+            472,
+            908,
+            558
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            2705,
+            2723,
+            493,
+            182
+        ]
+    },
+    {
+        "text": "Hershey's Kiss\n(1¢)",
+        "bbox": [
+            851,
+            569,
+            908,
+            676
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            3262,
+            2723,
+            613,
+            182
+        ]
+    },
+    {
+        "text": "Lindt Truffle\n(14¢)",
+        "bbox": [
+            851,
+            762,
+            908,
+            847
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            4368,
+            2723,
+            487,
+            182
+        ]
+    },
+    {
+        "text": "Hershey's Kiss\n(Free)",
+        "bbox": [
+            851,
+            862,
+            908,
+            962
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            4941,
+            2723,
+            573,
+            182
+        ]
+    },
+    {
+        "text": "출처: 댄 애리얼리, 행동 경제학 실험.",
+        "bbox": [
+            953,
+            35,
+            974,
+            210
+        ],
+        "style": {
+            "color": "#666666",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            200,
+            3049,
+            1003,
+            67
+        ]
+    }
+]

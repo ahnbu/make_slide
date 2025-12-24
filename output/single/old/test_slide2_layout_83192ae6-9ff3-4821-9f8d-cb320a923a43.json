@@ -1,0 +1,382 @@
+[
+    {
+        "text": "디지털 기술의 3대 비용(처리 능력, 저장 공간, 대역폭)이 기하급수적으로\n하락하며 모든 디지털 상품의 가격을 ‘제로’로 수렴시키고 있습니다.",
+        "bbox": [
+            44,
+            38,
+            175,
+            905
+        ],
+        "style": {
+            "color": "#0F203E",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            217,
+            140,
+            4970,
+            419
+        ]
+    },
+    {
+        "text": "원자(Atoms) 경제:\n물리적 상품은 생산할수록 비용이 들고\n시간이 지나면 가치가 하락함.\n물가는 상승하는 경향.",
+        "bbox": [
+            254,
+            122,
+            448,
+            410
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            699,
+            812,
+            1651,
+            620
+        ]
+    },
+    {
+        "text": "비트(Bits) 경제:\n디지털 상품은 복제 비용(한계 비용)이\n거의 0이며, 기술 발전으로 핵심 비용이\n매년 50% 가까이 하락.",
+        "bbox": [
+            513,
+            122,
+            703,
+            415
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            699,
+            1641,
+            1679,
+            608
+        ]
+    },
+    {
+        "text": "이 ‘디지털 3중주(Triple Play)’ 현상은\n과거에는 불가능했던 비즈니스 모델(예:\nYouTube)을 현실로 만들었음.",
+        "bbox": [
+            755,
+            122,
+            896,
+            420
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            699,
+            2416,
+            1708,
+            451
+        ]
+    },
+    {
+        "text": "디지털 상품의 한계 비용 붕괴 (1980-Present)",
+        "bbox": [
+            254,
+            473,
+            294,
+            836
+        ],
+        "style": {
+            "color": "#144464",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            2711,
+            812,
+            2081,
+            128
+        ]
+    },
+    {
+        "text": "무어의 법칙",
+        "bbox": [
+            338,
+            742,
+            424,
+            942
+        ],
+        "style": {
+            "color": "#D9D9D9",
+            "font_weight": "bold",
+            "align": "center"
+        },
+        "bbox_px": [
+            4253,
+            1081,
+            1146,
+            275
+        ]
+    },
+    {
+        "text": "비용 (로그 스케일)",
+        "bbox": [
+            494,
+            468,
+            698,
+            495
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            2683,
+            1580,
+            154,
+            652
+        ]
+    },
+    {
+        "text": "High",
+        "bbox": [
+            313,
+            470,
+            344,
+            510
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "right"
+        },
+        "bbox_px": [
+            2694,
+            1001,
+            229,
+            99
+        ]
+    },
+    {
+        "text": "Near\nZero",
+        "bbox": [
+            812,
+            470,
+            876,
+            515
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "right"
+        },
+        "bbox_px": [
+            2694,
+            2598,
+            257,
+            204
+        ]
+    },
+    {
+        "text": "컴퓨터 처리 능력 비용",
+        "bbox": [
+            494,
+            618,
+            528,
+            770
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            3542,
+            1580,
+            871,
+            108
+        ]
+    },
+    {
+        "text": "기하급수적 하락\n(매년 ~50% 감소)",
+        "bbox": [
+            704,
+            520,
+            766,
+            635
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            2981,
+            2252,
+            659,
+            198
+        ]
+    },
+    {
+        "text": "디지털 저장 공간 비용",
+        "bbox": [
+            675,
+            742,
+            709,
+            893
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            4253,
+            2160,
+            865,
+            108
+        ]
+    },
+    {
+        "text": "디지털 저장 공간 비용",
+        "bbox": [
+            738,
+            789,
+            772,
+            940
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            4523,
+            2361,
+            865,
+            108
+        ]
+    },
+    {
+        "text": "대역폭 비용",
+        "bbox": [
+            802,
+            638,
+            837,
+            706
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            3657,
+            2566,
+            389,
+            112
+        ]
+    },
+    {
+        "text": "1980",
+        "bbox": [
+            881,
+            498,
+            914,
+            540
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            2855,
+            2819,
+            240,
+            105
+        ]
+    },
+    {
+        "text": "시간",
+        "bbox": [
+            881,
+            712,
+            914,
+            747
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            4081,
+            2819,
+            200,
+            105
+        ]
+    },
+    {
+        "text": "Present",
+        "bbox": [
+            881,
+            910,
+            914,
+            965
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            5217,
+            2819,
+            315,
+            105
+        ]
+    },
+    {
+        "text": "Fairchild Semiconductor는 미래 예상 비용을 기준으로 가격을 책정하여 시장을 장악함.",
+        "bbox": [
+            953,
+            38,
+            988,
+            545
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            217,
+            3049,
+            2906,
+            112
+        ]
+    },
+    {
+        "text": "NotebookLM",
+        "bbox": [
+            971,
+            922,
+            990,
+            992
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "right"
+        },
+        "bbox_px": [
+            5285,
+            3107,
+            401,
+            60
+        ]
+    }
+]

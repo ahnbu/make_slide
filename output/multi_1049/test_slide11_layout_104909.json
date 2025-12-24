@@ -1,0 +1,262 @@
+[
+    {
+        "text": "정보가 풍부한 시대에는 '관심'이 새로운 희소자원이 되며,\n'평판'은 이를 측정하고 교환하는 새로운 화폐의 역할을 합니다.",
+        "bbox": [
+            53,
+            37,
+            185,
+            864
+        ],
+        "style": {
+            "color": "#0B243B",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            212,
+            169,
+            4741,
+            422
+        ]
+    },
+    {
+        "text": "관심 경제 (Attention Economy): 정보의 풍요는\n필연적으로 인간의 '관심'을 가장 희소한 자원으로\n만듦.",
+        "bbox": [
+            233,
+            37,
+            362,
+            477
+        ],
+        "style": {
+            "color": "#1A1A1A",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            212,
+            745,
+            2522,
+            412
+        ]
+    },
+    {
+        "text": "평판 경제 (Reputation Economy): 웹에서\n하이퍼링크는 평판을 교환하는 공식 언어. 링크를\n많이 받을수록 평판이 높아짐.",
+        "bbox": [
+            405,
+            37,
+            534,
+            451
+        ],
+        "style": {
+            "color": "#1A1A1A",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            212,
+            1296,
+            2373,
+            412
+        ]
+    },
+    {
+        "text": "구글의 역할: 페이지랭크 알고리즘은 링크를 '투표'로\n간주하여 웹페이지의 평판을 측정함. 이는 사실상\n평판 경제의 가치를 결정하는 '중앙은행'과 같음.",
+        "bbox": [
+            577,
+            37,
+            706,
+            478
+        ],
+        "style": {
+            "color": "#1A1A1A",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            212,
+            1846,
+            2528,
+            412
+        ]
+    },
+    {
+        "text": "이 평판은 직접적인 현금 흐름으로 이어질 수 있음\n(예: 높은 평판의 블로거가 광고 수익이나 출판\n계약을 맺는 경우).",
+        "bbox": [
+            763,
+            37,
+            893,
+            457
+        ],
+        "style": {
+            "color": "#1A1A1A",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            212,
+            2441,
+            2407,
+            416
+        ]
+    },
+    {
+        "text": "페이스북 '친구'는 평판 화폐의 한 종류이며, 이는 실제 가치로 환산될 수 있음 (버거킹 실험).",
+        "bbox": [
+            953,
+            37,
+            976,
+            523
+        ],
+        "style": {
+            "color": "#1A1A1A",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            212,
+            3049,
+            2786,
+            73
+        ]
+    },
+    {
+        "text": "Diagram Principles",
+        "bbox": [
+            704,
+            524,
+            729,
+            649
+        ],
+        "style": {
+            "color": "#1A1A1A",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            3004,
+            2252,
+            716,
+            80
+        ]
+    },
+    {
+        "text": "Key Principle: A link from site A to site B is a vote by site A for site B.",
+        "bbox": [
+            733,
+            524,
+            758,
+            963
+        ],
+        "style": {
+            "color": "#1A1A1A",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            3004,
+            2345,
+            2516,
+            80
+        ]
+    },
+    {
+        "text": "Key Principle: A link from site A to site B is a vote by site A for site B.",
+        "bbox": [
+            765,
+            524,
+            789,
+            963
+        ],
+        "style": {
+            "color": "#1A1A1A",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            3004,
+            2448,
+            2516,
+            76
+        ]
+    },
+    {
+        "text": "Mechanism: More votes (especially from high-reputation sites) lead\nto higher PageRank and better visibility.",
+        "bbox": [
+            797,
+            524,
+            853,
+            959
+        ],
+        "style": {
+            "color": "#1A1A1A",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            3004,
+            2550,
+            2493,
+            179
+        ]
+    },
+    {
+        "text": "Result: Reputation becomes a quantifiable and valuable asset.",
+        "bbox": [
+            864,
+            524,
+            889,
+            936
+        ],
+        "style": {
+            "color": "#1A1A1A",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            3004,
+            2764,
+            2361,
+            80
+        ]
+    },
+    {
+        "text": "PageRank: The Central Bank of the Reputation Economy",
+        "bbox": [
+            901,
+            524,
+            933,
+            959
+        ],
+        "style": {
+            "color": "#0B427B",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            3004,
+            2883,
+            2493,
+            102
+        ]
+    },
+    {
+        "text": "NotebookLM",
+        "bbox": [
+            971,
+            921,
+            988,
+            988
+        ],
+        "style": {
+            "color": "#1A1A1A",
+            "font_weight": "normal",
+            "align": "right"
+        },
+        "bbox_px": [
+            5280,
+            3107,
+            384,
+            54
+        ]
+    }
+]

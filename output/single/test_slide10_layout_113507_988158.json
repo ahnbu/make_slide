@@ -1,0 +1,442 @@
+[
+    {
+        "text": "풍요로 인해 한 요소의 가치가 0이 되면, 가치는 사라지는 것이 아니라\n반드시 인접한 희소한 다른 계층으로 이동합니다.",
+        "bbox": [
+            93,
+            41,
+            227,
+            946
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            235,
+            297,
+            5188,
+            428
+        ]
+    },
+    {
+        "text": "5.2%",
+        "bbox": [
+            363,
+            400,
+            384,
+            426
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            2293,
+            1161,
+            149,
+            67
+        ]
+    },
+    {
+        "text": "4.3%",
+        "bbox": [
+            496,
+            332,
+            517,
+            358
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            1903,
+            1587,
+            149,
+            67
+        ]
+    },
+    {
+        "text": "3.1%",
+        "bbox": [
+            591,
+            265,
+            613,
+            291
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            1519,
+            1891,
+            149,
+            70
+        ]
+    },
+    {
+        "text": "-0.0%",
+        "bbox": [
+            570,
+            126,
+            591,
+            159
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            722,
+            1823,
+            189,
+            67
+        ]
+    },
+    {
+        "text": "-0.0%",
+        "bbox": [
+            753,
+            194,
+            775,
+            226
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            1112,
+            2409,
+            183,
+            70
+        ]
+    },
+    {
+        "text": "과거\n미디어 가치",
+        "bbox": [
+            824,
+            51,
+            874,
+            102
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            292,
+            2636,
+            292,
+            160
+        ]
+    },
+    {
+        "text": "인쇄/유통\n비용 제로화",
+        "bbox": [
+            824,
+            114,
+            874,
+            169
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            653,
+            2636,
+            315,
+            160
+        ]
+    },
+    {
+        "text": "뉴스/콘텐츠\n무료화",
+        "bbox": [
+            824,
+            180,
+            874,
+            240
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            1031,
+            2636,
+            343,
+            160
+        ]
+    },
+    {
+        "text": "독자의\n관심/데이터",
+        "bbox": [
+            824,
+            250,
+            874,
+            307
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            1433,
+            2636,
+            326,
+            160
+        ]
+    },
+    {
+        "text": "개인화/\n분석 서비스",
+        "bbox": [
+            824,
+            319,
+            874,
+            375
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            1828,
+            2636,
+            321,
+            160
+        ]
+    },
+    {
+        "text": "전문가\n강연/컨설팅",
+        "bbox": [
+            824,
+            386,
+            874,
+            444
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            2212,
+            2636,
+            332,
+            160
+        ]
+    },
+    {
+        "text": "새로운\n미디어 가치",
+        "bbox": [
+            824,
+            458,
+            874,
+            509
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            2625,
+            2636,
+            292,
+            160
+        ]
+    },
+    {
+        "text": "가치 보존의 법칙 (Law of Conservation of\nAttractive Profits):",
+        "bbox": [
+            302,
+            550,
+            383,
+            898
+        ],
+        "style": {
+            "color": "#1A4D7C",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            3153,
+            966,
+            1995,
+            259
+        ]
+    },
+    {
+        "text": "어떤 것(정보)이 풍부해져 무료가 되면, 그것을 보완하는\n희소한 것(정보를 이해하는 것)의 가치가 올라감.",
+        "bbox": [
+            405,
+            550,
+            488,
+            955
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            3153,
+            1296,
+            2321,
+            265
+        ]
+    },
+    {
+        "text": "가치 이동의 예시:",
+        "bbox": [
+            563,
+            550,
+            597,
+            680
+        ],
+        "style": {
+            "color": "#1A4D7C",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            3153,
+            1801,
+            745,
+            108
+        ]
+    },
+    {
+        "text": "● 제조/물질(원자)의 비용이 하락하자, 가치는 지식\n노동/서비스(비트)로 이동.",
+        "bbox": [
+            624,
+            550,
+            701,
+            920
+        ],
+        "style": {
+            "color": "#666666",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            3153,
+            1996,
+            2121,
+            246
+        ]
+    },
+    {
+        "text": "● 풍부한 정보(무료) -> 희소한 관심과 평판",
+        "bbox": [
+            721,
+            550,
+            755,
+            866
+        ],
+        "style": {
+            "color": "#4A8E8A",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            3153,
+            2307,
+            1811,
+            108
+        ]
+    },
+    {
+        "text": "● 무료 음악 -> 희소한 라이브 공연과 아티스트와의 교감",
+        "bbox": [
+            777,
+            550,
+            810,
+            957
+        ],
+        "style": {
+            "color": "#4A8E8A",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            3153,
+            2486,
+            2333,
+            105
+        ]
+    },
+    {
+        "text": "● 무료 책 E-Book -> 희소한 저자의 시간 (강연, 컨설팅)",
+        "bbox": [
+            831,
+            550,
+            865,
+            960
+        ],
+        "style": {
+            "color": "#4A8E8A",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            3153,
+            2659,
+            2350,
+            108
+        ]
+    },
+    {
+        "text": "전략의 핵심은 '무엇이 풍부해지는가'를 파악하고, 그로 인해 '무엇이 희소해지는가'를 예측하는 것임.",
+        "bbox": [
+            934,
+            41,
+            961,
+            557
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            235,
+            2988,
+            2958,
+            86
+        ]
+    },
+    {
+        "text": "NotebookLM",
+        "bbox": [
+            972,
+            922,
+            988,
+            992
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "right"
+        },
+        "bbox_px": [
+            5285,
+            3110,
+            401,
+            51
+        ]
+    }
+]

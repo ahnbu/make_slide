@@ -1,0 +1,262 @@
+[
+    {
+        "text": "풍요의 시대에 성공하기 위해서는 자원을 아끼려는 ‘희소성 사고’를 버리고,\n자원을 의도적으로 ‘낭비’하여 새로운 기회를 탐색하는 ‘풍요 사고’로 전환해야 합니다.",
+        "bbox": [
+            51,
+            39,
+            153,
+            931
+        ],
+        "style": {
+            "color": "#003B5C",
+            "font_weight": "bold",
+            "align": "center"
+        },
+        "bbox_px": [
+            223,
+            163,
+            5113,
+            326
+        ]
+    },
+    {
+        "text": "‘트랜지스터가 너무 저렴해지면, 아끼지 말고 ‘낭비’해야 한다.’ - 카버 미드",
+        "bbox": [
+            238,
+            97,
+            285,
+            903
+        ],
+        "style": {
+            "color": "#595959",
+            "font_weight": "bold",
+            "align": "center"
+        },
+        "bbox_px": [
+            556,
+            761,
+            4620,
+            150
+        ]
+    },
+    {
+        "text": "‘When transistors become too cheap to matter, don’t conserve them. Waste them.’\n- Carver Mead, Caltech Professor.",
+        "bbox": [
+            305,
+            186,
+            372,
+            814
+        ],
+        "style": {
+            "color": "#333333",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            1066,
+            976,
+            3600,
+            214
+        ]
+    },
+    {
+        "text": "희소성 사고 (Scarcity Mindset)",
+        "bbox": [
+            473,
+            67,
+            513,
+            377
+        ],
+        "style": {
+            "color": "#003B5C",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            384,
+            1513,
+            1777,
+            128
+        ]
+    },
+    {
+        "text": "원칙: 자원은 비싸므로 통제하고 최적화해야 한다.\n(Top-down control)",
+        "bbox": [
+            555,
+            67,
+            632,
+            447
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            384,
+            1776,
+            2178,
+            246
+        ]
+    },
+    {
+        "text": "오류: 풍부해진 자원(저장 공간)을 아끼고 희소한\n자원(사람의 시간)을 낭비함.",
+        "bbox": [
+            673,
+            67,
+            750,
+            418
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            384,
+            2153,
+            2012,
+            246
+        ]
+    },
+    {
+        "text": "결과: 점진적 개선에 머무름.",
+        "bbox": [
+            782,
+            67,
+            822,
+            311
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            384,
+            2502,
+            1398,
+            128
+        ]
+    },
+    {
+        "text": "풍요 사고 (Abundance Mindset)",
+        "bbox": [
+            473,
+            538,
+            513,
+            864
+        ],
+        "style": {
+            "color": "#003B5C",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            3084,
+            1513,
+            1868,
+            128
+        ]
+    },
+    {
+        "text": "원칙: 자원은 저렴하므로 실패 비용이 낮다.\n통제를 풀고 실험해야 한다.(Embrace chaos)",
+        "bbox": [
+            555,
+            538,
+            632,
+            893
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            3084,
+            1776,
+            2035,
+            246
+        ]
+    },
+    {
+        "text": "사례: 유튜브는 수많은 ‘저품질’ 영상을 낭비함으로써\n틈새시장을 발굴하고 미래 TV를 발명하고 있음.",
+        "bbox": [
+            673,
+            538,
+            750,
+            915
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            3084,
+            2153,
+            2161,
+            246
+        ]
+    },
+    {
+        "text": "결과: ‘실패를 빨리하라(Fail fast)’ 문화를 통해\n혁신을 주도.",
+        "bbox": [
+            782,
+            538,
+            859,
+            875
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            3084,
+            2502,
+            1932,
+            246
+        ]
+    },
+    {
+        "text": "자연은 수백만 개의 알을 ‘낭비’하여 최고의 생존자를 찾아냄. 비즈니스도 잠재적 공간을 완전히 탐색하기 위해 낭비가 필요함.",
+        "bbox": [
+            930,
+            43,
+            963,
+            843
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            246,
+            2976,
+            4586,
+            105
+        ]
+    },
+    {
+        "text": "NotebookLM",
+        "bbox": [
+            974,
+            922,
+            990,
+            992
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "right"
+        },
+        "bbox_px": [
+            5285,
+            3116,
+            401,
+            51
+        ]
+    }
+]

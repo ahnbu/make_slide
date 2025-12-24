@@ -1,0 +1,182 @@
+[
+    {
+        "text": "정보가 풍부한 시대에는 '관심'이 새로운 희소자원이 되며, \n'평판'은 이를 측정하고 교환하는 새로운 화폐의 역할을 합니다.",
+        "bbox": [
+            55,
+            38,
+            185,
+            860
+        ],
+        "style": {
+            "color": "#0e2a47",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            217,
+            176,
+            4712,
+            416
+        ]
+    },
+    {
+        "text": "관심 경제 (Attention Economy): 정보의 풍요는 \n필연적으로 인간의 '관심'을 가장 희소한 자원으로 \n만듦.",
+        "bbox": [
+            233,
+            38,
+            363,
+            477
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            217,
+            745,
+            2516,
+            416
+        ]
+    },
+    {
+        "text": "평판 경제 (Reputation Economy): 웹에서 \n하이퍼링크는 평판을 교환하는 공식 언어. 링크를 \n많이 받을수록 평판이 높아짐.",
+        "bbox": [
+            405,
+            38,
+            536,
+            459
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            217,
+            1296,
+            2413,
+            419
+        ]
+    },
+    {
+        "text": "구글의 역할: 페이지랭크 알고리즘은 링크를 '투표'로 \n간주하여 웹페이지의 평판을 측정함. 이는 사실상 \n평판 경제의 가치를 결정하는 '중앙은행'과 같음.",
+        "bbox": [
+            578,
+            38,
+            709,
+            479
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            217,
+            1849,
+            2528,
+            419
+        ]
+    },
+    {
+        "text": "이 평판은 직접적인 현금 흐름으로 이어질 수 있음 \n(예: 높은 평판의 블로거가 광고 수익이나 출판 \n계약을 맺는 경우).",
+        "bbox": [
+            766,
+            38,
+            896,
+            459
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            217,
+            2451,
+            2413,
+            416
+        ]
+    },
+    {
+        "text": "페이스북 '친구'는 평판 화폐의 한 종류이며, 이는 실제 가치로 환산될 수 있음 (버거킹 실험).",
+        "bbox": [
+            951,
+            38,
+            976,
+            524
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            217,
+            3043,
+            2786,
+            80
+        ]
+    },
+    {
+        "text": "Diagram Principles\nKey Principle: A link from site A to site B is a vote by site A for site B.\nKey Principle: A link from site A to site B is a vote by site A for site B.\nMechanism: More votes (especially from high-reputation sites) lead\nto higher PageRank and better visibility.\nResult: Reputation becomes a quantifiable and valuable asset.",
+        "bbox": [
+            702,
+            524,
+            895,
+            963
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            3004,
+            2246,
+            2516,
+            617
+        ]
+    },
+    {
+        "text": "PageRank: The Central Bank of the Reputation Economy",
+        "bbox": [
+            902,
+            524,
+            932,
+            959
+        ],
+        "style": {
+            "color": "#004c99",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            3004,
+            2886,
+            2493,
+            96
+        ]
+    },
+    {
+        "text": "NotebookLM",
+        "bbox": [
+            972,
+            923,
+            989,
+            992
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "right"
+        },
+        "bbox_px": [
+            5291,
+            3110,
+            395,
+            54
+        ]
+    }
+]

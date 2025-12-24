@@ -1,0 +1,462 @@
+[
+    {
+        "text": "‘무료’에 대한 흔한 비판들은 20세기 원자 경제의 관점에 기반한 것으로,\n한계 비용이 0인 디지털 경제의 현실을 반영하지 못합니다.",
+        "bbox": [
+            72,
+            51,
+            192,
+            922
+        ],
+        "style": {
+            "color": "#0b2239",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            292,
+            230,
+            4993,
+            384
+        ]
+    },
+    {
+        "text": "비판론\n(Common Skepticism)",
+        "bbox": [
+            260,
+            71,
+            332,
+            254
+        ],
+        "style": {
+            "color": "#ffffff",
+            "font_weight": "bold",
+            "align": "center"
+        },
+        "bbox_px": [
+            407,
+            832,
+            1049,
+            230
+        ]
+    },
+    {
+        "text": "20세기 관점\n(20C Atom-based View)",
+        "bbox": [
+            260,
+            287,
+            332,
+            487
+        ],
+        "style": {
+            "color": "#ffffff",
+            "font_weight": "bold",
+            "align": "center"
+        },
+        "bbox_px": [
+            1645,
+            832,
+            1146,
+            230
+        ]
+    },
+    {
+        "text": "21세기 현실\n(21C Bit-based Reality)",
+        "bbox": [
+            260,
+            517,
+            332,
+            706
+        ],
+        "style": {
+            "color": "#ffffff",
+            "font_weight": "bold",
+            "align": "center"
+        },
+        "bbox_px": [
+            2963,
+            832,
+            1083,
+            230
+        ]
+    },
+    {
+        "text": "핵심 통찰\n(Key Insight)",
+        "bbox": [
+            260,
+            784,
+            332,
+            891
+        ],
+        "style": {
+            "color": "#ffffff",
+            "font_weight": "bold",
+            "align": "center"
+        },
+        "bbox_px": [
+            4494,
+            832,
+            613,
+            230
+        ]
+    },
+    {
+        "text": "“공짜 점심은 없다”",
+        "bbox": [
+            400,
+            58,
+            437,
+            203
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            332,
+            1280,
+            831,
+            118
+        ]
+    },
+    {
+        "text": "모든 것에는 비용이 따른다.",
+        "bbox": [
+            400,
+            282,
+            437,
+            489
+        ],
+        "style": {
+            "color": "#802020",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            1616,
+            1280,
+            1186,
+            118
+        ]
+    },
+    {
+        "text": "비용이 너무 분산되어 실질\n적으로 무료. (위키피디아 기부\n에 낸 당신의 세금은 원자 단위)",
+        "bbox": [
+            363,
+            507,
+            471,
+            712
+        ],
+        "style": {
+            "color": "#006060",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            2906,
+            1161,
+            1175,
+            345
+        ]
+    },
+    {
+        "text": "측정 불가능할 정도로 작은\n비용은 0으로 간주 가능.",
+        "bbox": [
+            381,
+            732,
+            456,
+            934
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            4196,
+            1219,
+            1158,
+            240
+        ]
+    },
+    {
+        "text": "“비용이 없으면 가치도\n없다”",
+        "bbox": [
+            511,
+            58,
+            588,
+            227
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            332,
+            1635,
+            968,
+            246
+        ]
+    },
+    {
+        "text": "가격이 가치를 반영한다.",
+        "bbox": [
+            530,
+            282,
+            568,
+            467
+        ],
+        "style": {
+            "color": "#802020",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            1616,
+            1696,
+            1060,
+            121
+        ]
+    },
+    {
+        "text": "가치는 관심과 평판으로\n측정된다.",
+        "bbox": [
+            511,
+            507,
+            588,
+            686
+        ],
+        "style": {
+            "color": "#006060",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            2906,
+            1635,
+            1026,
+            246
+        ]
+    },
+    {
+        "text": "평판은 실제 현금(강연,\n계약)으로 전환될 수 있음.",
+        "bbox": [
+            511,
+            732,
+            588,
+            930
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            4196,
+            1635,
+            1135,
+            246
+        ]
+    },
+    {
+        "text": "“무료는 혁신을 저해한다”",
+        "bbox": [
+            666,
+            58,
+            704,
+            251
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            332,
+            2131,
+            1106,
+            121
+        ]
+    },
+    {
+        "text": "수익이 없으면 R&D 동기가\n없다.",
+        "bbox": [
+            647,
+            282,
+            723,
+            490
+        ],
+        "style": {
+            "color": "#802020",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            1616,
+            2070,
+            1192,
+            243
+        ]
+    },
+    {
+        "text": "무료 공유가 더 큰 협업과\n혁신을 촉진.",
+        "bbox": [
+            647,
+            507,
+            723,
+            718
+        ],
+        "style": {
+            "color": "#006060",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            2906,
+            2070,
+            1209,
+            243
+        ]
+    },
+    {
+        "text": "오픈소스 모델이 이를 증명.\n지적재산권도 결국 무료로\n전환되도록 설계됨.",
+        "bbox": [
+            629,
+            732,
+            745,
+            938
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            4196,
+            2012,
+            1180,
+            371
+        ]
+    },
+    {
+        "text": "“무료는 품질을 떨어뜨린다”",
+        "bbox": [
+            802,
+            58,
+            840,
+            268
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            332,
+            2566,
+            1203,
+            121
+        ]
+    },
+    {
+        "text": "전문가만이 고품질을\n만든다.",
+        "bbox": [
+            784,
+            282,
+            860,
+            439
+        ],
+        "style": {
+            "color": "#802020",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            1616,
+            2508,
+            900,
+            243
+        ]
+    },
+    {
+        "text": "전문가와 아마추어의\n경기장을 평준화.",
+        "bbox": [
+            784,
+            507,
+            860,
+            664
+        ],
+        "style": {
+            "color": "#006060",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            2906,
+            2508,
+            900,
+            243
+        ]
+    },
+    {
+        "text": "정보의 풍요는 전문가에게\n‘편집자/코치’라는 새로운\n역할을 부여함.",
+        "bbox": [
+            766,
+            732,
+            882,
+            928
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            4196,
+            2451,
+            1123,
+            371
+        ]
+    },
+    {
+        "text": "무료는 트릭이 아니라, 디지털 유통의 경제적 중력임.",
+        "bbox": [
+            935,
+            51,
+            966,
+            350
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "left"
+        },
+        "bbox_px": [
+            292,
+            2992,
+            1714,
+            99
+        ]
+    },
+    {
+        "text": "NotebookLM",
+        "bbox": [
+            973,
+            922,
+            989,
+            992
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "right"
+        },
+        "bbox_px": [
+            5285,
+            3113,
+            401,
+            51
+        ]
+    }
+]

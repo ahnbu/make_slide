@@ -1,0 +1,442 @@
+[
+    {
+        "text": "'무료' 경제는 4가지 핵심 비즈니스 모델을 통해 수익을 창출하며,\n각 모델은 가치를 이전시키는 방식에서 차이를 보입니다.",
+        "bbox": [
+            49,
+            41,
+            174,
+            856
+        ],
+        "style": {
+            "color": "#001B2E",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            235,
+            156,
+            4672,
+            400
+        ]
+    },
+    {
+        "text": "모델 유형",
+        "bbox": [
+            272,
+            114,
+            303,
+            192
+        ],
+        "style": {
+            "color": "#FFFFFF",
+            "font_weight": "bold",
+            "align": "center"
+        },
+        "bbox_px": [
+            653,
+            870,
+            447,
+            99
+        ]
+    },
+    {
+        "text": "수익원\n(Source of Revenue)",
+        "bbox": [
+            261,
+            294,
+            335,
+            474
+        ],
+        "style": {
+            "color": "#FFFFFF",
+            "font_weight": "bold",
+            "align": "center"
+        },
+        "bbox_px": [
+            1685,
+            835,
+            1031,
+            236
+        ]
+    },
+    {
+        "text": "핵심 대상\n(Target for Monetization)",
+        "bbox": [
+            261,
+            508,
+            335,
+            725
+        ],
+        "style": {
+            "color": "#FFFFFF",
+            "font_weight": "bold",
+            "align": "center"
+        },
+        "bbox_px": [
+            2912,
+            835,
+            1244,
+            236
+        ]
+    },
+    {
+        "text": "대표 사례\n(Key Example)",
+        "bbox": [
+            261,
+            784,
+            335,
+            911
+        ],
+        "style": {
+            "color": "#FFFFFF",
+            "font_weight": "bold",
+            "align": "center"
+        },
+        "bbox_px": [
+            4494,
+            835,
+            728,
+            236
+        ]
+    },
+    {
+        "text": "1. 직접 교차 보조\n(Direct Cross-Subsidy)",
+        "bbox": [
+            371,
+            44,
+            452,
+            255
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            252,
+            1187,
+            1209,
+            259
+        ]
+    },
+    {
+        "text": "연관 유료 상품/서비스",
+        "bbox": [
+            386,
+            295,
+            417,
+            473
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            1691,
+            1235,
+            1020,
+            99
+        ]
+    },
+    {
+        "text": "‘무료’ 상품에 유인된 고객",
+        "bbox": [
+            386,
+            521,
+            417,
+            712
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            2986,
+            1235,
+            1095,
+            99
+        ]
+    },
+    {
+        "text": "킹 질레트 (면도날 판매)",
+        "bbox": [
+            386,
+            754,
+            417,
+            942
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            4322,
+            1235,
+            1077,
+            99
+        ]
+    },
+    {
+        "text": "2. 삼자 시장\n(Three-Party Market)",
+        "bbox": [
+            496,
+            44,
+            577,
+            258
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            252,
+            1587,
+            1226,
+            259
+        ]
+    },
+    {
+        "text": "광고주",
+        "bbox": [
+            511,
+            356,
+            542,
+            411
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            2040,
+            1635,
+            315,
+            99
+        ]
+    },
+    {
+        "text": "콘텐츠를 소비하는\n사용자의 관심",
+        "bbox": [
+            496,
+            537,
+            571,
+            696
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            3078,
+            1587,
+            911,
+            240
+        ]
+    },
+    {
+        "text": "구글 검색, 지상파 방송",
+        "bbox": [
+            511,
+            754,
+            542,
+            941
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            4322,
+            1635,
+            1072,
+            99
+        ]
+    },
+    {
+        "text": "3. 프리미엄\n(Freemium)",
+        "bbox": [
+            621,
+            44,
+            702,
+            169
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            252,
+            1987,
+            716,
+            259
+        ]
+    },
+    {
+        "text": "소수의 프리미엄 유저",
+        "bbox": [
+            636,
+            298,
+            667,
+            470
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            1708,
+            2035,
+            986,
+            99
+        ]
+    },
+    {
+        "text": "시간보다 돈을 더\n가치있게 여기는 사용자",
+        "bbox": [
+            621,
+            527,
+            696,
+            705
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            3021,
+            1987,
+            1020,
+            240
+        ]
+    },
+    {
+        "text": "링크드인, 스포티파이",
+        "bbox": [
+            636,
+            765,
+            667,
+            930
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            4385,
+            2035,
+            945,
+            99
+        ]
+    },
+    {
+        "text": "4. 비화폐 시장\n(Nonmonetary Markets)",
+        "bbox": [
+            746,
+            44,
+            827,
+            260
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "bold",
+            "align": "left"
+        },
+        "bbox_px": [
+            252,
+            2387,
+            1238,
+            259
+        ]
+    },
+    {
+        "text": "간접적 가치\n(데이터, 평판)",
+        "bbox": [
+            746,
+            329,
+            821,
+            439
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            1886,
+            2387,
+            630,
+            240
+        ]
+    },
+    {
+        "text": "서비스 개선에 기여하는\n사용자 활동",
+        "bbox": [
+            746,
+            522,
+            821,
+            711
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            2992,
+            2387,
+            1083,
+            240
+        ]
+    },
+    {
+        "text": "위키피디아,\n구글 검색 알고리즘",
+        "bbox": [
+            746,
+            775,
+            821,
+            921
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "center"
+        },
+        "bbox_px": [
+            4443,
+            2387,
+            837,
+            240
+        ]
+    },
+    {
+        "text": "* 각 모델은 단독 혹은 복합적으로 사용될 수 있음.",
+        "bbox": [
+            876,
+            704,
+            898,
+            959
+        ],
+        "style": {
+            "color": "#000000",
+            "font_weight": "normal",
+            "align": "right"
+        },
+        "bbox_px": [
+            4036,
+            2803,
+            1461,
+            70
+        ]
+    }
+]

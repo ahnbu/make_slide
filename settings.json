@@ -1,0 +1,5 @@
+{
+    "vision_model": "gemini-3-flash-preview",
+    "inpainting_model": "opencv-ns",
+    "codegen_model": "algorithmic"
+}
