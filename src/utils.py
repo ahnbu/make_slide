@@ -15,7 +15,7 @@ def get_logger(name):
     return logging.getLogger(name)
 
 def generate_timestamp():
-    return datetime.now().strftime("%H%M%S_%f")
+    return datetime.now().strftime("%Y%m%d_%H%M%S_%f")
 
 def ensure_directory(path):
     if not os.path.exists(path):

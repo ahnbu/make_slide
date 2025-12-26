@@ -28,3 +28,19 @@
 [2025-12-24T11:47:50.022153] File: test_slide11 | Vision: gemini-3-flash-preview | Inpaint: opencv-ns | CodeGen: algorithmic
 [2025-12-24T11:55:52.970681] File: test_slide8 | Vision: gemini-3-flash-preview | Inpaint: opencv-ns | CodeGen: algorithmic
 [2025-12-24T12:01:43.460258] File: test_slide6 | Vision: gemini-3-flash-preview | Inpaint: opencv-ns | CodeGen: algorithmic
+[2025-12-26T10:42:32.594743] File: 백신에서 알파폴드 역할_노트북LM_20251226 | Vision: gemini-3-flash-preview | Inpaint: opencv-ns | CodeGen: algorithmic
+[2025-12-26T10:48:43.510556] File: 백신에서 알파폴드 역할_노트북LM_20251226 | Vision: gemini-3-flash-preview | Inpaint: opencv-ns | CodeGen: algorithmic
+[2025-12-26T10:54:57.935293] File: 백신에서 알파폴드 역할_노트북LM_20251226 | Vision: gemini-3-flash-preview | Inpaint: opencv-ns | CodeGen: algorithmic
+[2025-12-26T11:23:49.760540] File: test_slide9 | Vision: gemini-3-flash-preview | Inpaint: opencv-ns | CodeGen: algorithmic
+[2025-12-26T11:24:02.359831] File: test_slide8 | Vision: gemini-3-flash-preview | Inpaint: opencv-ns | CodeGen: algorithmic
+[2025-12-26T11:24:09.422047] File: test_slide7 | Vision: gemini-3-flash-preview | Inpaint: opencv-ns | CodeGen: algorithmic
+[2025-12-26T11:24:21.315819] File: test_slide9 | Vision: gemini-3-flash-preview | Inpaint: opencv-ns | CodeGen: algorithmic
+[2025-12-26T11:24:24.618307] File: test_slide10 | Vision: gemini-3-flash-preview | Inpaint: opencv-ns | CodeGen: algorithmic
+[2025-12-26T11:24:27.229671] File: test_slide8 | Vision: gemini-3-flash-preview | Inpaint: opencv-ns | CodeGen: algorithmic
+[2025-12-26T11:24:53.016046] File: test_slide11 | Vision: gemini-3-flash-preview | Inpaint: opencv-ns | CodeGen: algorithmic
+[2025-12-26T11:25:08.044901] File: test_slide7 | Vision: gemini-3-flash-preview | Inpaint: opencv-ns | CodeGen: algorithmic
+[2025-12-26T11:25:23.260617] File: test_slide12 | Vision: gemini-3-flash-preview | Inpaint: opencv-ns | CodeGen: algorithmic
+[2025-12-26T11:25:46.483799] File: test_slide13 | Vision: gemini-3-flash-preview | Inpaint: opencv-ns | CodeGen: algorithmic
+[2025-12-26T11:39:21.891853] File: test_slide1 | Vision: gemini-3-flash-preview | Inpaint: opencv-ns | CodeGen: algorithmic
+[2025-12-26T11:39:22.406229] File: test_slide2 | Vision: gemini-3-flash-preview | Inpaint: opencv-ns | CodeGen: algorithmic
+[2025-12-26T11:40:26.512605] File: test_slide3 | Vision: gemini-3-flash-preview | Inpaint: opencv-ns | CodeGen: algorithmic

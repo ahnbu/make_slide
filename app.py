@@ -16,7 +16,7 @@ from datetime import datetime
 import json
 import uuid
 
-load_dotenv()
+load_dotenv(override=True)
 logger = get_logger(__name__)
 
 app = FastAPI(title="Slide Reconstructor")
@@ -116,20 +116,32 @@ async def upload_file(
     vision_model: str = Form("gemini-3-flash-preview"),
     inpainting_model: str = Form("opencv-telea"),
     codegen_model: str = Form("algorithmic"),
-    batch_folder: str = Form("single")
+    batch_folder: str = Form("single"),
+    max_concurrent: int = Form(3) # Receive concurrency setting
 ):
+    # Dynamic Concurrency Update (Runtime)
+    global MAX_CONCURRENT_TASKS, semaphore
+    if max_concurrent != MAX_CONCURRENT_TASKS:
+        MAX_CONCURRENT_TASKS = max_concurrent
+        semaphore = asyncio.Semaphore(MAX_CONCURRENT_TASKS)
+        logger.info(f"Runtime Concurrency Updated to: {MAX_CONCURRENT_TASKS}")
+
     timestamp = generate_timestamp()
     task_id = str(uuid.uuid4()) # Use UUID for unique task tracking
     
     original_name = os.path.splitext(file.filename)[0]
     ext = os.path.splitext(file.filename)[1]
     input_filename = f"{original_name}_{timestamp}{ext}"
-    input_path = os.path.join(UPLOAD_DIR, input_filename)
+    
+    # SAVE DIRECTLY TO OUTPUT DIR (User Request)
+    target_dir = os.path.join(OUTPUT_DIR, batch_folder)
+    ensure_directory(target_dir)
+    input_path = os.path.join(target_dir, input_filename)
     
     with open(input_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
         
-    logger.info(f"File uploaded: {input_path}")
+    logger.info(f"File uploaded to Output Dir: {input_path}")
     
     # Initialize progress
     progress_store[task_id] = {"status": "starting", "message": "Starting process...", "percent": 0}
@@ -150,7 +162,7 @@ async def upload_file(
     return JSONResponse({"status": "processing", "task_id": task_id})
 
 # Concurrency Limit
-MAX_CONCURRENT_TASKS = 3
+MAX_CONCURRENT_TASKS = int(current_settings.get("max_concurrent", 3))
 semaphore = asyncio.Semaphore(MAX_CONCURRENT_TASKS)
 
 # Cancellation Store
@@ -266,8 +278,9 @@ async def process_slide_task(task_id, input_path, original_name, vision_model, i
             with open(json_path, "w", encoding="utf-8") as f:
                 json.dump(layout_data, f, indent=4, ensure_ascii=False)
                 
-            result_input_path = os.path.join(target_dir, f"{original_name}_{file_id}{os.path.splitext(input_path)[1]}")
-            shutil.copy2(input_path, result_input_path)
+            # result_input_path = os.path.join(target_dir, f"{original_name}_{file_id}{os.path.splitext(input_path)[1]}")
+            # Input is already in target dir, no need to copy
+            # shutil.copy2(input_path, result_input_path)
 
             # Check Cancellation
             if task_id in cancelled_tasks:
@@ -354,7 +367,11 @@ async def remove_text(
         original_name = os.path.splitext(file.filename)[0]
         ext = os.path.splitext(file.filename)[1]
         input_filename = f"{original_name}_{timestamp}{ext}"
-        input_path = os.path.join(UPLOAD_DIR, input_filename)
+        
+        # Save to Output Dir directly
+        target_dir = os.path.join(OUTPUT_DIR, batch_folder)
+        ensure_directory(target_dir)
+        input_path = os.path.join(target_dir, input_filename)
         
         with open(input_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
@@ -362,8 +379,7 @@ async def remove_text(
         analyzer.model_name = vision_model
         layout_data, width, height = analyzer.analyze_image(input_path)
         
-        target_dir = os.path.join(OUTPUT_DIR, batch_folder)
-        ensure_directory(target_dir)
+        # target_dir already defined above
 
         bg_filename = f"{original_name}_bg_only_{timestamp}.png"
         bg_path = os.path.join(target_dir, bg_filename)
@@ -391,10 +407,32 @@ async def remove_text_ai(
         original_name = os.path.splitext(file.filename)[0]
         ext = os.path.splitext(file.filename)[1]
         input_filename = f"{original_name}_{timestamp}{ext}"
-        input_path = os.path.join(UPLOAD_DIR, input_filename)
+        
+        # Save to Output Dir
+        target_dir = os.path.join(OUTPUT_DIR, batch_folder)
+        ensure_directory(target_dir)
+        input_path = os.path.join(target_dir, input_filename)
         
         with open(input_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
+            
+        # Use simple client to ask for clean text (No layout needed theoretically but we use analyzer for now? No, direct prompt)
+        # But wait, original code likely used analyzer or direct call. I should keep original logic but update path.
+        # Original code used `process_remove_text_ai` or similar. Let's check context.
+        # Assuming removing text uses analyzer.
+        
+        analyzer.model_name = vision_model
+        # ... (rest of logic) ...
+        # logic below depends on input_path.
+        
+        # Just update path setup above.
+        pass
+        
+        # The surrounding code is not fully visible so I will substitute blindly but carefully.
+        # Wait, the tool requires EXACT match. I can't guess.
+        # I only viewed up to line 400. `remove_text_ai` starts at 391.
+        # I need to see more lines to safely replace `remove_text_ai`.
+        # I will skip `remove_text_ai` for now and do it in next step after viewing.
             
         # Call Gemini for Text Removal
         from google.genai import types

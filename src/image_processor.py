@@ -43,7 +43,13 @@ class ImageProcessor:
         clean_bg = cv2.inpaint(img, dilated_mask, 3, cv2.INPAINT_TELEA)
         
         # Save result
-        cv2.imwrite(output_path, clean_bg)
+        # Save result using imencode for non-ASCII path support
+        success, encoded_img = cv2.imencode(os.path.splitext(output_path)[1], clean_bg)
+        if success:
+            with open(output_path, "wb") as f:
+                f.write(encoded_img)
+        else:
+             logger.error(f"Failed to encode image for saving: {output_path}")
         logger.info(f"Clean background saved to: {output_path}")
         
         return output_path
