@@ -716,3 +716,220 @@ iframe {
   display: flex;
   align-items: center;
 }
+
+/* PDF to PNG Section */
+.pdf-zone {
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 1. Top Area */
+.pdf-top-area {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 1rem 1rem 0 0;
+}
+
+.pdf-controls-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.file-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.file-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.pdf-drop {
+  border: 2px dashed var(--border-color);
+  background: rgba(30, 41, 59, 0.4);
+  border-radius: 0.5rem;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.pdf-drop:hover {
+  border-color: var(--primary);
+  background: rgba(99, 102, 241, 0.1);
+}
+
+/* 2. Toolbar (Middle) */
+.pdf-toolbar {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-card);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.toolbar-left,
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Custom Checkbox */
+.custom-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.custom-checkbox input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmark {
+  height: 20px;
+  width: 20px;
+  background-color: var(--bg-dark);
+  border: 2px solid var(--border-color);
+  border-radius: 4px;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.custom-checkbox:hover input~.checkmark {
+  border-color: var(--primary);
+}
+
+.custom-checkbox input:checked~.checkmark {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.custom-checkbox .checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.custom-checkbox input:checked~.checkmark:after {
+  display: block;
+}
+
+/* 3. Grid (Bottom) */
+.pdf-results {
+  padding: 1.5rem;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 0 0 1rem 1rem;
+  overflow-y: auto;
+  max-height: 700px;
+}
+
+.pdf-grid {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+@media (max-width: 900px) {
+  .pdf-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .pdf-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.pdf-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  position: relative;
+  transition: transform 0.2s, border-color 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+
+.pdf-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--primary-hover);
+  box-shadow: var(--shadow-md);
+}
+
+.pdf-card.selected {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
+}
+
+.pdf-card-check {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 5;
+}
+
+.pdf-card-check .checkmark {
+  background-color: rgba(0, 0, 0, 0.5);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.pdf-card-check input:checked~.checkmark {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.pdf-card img {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: contain;
+  background-color: #fff;
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+  display: block;
+  /* Eliminate bottom gap */
+}
+
+.pdf-card-footer {
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  background: var(--bg-card);
+}

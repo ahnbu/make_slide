@@ -16,6 +16,10 @@
 
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- PDF.js & JSZip -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
 </head>
 
 <body>
@@ -35,6 +39,7 @@
     <!-- Tabs -->
     <div class="tabs-container">
       <button class="tab-btn active" data-tab="reconstruct">슬라이드 재구성</button>
+      <button class="tab-btn" data-tab="pdf-to-png"><i data-lucide="file-type-2"></i> PDF to PNG</button>
       <!-- <button class="tab-btn" data-tab="remove-text">텍스트 제거 (OpenCV) </button> -->
       <!-- <button class="tab-btn" data-tab="remove-text-ai" style="color: var(--accent);">텍스트 제거 (AI 생성)</button> -->
       <!-- <button class="tab-btn" data-tab="extract-text">텍스트 추출</button> -->
@@ -110,6 +115,65 @@
           <button class="btn-primary" onclick="document.getElementById('fileInput').click()">
             파일 선택 (다중 가능)
           </button>
+        </div>
+      </section>
+
+      <!-- PDF Section (Client Side) -->
+      <section id="pdfSection" class="glass-panel pdf-zone hidden">
+
+        <!-- 1. Top: Info & Upload -->
+        <div id="pdfTopArea" class="pdf-top-area">
+          <!-- Initial Control / Info -->
+          <div id="pdfDropZone" class="upload-content pdf-drop">
+            <div class="icon-cloud"><i data-lucide="file-text" size="48"></i></div>
+            <h2>PDF 파일 업로드</h2>
+            <p>여기에 PDF를 드래그하거나 클릭하세요. (서버 전송 없음)</p>
+            <input type="file" id="pdfInput" accept="application/pdf" hidden>
+          </div>
+          <div class="pdf-controls-header">
+            <div class="control-group">
+              <!-- <label for="pdfQuality"><i data-lucide="image"></i> 변환 화질:</label> -->
+              <div class="setting-group" style="width: 200px;">
+                <label for="pdfQuality"
+                  style="margin-bottom: 0.25rem; font-size: 0.85rem; color: var(--text-secondary);">변환 화질</label>
+                <select id="pdfQuality">
+                  <option value="1.5">화면용 (Standard)</option>
+                  <option value="2.0">고화질 (HD - Slide)</option>
+                  <option value="3.0" selected>인쇄용 (Ultra HD)</option>
+                </select>
+              </div>
+            </div>
+            <div id="pdfFileInfo" class="file-info hidden">
+              <span id="pdfFileName" class="file-name">filename.pdf</span>
+              <span id="pdfPageCount" class="badge">0 pages</span>
+              <button id="btnPdfReset" class="btn-text small">다른 파일 업로드</button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 2. Middle: Toolbar (Hidden initially) -->
+        <div id="pdfToolbar" class="pdf-toolbar hidden">
+          <div class="toolbar-left">
+            <label class="custom-checkbox">
+              <input type="checkbox" id="pdfSelectAll">
+              <span class="checkmark"></span>
+              <span class="label-text">전체 선택</span>
+            </label>
+          </div>
+          <div class="toolbar-right">
+            <button id="btnDownloadSelected" class="btn-secondary small" disabled>
+              <i data-lucide="check-square"></i> 선택 다운로드 (0)
+            </button>
+            <button id="btnDownloadAll" class="btn-primary small">
+              <i data-lucide="archive"></i> 전체 다운로드
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. Bottom: Grid -->
+        <div id="pdfResultContainer" class="pdf-results hidden">
+          <!-- Preview items go here -->
         </div>
       </section>
 

@@ -32,6 +32,29 @@ document.addEventListener('DOMContentLoaded', () => {
   const maxConcurrentSelect = document.getElementById('maxConcurrent');
   const btnSaveDefaults = document.getElementById('btnSaveDefaults');
 
+  // PDF Elements
+  // PDF Elements
+  const pdfSection = document.getElementById('pdfSection');
+  const pdfDropZone = document.getElementById('pdfDropZone');
+  const pdfInput = document.getElementById('pdfInput');
+  const pdfResultContainer = document.getElementById('pdfResultContainer');
+  const pdfQualitySelect = document.getElementById('pdfQuality');
+
+  // PDF New UI Elements
+  const pdfTopArea = document.getElementById('pdfTopArea');
+  const pdfFileInfo = document.getElementById('pdfFileInfo');
+  const pdfFileName = document.getElementById('pdfFileName');
+  const pdfPageCount = document.getElementById('pdfPageCount');
+  const btnPdfReset = document.getElementById('btnPdfReset');
+
+  const pdfToolbar = document.getElementById('pdfToolbar');
+  const pdfSelectAll = document.getElementById('pdfSelectAll');
+  const btnDownloadSelected = document.getElementById('btnDownloadSelected');
+  const btnDownloadAll = document.getElementById('btnDownloadAll');
+
+  // PDF State
+  let currentPdfBlobs = []; // Array of { blob, filename, index }
+
   // Preview Modal Elements (Global references)
   const modal = document.getElementById('previewModal');
   const modalTitle = document.getElementById('modalTitle');
@@ -446,12 +469,244 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // --- Toast Function ---
   function showToast(msg) {
     const toast = document.getElementById('toast');
     toast.textContent = msg;
     toast.classList.remove('hidden');
     setTimeout(() => { toast.classList.add('hidden'); }, 3000);
   }
+
+  // --- PDF to PNG Logic (Client Side) ---
+  pdfDropZone.addEventListener('click', () => pdfInput.click());
+  pdfInput.addEventListener('change', (e) => {
+    if (e.target.files.length) handlePdf(e.target.files[0]);
+  });
+  pdfDropZone.addEventListener('dragover', (e) => { e.preventDefault(); pdfDropZone.classList.add('dragover'); });
+  pdfDropZone.addEventListener('dragleave', () => { pdfDropZone.classList.remove('dragover'); });
+  pdfDropZone.addEventListener('drop', (e) => {
+    e.preventDefault(); pdfDropZone.classList.remove('dragover');
+    if (e.dataTransfer.files.length && e.dataTransfer.files[0].type === 'application/pdf') {
+      handlePdf(e.dataTransfer.files[0]);
+    } else {
+      showToast("PDF 파일만 지원합니다.");
+    }
+  });
+
+  // Reset Button
+  if (btnPdfReset) {
+    btnPdfReset.addEventListener('click', () => {
+      pdfFileInfo.classList.add('hidden');
+      pdfToolbar.classList.add('hidden');
+      pdfResultContainer.classList.add('hidden');
+      pdfResultContainer.innerHTML = '';
+      pdfDropZone.classList.remove('hidden');
+      pdfInput.value = '';
+      currentPdfBlobs = [];
+
+      // Reset Selection State
+      pdfSelectAll.checked = false;
+      updateSelectionState();
+    });
+  }
+
+  // Toolbar Events
+  if (pdfSelectAll) {
+    pdfSelectAll.addEventListener('change', (e) => {
+      const checkboxes = document.querySelectorAll('.pdf-check-input');
+      checkboxes.forEach(cb => {
+        cb.checked = e.target.checked;
+        toggleCardSelect(cb);
+      });
+      updateSelectionState();
+    });
+  }
+
+  if (btnDownloadAll) {
+    btnDownloadAll.addEventListener('click', () => downloadImages(currentPdfBlobs)); // All
+  }
+
+  if (btnDownloadSelected) {
+    btnDownloadSelected.addEventListener('click', () => {
+      const selectedIndices = Array.from(document.querySelectorAll('.pdf-check-input:checked'))
+        .map(cb => parseInt(cb.dataset.index));
+      const selectedBlobs = currentPdfBlobs.filter(item => selectedIndices.includes(item.index));
+      downloadImages(selectedBlobs);
+    });
+  }
+
+  function toggleCardSelect(checkbox) {
+    const card = checkbox.closest('.pdf-card');
+    if (checkbox.checked) card.classList.add('selected');
+    else card.classList.remove('selected');
+  }
+
+  function updateSelectionState() {
+    const total = currentPdfBlobs.length;
+    const checkedCount = document.querySelectorAll('.pdf-check-input:checked').length;
+
+    btnDownloadSelected.innerHTML = `<i data-lucide="check-square"></i> 선택 다운로드 (${checkedCount})`;
+    btnDownloadSelected.disabled = checkedCount === 0;
+
+    // Update Master Checkbox
+    if (total > 0 && checkedCount === total) {
+      pdfSelectAll.checked = true;
+      pdfSelectAll.indeterminate = false;
+    } else if (checkedCount > 0) {
+      pdfSelectAll.checked = false;
+      pdfSelectAll.indeterminate = true;
+    } else {
+      pdfSelectAll.checked = false;
+      pdfSelectAll.indeterminate = false;
+    }
+  }
+
+  async function handlePdf(file) {
+    pdfDropZone.classList.add('hidden');
+    pdfResultContainer.innerHTML = '<div class="loader"></div><p style="text-align:center">PDF 변환 중...</p>';
+    pdfResultContainer.classList.remove('hidden');
+
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+      const scale = parseFloat(pdfQualitySelect.value);
+
+      pdfResultContainer.innerHTML = '';
+      const grid = document.createElement('div');
+      grid.className = 'pdf-grid';
+      pdfResultContainer.appendChild(grid);
+
+      // Reset State
+      currentPdfBlobs = [];
+
+      // Update Top Info
+      pdfFileName.textContent = file.name;
+      pdfPageCount.textContent = `${pdf.numPages} pages`;
+      pdfFileInfo.classList.remove('hidden');
+
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const viewport = page.getViewport({ scale: scale });
+
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+
+        await page.render({ canvasContext: context, viewport: viewport }).promise;
+
+        // To Blob
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        const fileName = `page_${String(i).padStart(3, '0')}.png`;
+
+        // Store state
+        currentPdfBlobs.push({ index: i, blob: blob, filename: fileName });
+
+        // Create Card
+        const imgUrl = URL.createObjectURL(blob);
+        const card = document.createElement('div');
+        card.className = 'pdf-card';
+        card.innerHTML = `
+                <div class="pdf-card-check">
+                     <label class="custom-checkbox">
+                        <input type="checkbox" class="pdf-check-input" data-index="${i}">
+                        <span class="checkmark"></span>
+                     </label>
+                </div>
+                <img src="${imgUrl}" loading="lazy" onclick="this.parentElement.querySelector('input').click()">
+                <div class="pdf-card-footer">
+                     <span>Page ${i}</span>
+                     <button class="btn-text small" onclick="openModal({bg_url:'${imgUrl}'}, '${fileName}')"><i data-lucide="eye" size="14"></i></button>
+                </div>
+              `;
+        grid.appendChild(card);
+
+        // Bind individual change event
+        const checkbox = card.querySelector('input');
+        checkbox.addEventListener('change', (e) => {
+          toggleCardSelect(e.target);
+          updateSelectionState();
+        });
+      }
+
+      // Show Toolbar
+      pdfToolbar.classList.remove('hidden');
+      lucide.createIcons();
+      updateSelectionState(); // Init state
+
+      showToast("PDF 변환 완료!");
+
+    } catch (e) {
+      console.error(e);
+      showToast("PDF 변환 실패.");
+      pdfDropZone.classList.remove('hidden');
+      pdfResultContainer.classList.add('hidden');
+      pdfFileInfo.classList.add('hidden');
+    }
+  }
+
+  async function downloadImages(items) {
+    if (items.length === 0) return;
+
+    if (items.length === 1) {
+      // Single Download
+      const item = items[0];
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(item.blob);
+      link.download = item.filename;
+      link.click();
+    } else {
+      // Zip Download
+      const zip = new JSZip();
+      const folder = zip.folder("images");
+      items.forEach(item => {
+        folder.file(item.filename, item.blob);
+      });
+
+      const content = await zip.generateAsync({ type: "blob" });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(content);
+      link.download = `${pdfFileName.textContent.replace('.pdf', '')}_converted.zip`;
+      link.click();
+    }
+    showToast(`${items.length}개 파일 다운로드 시작`);
+  }
+
+  // Handle Tab Switch for PDF
+  tabButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      // ... (Existing logic managed by tabButtons event listener above, we just need to handle visibility)
+      // Actually the existing listener just sets currentTab. We need to toggle sections.
+      // Let's modify the ORIGINAL listener or add logic here.
+      // Wait, the original listener (line 426) only changes styling and title. 
+      // We need to hide/show sections.
+
+      const target = btn.dataset.tab;
+      if (target === 'pdf-to-png') {
+        uploadZone.classList.add('hidden');
+        batchControlPanel.classList.add('hidden');
+        jobListContainer.classList.add('hidden');
+        pdfSection.classList.remove('hidden');
+        document.getElementById('resultReconstruct').classList.add('hidden'); // Ensure results hidden
+        // Also hide settings? Maybe keep them for consistency or hide if irrelevant.
+        // PDF doesn't use settings.
+        document.querySelector('.settings-container').classList.add('hidden');
+      } else {
+        if (jobQueue.queue.length > 0) {
+          // If jobs exist
+          uploadZone.classList.add('hidden');
+          batchControlPanel.classList.remove('hidden');
+          jobListContainer.classList.remove('hidden');
+        } else {
+          uploadZone.classList.remove('hidden');
+          batchControlPanel.classList.add('hidden');
+          jobListContainer.classList.remove('hidden');
+        }
+        pdfSection.classList.add('hidden');
+        document.querySelector('.settings-container').classList.remove('hidden');
+      }
+    });
+  });
 });
 
 // --- Modal Logic (Global) ---
