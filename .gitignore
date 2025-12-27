@@ -1,7 +1,10 @@
 .env
 docs/colab_success.py
 __pyca# Exclude output directory
-output/
 
 # Exclude uploaded files (temp)
 static/uploads/
+sample_image/
+docs/antigravity-workflow-ppt-main
+output/
+logs/

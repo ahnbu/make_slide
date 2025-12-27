@@ -2,5 +2,5 @@
     "vision_model": "gemini-3-flash-preview",
     "inpainting_model": "opencv-ns",
     "codegen_model": "algorithmic",
-    "max_concurrent": 2
+    "max_concurrent": 5
 }
