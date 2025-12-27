@@ -647,6 +647,46 @@ async def generate_pptx_batch(batch_folder: str):
         return JSONResponse(status_code=500, content={"message": str(e)})
 
 
+@app.post("/save-pdf-images")
+async def save_pdf_images(images: list[UploadFile] = File(...)):
+    """
+    Client sends multiple image files.
+    Server saves them to output/pdftoimage_{yyyymmdd}_{hhmmss}/
+    """
+    try:
+        if not images:
+            return JSONResponse(status_code=400, content={'status': 'error', 'message': 'No files received'})
+
+        # Create timestamped folder
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        folder_name = f"pdftoimage_{timestamp}"
+        save_path = os.path.join("output", folder_name)
+        os.makedirs(save_path, exist_ok=True)
+
+        count = 0
+        for file in images:
+            if file.filename:
+                # Simple sanitization
+                safe_filename = os.path.basename(file.filename)
+                file_path = os.path.join(save_path, safe_filename)
+                
+                # Write file
+                with open(file_path, "wb") as buffer:
+                    shutil.copyfileobj(file.file, buffer)
+                count += 1
+
+        logger.info(f"Saved {count} PDF images to {save_path}")
+        return JSONResponse(content={
+            'status': 'success', 
+            'message': f'Saved {count} images', 
+            'folder': folder_name
+        })
+
+    except Exception as e:
+        logger.error(f"Error saving PDF images: {e}")
+        return JSONResponse(status_code=500, content={'status': 'error', 'message': str(e)})
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("app:app", host="127.0.0.1", port=8000, reload=True)

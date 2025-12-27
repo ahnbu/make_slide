@@ -634,7 +634,10 @@ document.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
       updateSelectionState(); // Init state
 
-      showToast("PDF 변환 완료!");
+      showToast("PDF 변환 완료! 서버에 저장 중...");
+
+      // Auto Upload to Server
+      uploadPdfImages(currentPdfBlobs);
 
     } catch (e) {
       console.error(e);
@@ -645,31 +648,48 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  async function uploadPdfImages(items) {
+    if (!items || items.length === 0) return;
+
+    const formData = new FormData();
+    items.forEach(item => {
+      formData.append('images', item.blob, item.filename);
+    });
+
+    try {
+      const res = await fetch('/save-pdf-images', { method: 'POST', body: formData });
+      const data = await res.json();
+      if (res.ok) {
+        console.log('Server backup success:', data.folder);
+        showToast("서버에 자동 저장되었습니다.");
+      } else {
+        console.error('Server backup failed:', data);
+      }
+    } catch (e) {
+      console.error('Upload error:', e);
+    }
+  }
+
   async function downloadImages(items) {
     if (items.length === 0) return;
 
-    if (items.length === 1) {
-      // Single Download
-      const item = items[0];
+    // Multi-file Download (No Zip)
+    let count = 0;
+    for (const item of items) {
       const link = document.createElement('a');
       link.href = URL.createObjectURL(item.blob);
       link.download = item.filename;
+      link.style.display = 'none';
+      document.body.appendChild(link);
       link.click();
-    } else {
-      // Zip Download
-      const zip = new JSZip();
-      const folder = zip.folder("images");
-      items.forEach(item => {
-        folder.file(item.filename, item.blob);
-      });
+      document.body.removeChild(link);
 
-      const content = await zip.generateAsync({ type: "blob" });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(content);
-      link.download = `${pdfFileName.textContent.replace('.pdf', '')}_converted.zip`;
-      link.click();
+      count++;
+      // Small delay to prevent browser blocking multiple downloads
+      await new Promise(r => setTimeout(r, 300));
     }
-    showToast(`${items.length}개 파일 다운로드 시작`);
+
+    showToast(`${count}개 파일 다운로드 완료`);
   }
 
   // Handle Tab Switch for PDF
