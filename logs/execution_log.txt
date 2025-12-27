@@ -48,3 +48,13 @@
 [2025-12-27T15:33:53.586227] File: slide_1 | Vision: gemini-3-flash-preview | Inpaint: opencv-ns | CodeGen: algorithmic
 [2025-12-27T15:34:01.663696] File: slide_3 | Vision: gemini-3-flash-preview | Inpaint: opencv-ns | CodeGen: algorithmic
 [2025-12-27T15:34:10.536140] File: slide_4 | Vision: gemini-3-flash-preview | Inpaint: opencv-ns | CodeGen: algorithmic
+[2025-12-27T17:33:30.091209] File: slide_8 | Vision: gemini-3-flash-preview | Inpaint: opencv-ns | CodeGen: algorithmic
+[2025-12-27T17:36:54.936424] File: slide_3 | Vision: gemini-3-flash-preview | Inpaint: opencv-ns | CodeGen: algorithmic
+[2025-12-27T17:37:21.631178] File: slide_8 | Vision: gemini-3-flash-preview | Inpaint: opencv-ns | CodeGen: algorithmic
+[2025-12-27T17:37:28.707196] File: slide_4 | Vision: gemini-3-flash-preview | Inpaint: opencv-ns | CodeGen: algorithmic
+[2025-12-27T23:22:45.726298] File: slide_3 | Vision: gemini-3-flash-preview | Inpaint: opencv-ns | CodeGen: algorithmic
+[2025-12-27T23:22:46.628311] File: slide_8 | Vision: gemini-3-flash-preview | Inpaint: opencv-ns | CodeGen: algorithmic
+[2025-12-27T23:22:52.983395] File: slide_4 | Vision: gemini-3-flash-preview | Inpaint: opencv-ns | CodeGen: algorithmic
+[2025-12-27T23:39:38.802810] File: slide_8 | Vision: gemini-3-flash-preview | Inpaint: opencv-telea | CodeGen: algorithmic
+[2025-12-27T23:39:44.057797] File: slide_4 | Vision: gemini-3-flash-preview | Inpaint: opencv-telea | CodeGen: algorithmic
+[2025-12-27T23:39:47.967513] File: slide_3 | Vision: gemini-3-flash-preview | Inpaint: opencv-telea | CodeGen: algorithmic

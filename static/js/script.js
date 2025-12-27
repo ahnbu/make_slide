@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     vision_model: 'gemini-3-flash-preview',
     inpainting_model: 'opencv-telea',
     codegen_model: 'algorithmic',
+    output_format: 'both',
     max_concurrent: 3
   };
 
@@ -27,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const visionModelSelect = document.getElementById('visionModel');
   const inpaintingModelSelect = document.getElementById('inpaintingModel');
   const codegenModelSelect = document.getElementById('codegenModel');
+  const outputFormatSelect = document.getElementById('outputFormat');
   const maxConcurrentSelect = document.getElementById('maxConcurrent');
   const btnSaveDefaults = document.getElementById('btnSaveDefaults');
 
@@ -43,6 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
       this.queue = [];
       this.activeCount = 0;
       this.isPaused = false;
+      this.latestBatchFolder = null;
     }
 
     // Dynamic Getter for Config from AppSettings
@@ -65,6 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const second = String(now.getSeconds()).padStart(2, '0');
       const timeStr = `${year}${month}${day}_${hour}${minute}${second}`;
       const batchFolder = files.length > 1 ? `multi_${timeStr}` : 'single';
+      this.latestBatchFolder = batchFolder;
 
       Array.from(files).forEach(file => {
         if (!file.type.startsWith('image/')) return;
@@ -192,10 +196,18 @@ document.addEventListener('DOMContentLoaded', () => {
       if (actionsDiv) {
         actionsDiv.innerHTML = '';
         const originalUrl = URL.createObjectURL(job.file);
-        actionsDiv.innerHTML += `<button class="btn-secondary small" onclick="openModal({bg_url: '${originalUrl}'}, '${job.file.name} (원본)')"><i data-lucide="image" size="14"></i> 원본</button>`;
+        // Prepare safe data object for onclick
+        const safeData = { html_url: data.html_url, bg_url: data.bg_url, pptx_url: data.pptx_url };
+        const dataStr = JSON.stringify(safeData).replace(/"/g, "&quot;");
+
+        actionsDiv.innerHTML += `<button class="btn-secondary small" onclick="openModal(${dataStr}, '${job.file.name} (원본)', '${originalUrl}')"><i data-lucide="image" size="14"></i> 원본</button>`;
+
         if (data.html_url) {
           actionsDiv.innerHTML += `<a href="${data.html_url}" class="btn-secondary small" target="_blank"><i data-lucide="eye" size="14"></i> 보기</a>`;
           actionsDiv.innerHTML += `<a href="${data.html_url}" class="btn-secondary small" download><i data-lucide="download" size="14"></i> DL</a>`;
+        }
+        if (data.pptx_url) {
+          actionsDiv.innerHTML += `<a href="${data.pptx_url}" class="btn-secondary small" download><i data-lucide="file-text" size="14"></i> PPTX</a>`;
         }
         if (data.bg_url) {
           actionsDiv.innerHTML += `<a href="${data.bg_url}" class="btn-secondary small" download><i data-lucide="image" size="14"></i> 배경</a>`;
@@ -264,6 +276,51 @@ document.addEventListener('DOMContentLoaded', () => {
       const percent = total === 0 ? 0 : (completed / total) * 100;
       batchStatusText.textContent = `완료: ${completed} / ${total}`;
       batchProgressBar.style.width = `${percent}%`;
+
+      // Show PPTX Download Button if we have completed items
+      const btnPPTX = document.getElementById('btnDownloadBatchPPTX');
+      if (completed > 0 && this.latestBatchFolder) {
+        btnPPTX.classList.remove('hidden');
+      } else {
+        btnPPTX.classList.add('hidden');
+      }
+    }
+
+    async downloadBatchPPTX() {
+      if (!this.latestBatchFolder) {
+        showToast('다운로드할 배치가 없습니다.');
+        return;
+      }
+
+      const btn = document.getElementById('btnDownloadBatchPPTX');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = `<i data-lucide="loader-2" class="animate-spin"></i> 생성 중...`;
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`/generate-pptx-batch/${this.latestBatchFolder}`, { method: 'POST' });
+        const data = await res.json();
+
+        if (res.ok && data.status === 'success') {
+          // Trigger Download
+          const link = document.createElement('a');
+          link.href = data.download_url;
+          link.download = data.filename;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          showToast('PPTX 다운로드가 시작되었습니다.');
+        } else {
+          showToast(`오류: ${data.message || 'PPTX 생성 실패'}`);
+        }
+      } catch (e) {
+        console.error(e);
+        showToast('PPTX 요청 중 오류가 발생했습니다.');
+      } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        lucide.createIcons(); // restore icon
+      }
     }
 
     pause() {
@@ -310,12 +367,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (settings.vision_model) AppSettings.vision_model = settings.vision_model;
         if (settings.inpainting_model) AppSettings.inpainting_model = settings.inpainting_model;
         if (settings.codegen_model) AppSettings.codegen_model = settings.codegen_model;
+        if (settings.output_format) AppSettings.output_format = settings.output_format;
         if (settings.max_concurrent) AppSettings.max_concurrent = parseInt(settings.max_concurrent);
 
         // Sync UI
         visionModelSelect.value = AppSettings.vision_model;
         inpaintingModelSelect.value = AppSettings.inpainting_model;
         codegenModelSelect.value = AppSettings.codegen_model;
+        if (outputFormatSelect) outputFormatSelect.value = AppSettings.output_format;
         maxConcurrentSelect.value = AppSettings.max_concurrent;
       }
     } catch (e) {
@@ -329,6 +388,7 @@ document.addEventListener('DOMContentLoaded', () => {
       vision_model: AppSettings.vision_model,
       inpainting_model: AppSettings.inpainting_model,
       codegen_model: AppSettings.codegen_model,
+      output_format: AppSettings.output_format,
       max_concurrent: AppSettings.max_concurrent
     };
 
@@ -347,6 +407,7 @@ document.addEventListener('DOMContentLoaded', () => {
   visionModelSelect.addEventListener('change', (e) => { AppSettings.vision_model = e.target.value; });
   inpaintingModelSelect.addEventListener('change', (e) => { AppSettings.inpainting_model = e.target.value; });
   codegenModelSelect.addEventListener('change', (e) => { AppSettings.codegen_model = e.target.value; });
+  if (outputFormatSelect) outputFormatSelect.addEventListener('change', (e) => { AppSettings.output_format = e.target.value; });
 
   maxConcurrentSelect.addEventListener('change', (e) => {
     AppSettings.max_concurrent = parseInt(e.target.value);
@@ -394,25 +455,54 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // --- Modal Logic (Global) ---
-function openModal(data, title) {
+function openModal(data, title, previewOverrideUrl = null) {
   const modal = document.getElementById('previewModal');
   const modalTitle = document.getElementById('modalTitle');
   const container = document.getElementById('modalPreviewContainer');
-  const btnDlHtml = document.getElementById('btnDownloadHtml');
-  const btnDlBg = document.getElementById('btnDownloadBg');
+  // Updated selectors for Bug Fix
+  const btnDlHtml = document.getElementById('modalBtnDownloadHtml');
+  const btnDlBg = document.getElementById('modalBtnDownloadBg');
+  const btnDlPptx = document.getElementById('modalBtnDownloadPptx');
 
   modalTitle.textContent = title || "Slide Preview";
   container.innerHTML = '';
 
+  // Setup Download Links (Always use data)
   if (data.html_url) {
-    container.innerHTML = `<iframe src="${data.html_url}" style="width:100%; height:100%; border:none;"></iframe>`;
-    btnDlHtml.href = data.html_url; btnDlHtml.classList.remove('hidden');
-  } else btnDlHtml.classList.add('hidden');
+    btnDlHtml.href = data.html_url;
+    btnDlHtml.classList.remove('hidden');
+  } else {
+    btnDlHtml.classList.add('hidden');
+  }
+
+  // PPTX Setup
+  if (data.pptx_url && btnDlPptx) {
+    btnDlPptx.href = data.pptx_url;
+    btnDlPptx.classList.remove('hidden');
+  } else if (btnDlPptx) {
+    btnDlPptx.classList.add('hidden');
+  }
 
   if (data.bg_url) {
-    if (!data.html_url) container.innerHTML = `<img src="${data.bg_url}" style="width:100%; height:100%; object-fit:contain;">`;
-    btnDlBg.href = data.bg_url; btnDlBg.setAttribute('download', 'image.png'); btnDlBg.classList.remove('hidden');
-  } else btnDlBg.classList.add('hidden');
+    btnDlBg.href = data.bg_url;
+    btnDlBg.setAttribute('download', 'image.png');
+    btnDlBg.classList.remove('hidden');
+  } else {
+    btnDlBg.classList.add('hidden'); // Fix: hide if no bg_url
+  }
+
+  // Setup Display Content
+  if (previewOverrideUrl) {
+    // Show Override (e.g., Original Image)
+    container.innerHTML = `<img src="${previewOverrideUrl}" style="width:100%; height:100%; object-fit:contain;">`;
+  } else {
+    // Default Logic
+    if (data.html_url) {
+      container.innerHTML = `<iframe src="${data.html_url}" style="width:100%; height:100%; border:none;"></iframe>`;
+    } else if (data.bg_url) {
+      container.innerHTML = `<img src="${data.bg_url}" style="width:100%; height:100%; object-fit:contain;">`;
+    }
+  }
 
   modal.classList.remove('hidden');
   document.body.style.overflow = 'hidden';

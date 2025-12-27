@@ -57,10 +57,11 @@ class CodeGenerator:
 
         return layout_data
 
-    def generate_html(self, layout_data, width, height, bg_image_path, output_path):
+    def generate_html(self, layout_data, width, height, bg_image_path, output_path, normalize=True):
         logger.info(f"Generating HTML (with embedded BG): {output_path}")
         
-        layout_data = self.normalize_font_sizes(layout_data, width)
+        if normalize:
+            layout_data = self.normalize_font_sizes(layout_data, width)
         
         # Read and encode background image
         import base64

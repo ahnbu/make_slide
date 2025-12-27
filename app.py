@@ -11,6 +11,7 @@ import asyncio
 from src.analyzer import Analyzer
 from src.image_processor import ImageProcessor
 from src.code_generator import CodeGenerator
+from src.pptx_generator import PPTXGenerator
 from src.utils import generate_timestamp, ensure_directory, get_logger
 from datetime import datetime
 import json
@@ -42,7 +43,8 @@ templates = Jinja2Templates(directory=TEMPLATES_DIR)
 DEFAULT_SETTINGS = {
     "vision_model": "gemini-3-flash-preview",
     "inpainting_model": "opencv-telea",
-    "codegen_model": "algorithmic"
+    "codegen_model": "algorithmic",
+    "output_format": "both"
 }
 
 SETTINGS_FILE = os.path.join(BASE_DIR, "settings.json")
@@ -70,6 +72,7 @@ current_settings = load_settings()
 analyzer = Analyzer(model_name=current_settings["vision_model"])
 image_processor = ImageProcessor()
 code_generator = CodeGenerator()
+pptx_generator = PPTXGenerator()
 
 @app.get("/settings")
 async def get_settings():
@@ -272,6 +275,10 @@ async def process_slide_task(task_id, input_path, original_name, vision_model, i
             # 1.3 Pixel Conversion
             layout_data = analyzer.convert_to_pixels(layout_data, width, height)
             
+            # --- Pre-Normalize Layout (New Step) ---
+            # Ensure HTML and PPTX usage consistent font sizes
+            layout_data = code_generator.normalize_font_sizes(layout_data, width)
+            
             # Save things
             json_filename = f"{original_name}_layout_{file_id}.json"
             json_path = os.path.join(target_dir, json_filename)
@@ -318,10 +325,52 @@ async def process_slide_task(task_id, input_path, original_name, vision_model, i
             
             # Run blocking HTML generation in thread pool
             # Now passing bg_path (absolute) instead of relative filename
-            await asyncio.to_thread(code_generator.generate_html, layout_data, width, height, bg_path, html_path)
+            # normalize=False because we already did it
+            await asyncio.to_thread(code_generator.generate_html, layout_data, width, height, bg_path, html_path, normalize=False)
             
             # Log execution
             log_execution(original_name, current_vision_model, inpainting_model, codegen_model)
+
+            # --- PPTX Generation (New Step) ---
+            # Check settings for output format
+            # We can reload settings or use what was passed? 
+            # ideally we should have passed it, but for now let's load or assume "both" if not present
+            # But wait, app.py has `current_settings` global? No, it loads at top.
+            # Best is to reload settings here or pass it. 
+            # Let's read from the settings file to be sure (since user might have changed it)
+            # Or better, read from global since we update it.
+            # actually `process_slide_task` is async background.
+            
+            # Let's read the latest settings safely
+            current_settings_local = load_settings() 
+            output_fmt = current_settings_local.get("output_format", "both")
+            
+            pptx_url = None
+            if output_fmt in ["pptx", "both"]:
+                try:
+                    progress_store[task_id]["message"] = "[추가 작업] PPTX 생성 중..."
+                    
+                    pptx_filename = f"{original_name}_slide_{file_id}.pptx"
+                    pptx_path = os.path.join(target_dir, pptx_filename)
+                    
+                    # Need original width/height. We have them from Step 1.
+                    # layout_data, width, height
+                    
+                    pptx_gen_single = PPTXGenerator()
+                    # We need to recreate the generator or use a method that adds one slide and saves.
+                    # Current PPTXGenerator is designed for multi-slide if we call add_slide multiple times.
+                    # Here we just want one slide.
+                    
+                    pptx_gen_single.add_slide(layout_data, bg_path, width, height)
+                    pptx_gen_single.save(pptx_path)
+                    
+                    pptx_url = f"/output/{batch_folder}/{pptx_filename}"
+                    logger.info(f"PPTX generated: {pptx_path}")
+                    
+                except Exception as e:
+                    logger.error(f"Failed to generate single PPTX: {e}")
+                    # Don't fail the whole task for this optional step
+
 
             # Complete
             progress_store[task_id] = {
@@ -331,7 +380,8 @@ async def process_slide_task(task_id, input_path, original_name, vision_model, i
                 "data": {
                     "html_url": f"/output/{batch_folder}/{html_filename}",
                     "bg_url": f"/output/{batch_folder}/{bg_filename}",
-                    "preview_url": f"/output/{batch_folder}/{html_filename}" 
+                    "preview_url": f"/output/{batch_folder}/{html_filename}",
+                    "pptx_url": pptx_url
                 }
             }
 
@@ -503,6 +553,99 @@ async def remove_text_ai(
     except Exception as e:
         logger.error(f"Remove Text AI Error: {e}")
         return JSONResponse(status_code=500, content={"message": str(e)})
+
+@app.post("/generate-pptx-batch/{batch_folder}")
+async def generate_pptx_batch(batch_folder: str):
+    try:
+        target_dir = os.path.join(OUTPUT_DIR, batch_folder)
+        if not os.path.exists(target_dir):
+            return JSONResponse(status_code=404, content={"message": "Batch folder not found"})
+
+        # Find all JSON layout files
+        json_files = [f for f in os.listdir(target_dir) if f.endswith(".json") and "_layout_" in f]
+        if not json_files:
+            return JSONResponse(status_code=400, content={"message": "No processed slides found in this batch"})
+
+        # Sort files to ensure order (optional, by timestamp usually)
+        json_files.sort()
+
+        # Create PPTX
+        pptx_gen = PPTXGenerator() 
+        
+        slides_added = 0
+        for json_file in json_files:
+            # Parse IDs to find matching BG
+            # Format: {original}_{timestamp}_layout_{id}.json
+            # We need to load JSON to be sure about the image size or deduce it.
+            # actually app.py saved metadata: layout_data = ...
+            # and logic: bg_filename = f"{original_name}_bg_{file_id}.png"
+            
+            # Helper to find matching bg file
+            json_path = os.path.join(target_dir, json_file)
+            
+            try:
+                with open(json_path, "r", encoding="utf-8") as f:
+                    layout_data = json.load(f)
+            except Exception as e:
+                logger.warning(f"Skipping bad JSON {json_file}: {e}")
+                continue
+
+            # Need width/height.
+            # In process_slide_task, we saved the JSON. Currently JSON doesn't strictly have width/height in root.
+            # But convert_to_pixels put 'bbox_px' which is absolute.
+            # Refine_layout returns list of items.
+            # Missing: Original Image Dimensions.
+            # Workaround: Open the BG image to get dimensions.
+            
+            # Infer BG Filename
+            # Naming convention: {original_name}_layout_{file_id}.json
+            # BG convention:     {original_name}_bg_{file_id}.png
+            base_part = json_file.replace("_layout_", "_bg_").replace(".json", ".png")
+            bg_path = os.path.join(target_dir, base_part)
+            
+            if not os.path.exists(bg_path):
+                # Try fallback or loose search?
+                # Let's try to match by file_id if strict replacement fails
+                parts = json_file.split('_layout_')
+                if len(parts) == 2:
+                    prefix = parts[0]
+                    suffix = parts[1].replace('.json', '.png')
+                    bg_path_candidate = os.path.join(target_dir, f"{prefix}_bg_{suffix}")
+                    if os.path.exists(bg_path_candidate):
+                        bg_path = bg_path_candidate
+                    else:
+                        logger.warning(f"BG image not found for {json_file}")
+                        continue
+                else:
+                    continue
+            
+            # Get dimensions from BG image
+            from PIL import Image
+            with Image.open(bg_path) as img:
+                w, h = img.size
+            
+            pptx_gen.add_slide(layout_data, bg_path, w, h)
+            slides_added += 1
+
+        if slides_added == 0:
+             return JSONResponse(status_code=400, content={"message": "Could not create any slides (missing backgrounds?)"})
+
+        timestamp = generate_timestamp()
+        pptx_filename = f"batch_presentation_{batch_folder}_{timestamp}.pptx"
+        output_pptx_path = os.path.join(target_dir, pptx_filename)
+        
+        pptx_gen.save(output_pptx_path)
+        
+        return JSONResponse({
+            "status": "success",
+            "download_url": f"/output/{batch_folder}/{pptx_filename}",
+            "filename": pptx_filename
+        })
+
+    except Exception as e:
+        logger.error(f"Generate PPTX Batch Error: {e}")
+        return JSONResponse(status_code=500, content={"message": str(e)})
+
 
 if __name__ == "__main__":
     import uvicorn
