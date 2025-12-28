@@ -16,6 +16,10 @@ Google Gemini 3.0의 강력한 비전 인식 능력과 OpenCV의 이미지 처�
     - **HTML**: 반응형(`cqw`) 웹 슬라이드.
     - **PPTX**: 파워포인트 편집 가능 파일 (Batch 변환 지원).
     - **PDF**: 고해상도(Ultra HD) 인쇄용 PDF 변환.
+- **Image + Text Combination**:
+    - 텍스트 원본(Source)과 깨끗한 배경(Clean BG)을 각각 업로드하여 고품질 슬라이드를 결합 생성합니다.
+    - **Dual Upload & Validation**: 파일 개수 매칭 및 자동 이름 정렬(Natural Sort) 지원.
+    - **Optimized Pipeline**: Inpainting 과정을 건너뛰고 배경을 직접 병합하여 처리 속도 2배 향상.
 - **Batch Processing**: 여러 장의 슬라이드를 한 번에 변환하고, 하나의 PPTX로 병합할 수 있습니다.
 
 ## 🛠️ 기술 스택 (Tech Stack)

@@ -222,6 +222,128 @@ async def cancel_task(task_id: str):
         progress_store[task_id]["message"] = "작업이 취소되었습니다."
     return JSONResponse({"status": "cancelled"})
 
+    return JSONResponse({"status": "cancelled"})
+
+async def process_combine_task(task_id, source_path, bg_path, original_name, vision_model, codegen_model, batch_folder, font_family="Malgun Gothic", refine_layout=False, exclude_text=None):
+    async with semaphore:
+        if task_id in cancelled_tasks:
+            cancelled_tasks.discard(task_id)
+            return
+
+        logger.info(f"Starting process_combine_task for {task_id} (Refine: {refine_layout})")
+        target_dir = os.path.join(OUTPUT_DIR, batch_folder)
+        ensure_directory(target_dir)
+
+        try:
+             await wait_if_paused(task_id)
+             if task_id in cancelled_tasks: return
+             
+             # 1. Analyze Source
+             # Update model
+             analyzer.model_name = vision_model
+             
+             file_id = generate_timestamp()
+             
+             progress_store[task_id] = {"status": "processing", "message": "[1단계] 원본 텍스트 분석 중...", "percent": 20}
+             
+             # 1.1 Initial Detection
+             layout_data, width, height = await asyncio.to_thread(analyzer.detect_initial_layout, source_path)
+             
+             # 1.2 Refinement (Optional)
+             if refine_layout:
+                 progress_store[task_id] = {"status": "processing", "message": "[1.5단계] 정밀 분석 (Refinement) 수행 중...", "percent": 40}
+                 layout_data = await asyncio.to_thread(analyzer.refine_layout, source_path, layout_data)
+             
+             # 1.3 Pixel Convert
+             layout_data = analyzer.convert_to_pixels(layout_data, width, height)
+             
+             # 1.4 Normalize
+             layout_data = code_generator.normalize_font_sizes(layout_data, width)
+             
+             # 1.5 Text Exclusion (Fix for Watermark)
+             # Use provided exclude_text or default
+             if not exclude_text:
+                 exclude_text = "NotebookLM, 워터마크" # Default as per user request
+             
+             full_layout_data = layout_data
+             filtered_layout_data = analyzer.apply_text_exclusion(layout_data, exclude_text)
+             
+             # Save JSON
+             json_filename = f"{original_name}_layout_{file_id}.json"
+             # Also save as filtered for PPTX batch compatibility logic
+             json_filename_filtered = f"{original_name}_layout_{file_id}_filtered.json"
+             
+             json_path = os.path.join(target_dir, json_filename)
+             with open(json_path, "w", encoding="utf-8") as f:
+                 json.dump(full_layout_data, f, indent=4, ensure_ascii=False)
+                 
+             json_path_filtered = os.path.join(target_dir, json_filename_filtered)
+             with open(json_path_filtered, "w", encoding="utf-8") as f:
+                 json.dump(filtered_layout_data, f, indent=4, ensure_ascii=False)
+
+             await wait_if_paused(task_id) 
+             if task_id in cancelled_tasks: return
+
+             # Step 2: Skip Inpainting, Use Provided BG
+             # Fix for PPTX Size: Resize Provided BG to Match Source Dimensions
+             # User reported text size issues in batch. Batch uses BG image size. 
+             # If BG size != Source Size, Layout (based on Source) is mismatched.
+             # We must resize BG to Source (width, height).
+             
+             final_bg_filename = f"{original_name}_bg_{file_id}.png"
+             final_bg_path = os.path.join(target_dir, final_bg_filename)
+             
+             # Resize logic using PIL in thread
+             def resize_bg(src_bg, target_w, target_h, dest_path):
+                 from PIL import Image
+                 with Image.open(src_bg) as img:
+                     msg_log = f"Resizing BG from {img.size} to ({target_w}, {target_h})"
+                     img_resized = img.resize((target_w, target_h), Image.Resampling.LANCZOS)
+                     img_resized.save(dest_path)
+                     return msg_log
+
+             msg = await asyncio.to_thread(resize_bg, bg_path, width, height, final_bg_path)
+             logger.info(msg)
+             
+             # Step 3: Generate HTML
+             progress_store[task_id] = {"status": "processing", "message": "[2단계] HTML 생성 중...", "percent": 60}
+             html_filename = f"{original_name}_slide_{file_id}.html"
+             html_path = os.path.join(target_dir, html_filename)
+             
+             await asyncio.to_thread(code_generator.generate_html, filtered_layout_data, width, height, final_bg_path, html_path, normalize=False, font_family=font_family)
+
+             # Step 4: Generate PPTX
+             progress_store[task_id] = {"status": "processing", "message": "[3단계] PPTX 생성 중...", "percent": 80}
+             
+             # Check settings
+             current_settings_local = load_settings() 
+             output_fmt = current_settings_local.get("output_format", "both")
+             
+             pptx_url = None
+             if output_fmt in ["pptx", "both"]:
+                  pptx_filename = f"{original_name}_slide_{file_id}.pptx"
+                  pptx_path = os.path.join(target_dir, pptx_filename)
+                  pptx_gen_single = PPTXGenerator()
+                  pptx_gen_single.add_slide(filtered_layout_data, final_bg_path, width, height, font_family=font_family)
+                  pptx_gen_single.save(pptx_path)
+                  pptx_url = f"/output/{batch_folder}/{pptx_filename}"
+
+             # Complete
+             progress_store[task_id] = {
+                "status": "complete", 
+                "message": "[완료] 조합 작업이 끝났습니다.", 
+                "percent": 100,
+                "data": {
+                    "html_url": f"/output/{batch_folder}/{html_filename}",
+                    "bg_url": f"/output/{batch_folder}/{final_bg_filename}",
+                    "pptx_url": pptx_url
+                }
+            }
+             
+        except Exception as e:
+            logger.error(f"Combine Task Error: {e}")
+            progress_store[task_id] = {"status": "error", "message": str(e), "percent": 0}
+
 async def process_slide_task(task_id, input_path, original_name, vision_model, inpainting_model, codegen_model, batch_folder, exclude_text=None, font_family="Malgun Gothic"):
     async with semaphore:
         if task_id in cancelled_tasks:
@@ -731,6 +853,66 @@ async def save_pdf_images(images: list[UploadFile] = File(...)):
     except Exception as e:
         logger.error(f"Error saving PDF images: {e}")
         return JSONResponse(status_code=500, content={'status': 'error', 'message': str(e)})
+
+@app.post("/combine-upload")
+async def combine_upload(
+    background_tasks: BackgroundTasks,
+    source_file: UploadFile = File(...),
+    background_file: UploadFile = File(...),
+    vision_model: str = Form("gemini-3-flash-preview"),
+    codegen_model: str = Form("algorithmic"),
+    batch_folder: str = Form("combine_single"), # Receive batch folder
+    max_concurrent: int = Form(3),
+    font_family: str = Form("Malgun Gothic"),
+    refine_layout: str = Form("false"), # Receives string 'true'/'false'
+    exclude_text: str = Form(None)
+):
+    global MAX_CONCURRENT_TASKS, semaphore
+    if max_concurrent != MAX_CONCURRENT_TASKS:
+        MAX_CONCURRENT_TASKS = max_concurrent
+        semaphore = asyncio.Semaphore(MAX_CONCURRENT_TASKS)
+        
+    timestamp = generate_timestamp()
+    task_id = str(uuid.uuid4())
+    
+    original_name = os.path.splitext(source_file.filename)[0]
+    
+    # Target Directory
+    target_dir = os.path.join(OUTPUT_DIR, batch_folder)
+    ensure_directory(target_dir)
+    
+    # Save Source
+    source_ext = os.path.splitext(source_file.filename)[1]
+    source_filename = f"{original_name}_source_{timestamp}{source_ext}"
+    source_path = os.path.join(target_dir, source_filename)
+    with open(source_path, "wb") as buffer:
+        shutil.copyfileobj(source_file.file, buffer)
+        
+    # Save Background
+    bg_ext = os.path.splitext(background_file.filename)[1]
+    bg_filename = f"{original_name}_bg_clean_{timestamp}{bg_ext}"
+    bg_path = os.path.join(target_dir, bg_filename)
+    with open(bg_path, "wb") as buffer:
+        shutil.copyfileobj(background_file.file, buffer)
+        
+    # Init Progress
+    progress_store[task_id] = {"status": "starting", "message": "조합 작업 대기 중...", "percent": 0}
+    
+    background_tasks.add_task(
+        process_combine_task,
+        task_id,
+        source_path,
+        bg_path,
+        original_name,
+        vision_model,
+        codegen_model,
+        batch_folder,
+        font_family,
+        refine_layout.lower() == 'true',
+        exclude_text
+    )
+    
+    return JSONResponse({"status": "processing", "task_id": task_id})
 
 
 if __name__ == "__main__":

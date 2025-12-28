@@ -47,6 +47,17 @@
 ### D. AI 텍스트 제거 (Bonus Feature)
 - **Multimodal GenAI**: OpenCV 방식(알고리즘)보다 더 복잡한 배경의 텍스트 제거 시 Gemini 활용.
 - **Endpoint**: `/remove-text-ai`
+- **Multimodal GenAI**: OpenCV 방식(알고리즘)보다 더 복잡한 배경의 텍스트 제거 시 Gemini 활용.
+
+### E. 이미지 + 텍스트 조합 (Combine Mode)
+- **Concept**: 사용자가 '텍스트 원본'과 '텍스트가 없는 배경'을 쌍(Pair)으로 제공. Inpainting 단계를 생략하여 고속 처리.
+- **Validation**:
+    - **Count Check**: 원본 vs 배경 파일 개수 불일치 시 차단.
+    - **Matching**: 단순 순서 매칭의 위험을 줄이기 위해 `Natural Sort`(숫자 정렬) 도입. UI에서 썸네일로 확인 유도.
+- **Processing**:
+    - `src/analyzer.py`: 원본 이미지로 텍스트/레이아웃 분석 (Text Exclusion 적용).
+    - **Image Resize**: 배경 이미지의 해상도가 원본과 다를 경우, PPTX 생성 시 좌표 오차를 막기 위해 **배경을 원본 크기로 리사이징 (`process_combine_task` 내)**.
+    - **Watermark Removal**: "NotebookLM" 등의 워터마크 텍스트를 분석 단계에서 필터링.
 
 ---
 

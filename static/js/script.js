@@ -9,7 +9,9 @@ document.addEventListener('DOMContentLoaded', () => {
     output_format: 'both',
     exclude_text: '',
     max_concurrent: 3,
-    font_family: 'Malgun Gothic'
+    max_concurrent: 3,
+    font_family: 'Malgun Gothic',
+    refine_layout: false
   };
 
   // --- Elements ---
@@ -35,6 +37,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const fontFamilySelect = document.getElementById('fontFamily');
   const maxConcurrentSelect = document.getElementById('maxConcurrent');
   const btnSaveDefaults = document.getElementById('btnSaveDefaults');
+  const refineLayoutSelect = document.getElementById('refineLayout');
+
+  // Combine Mode Elements
+  const combineSection = document.getElementById('combineSection');
+  const combineSourceInput = document.getElementById('combineSourceInput');
+  const combineBgInput = document.getElementById('combineBgInput');
+  const combineSourceList = document.getElementById('combineSourceList');
+  const combineBgList = document.getElementById('combineBgList');
+  const btnCombineStart = document.getElementById('btnCombineStart');
+
+  let combineSourceFiles = [];
+  let combineBgFiles = [];
 
   // PDF Elements
   // PDF Elements
@@ -173,9 +187,17 @@ document.addEventListener('DOMContentLoaded', () => {
       formData.append('font_family', AppSettings.font_family);
       // Pass Concurrency Setting to Backend
       formData.append('max_concurrent', AppSettings.max_concurrent);
+      // New: Refine Layout Setting
+      formData.append('refine_layout', AppSettings.refine_layout);
 
       let endpoint = '/upload';
-      if (currentTab === 'reconstruct') {
+      if (job.type === 'combine') {
+        endpoint = '/combine-upload';
+        formData.append('source_file', job.sourceFile);
+        formData.append('background_file', job.bgFile);
+        // Remove default 'file' as we sent specific ones
+        formData.delete('file');
+      } else if (currentTab === 'reconstruct') {
         endpoint = '/upload';
         formData.append('inpainting_model', AppSettings.inpainting_model);
         formData.append('codegen_model', AppSettings.codegen_model);
@@ -193,7 +215,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!response.ok) throw new Error('서버 오류');
         const data = await response.json();
 
-        if ((currentTab === 'reconstruct' || currentTab === 'pdf-to-pptx') && data.status === 'processing') {
+        // Check for processing status to start polling (Generic check)
+        if (data.status === 'processing') {
           await this.monitorProgress(job, data.task_id);
         } else {
           this.completeJob(job, data.data);
@@ -225,12 +248,20 @@ document.addEventListener('DOMContentLoaded', () => {
       const actionsDiv = job.element.querySelector('.job-actions');
       if (actionsDiv) {
         actionsDiv.innerHTML = '';
-        const originalUrl = URL.createObjectURL(job.file);
+
+        // Handle file reference for Preview/Original button
+        const fileRef = job.file || job.sourceFile;
+        const fileName = fileRef ? fileRef.name : 'unknown';
+        let originalUrl = '';
+        try {
+          if (fileRef) originalUrl = URL.createObjectURL(fileRef);
+        } catch (e) { console.warn("URL creation failed", e); }
+
         // Prepare safe data object for onclick
         const safeData = { html_url: data.html_url, bg_url: data.bg_url, pptx_url: data.pptx_url };
         const dataStr = JSON.stringify(safeData).replace(/"/g, "&quot;");
 
-        actionsDiv.innerHTML += `<button class="btn-secondary small" onclick="openModal(${dataStr}, '${job.file.name} (원본)', '${originalUrl}')"><i data-lucide="image" size="14"></i> 원본</button>`;
+        actionsDiv.innerHTML += `<button class="btn-secondary small" onclick="openModal(${dataStr}, '${fileName} (원본)', '${originalUrl}')"><i data-lucide="image" size="14"></i> 원본</button>`;
 
         if (data.html_url) {
           actionsDiv.innerHTML += `<a href="${data.html_url}" class="btn-secondary small" target="_blank"><i data-lucide="eye" size="14"></i> 보기</a>`;
@@ -258,7 +289,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (previewContent) {
           previewContainer.innerHTML = previewContent;
-          previewContainer.onclick = () => openModal(data, job.file.name);
+          const fileRef = job.file || job.sourceFile;
+          const fileName = fileRef ? fileRef.name : 'Preview';
+          previewContainer.onclick = () => openModal(data, fileName);
         }
       }
     }
@@ -465,10 +498,274 @@ document.addEventListener('DOMContentLoaded', () => {
     jobQueue.processQueue(); // Retry queue with new limit immediately
   });
 
+  if (refineLayoutSelect) refineLayoutSelect.addEventListener('change', (e) => { AppSettings.refine_layout = e.target.value === 'true'; });
+
   if (btnSaveDefaults) btnSaveDefaults.addEventListener('click', saveSettings);
 
   // --- Initial Load ---
   loadSettings();
+
+  // --- Combine Logic ---
+  if (combineSourceInput) {
+    combineSourceInput.addEventListener('change', (e) => {
+      combineSourceFiles = Array.from(e.target.files).sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }));
+      updateCombineUI();
+    });
+  }
+  if (combineBgInput) {
+    combineBgInput.addEventListener('change', (e) => {
+      combineBgFiles = Array.from(e.target.files).sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }));
+      updateCombineUI();
+    });
+  }
+
+  // Drag & Drop for Combine
+  const setupCombineDragDrop = (boxId, updateFn) => {
+    const box = document.getElementById(boxId);
+    if (!box) return;
+    box.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      box.style.borderColor = 'var(--accent)';
+      box.style.background = 'rgba(255,255,255,0.08)';
+    });
+    box.addEventListener('dragleave', () => {
+      box.style.borderColor = 'var(--border)';
+      box.style.background = 'rgba(255,255,255,0.03)';
+    });
+    box.addEventListener('drop', (e) => {
+      e.preventDefault();
+      box.style.borderColor = 'var(--border)';
+      box.style.background = 'rgba(255,255,255,0.03)';
+      if (e.dataTransfer.files.length) {
+        updateFn(Array.from(e.dataTransfer.files));
+        updateCombineUI();
+      }
+    });
+  };
+
+  setupCombineDragDrop('combineSourceBox', (files) => { combineSourceFiles = files.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })); });
+  setupCombineDragDrop('combineBgBox', (files) => { combineBgFiles = files.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })); });
+
+  function updateCombineUI() {
+    const renderList = (files, container) => {
+      container.innerHTML = files.map(f => {
+        const isImage = f.type.startsWith('image/');
+        let content = '';
+
+        if (isImage) {
+          const url = URL.createObjectURL(f);
+          content = `<img src="${url}" style="width: 100%; height: 100px; object-fit: cover; border-radius: 6px; margin-bottom: 0.5rem;">`;
+        } else {
+          content = `<div style="width: 100%; height: 100px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.05); border-radius: 6px; margin-bottom: 0.5rem;"><i data-lucide="file-text" size="32" style="color: var(--text-secondary)"></i></div>`;
+        }
+
+        return `
+            <div class="file-thumb-card" title="${f.name}" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem; text-align: center;">
+                ${content}
+                <div class="thumb-name" style="font-size: 0.8rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${f.name}</div>
+            </div>`;
+      }).join('');
+    };
+
+    renderList(combineSourceFiles, combineSourceList);
+    renderList(combineBgFiles, combineBgList);
+    lucide.createIcons();
+
+    const isValid = combineSourceFiles.length > 0 && combineBgFiles.length > 0;
+    btnCombineStart.disabled = !isValid;
+  }
+
+  if (btnCombineStart) {
+    btnCombineStart.addEventListener('click', async () => {
+      // Validation: Count Check
+      // Logic: 
+      // 1. If PDF vs PDF -> Page Count check (Hard to do client side without parsing, for now assume user responsibility or server fail)
+      // 2. If Images -> Count match
+
+      // Simple Count Check for Images
+      const sourceIsPdf = combineSourceFiles.some(f => f.type === 'application/pdf');
+      const bgIsPdf = combineBgFiles.some(f => f.type === 'application/pdf');
+
+      if (!sourceIsPdf && !bgIsPdf) {
+        if (combineSourceFiles.length !== combineBgFiles.length) {
+          showCombineMismatchModal('count', [], `원본(${combineSourceFiles.length}개)과 배경(${combineBgFiles.length}개)의 파일 개수가 다릅니다.`);
+          return;
+        }
+
+        // Name Matching Check (Optional but recommended)
+        // Sort both and assume alignment or check names?
+        // Implementation Plan says: "System compares count and names"
+        // Let's do a loose name match check? Or just trust sorting? 
+        // User requested "Show detailed mismatch in modal". 
+        // Let's assume user expects 1:1 filename matching logic (ignoring extension or suffix).
+
+        // BUT, user often has: slide_1.png vs slide_1_clean.png
+        // Simple check: Sort and pair. If user wants name validation, we implement it. 
+        // Plan said: "Name matching failure -> alert". 
+        // So we should try to match.
+
+        // Let's SKIP strict name matching for now to be flexible, OR warn if very different.
+        // Actually, trusting sort is safer if naming is consistent.
+        // We will just enforce Count Equality here.
+      }
+
+      // Start Processing using JobQueue directly? 
+      // No, endpoint is /combine-upload. JobQueue is for /upload (single file per job).
+      // We need to adapt JobQueue or create a wrapper. 
+      // Strategy: "Combine" endpoint splits pairs and returns tasks?
+      // Or we utilize JobQueue to send pairs?
+      // The current JobQueue sends 1 file per request.
+      // We need to send 2 files per request for Combine.
+
+      // Solution: Extend JobQueue to handle "CombineJob".
+      // Or simpler: Manually create jobs in queue that hit a different endpoint.
+
+      // 1. Prepare Pairs
+      let pairs = [];
+      if (sourceIsPdf || bgIsPdf) {
+        pairs.push({ source: combineSourceFiles[0], bg: combineBgFiles[0], name: combineSourceFiles[0].name });
+      } else {
+        // Image Case: Create N jobs
+        const sortedSource = combineSourceFiles.sort((a, b) => a.name.localeCompare(b.name));
+        const sortedBg = combineBgFiles.sort((a, b) => a.name.localeCompare(b.name));
+
+        const mismatches = [];
+
+        for (let i = 0; i < sortedSource.length; i++) {
+          const s = sortedSource[i];
+          const b = sortedBg[i];
+          pairs.push({ source: s, bg: b, name: s.name });
+
+          // Simple Name Check: Check if base names have significant overlap
+          // Heuristic: remove extension, remove commonly used suffix like 'clean', 'bg', 'background'
+          const cleanName = (name) => name.toLowerCase().replace(/\.(png|jpg|jpeg|webp)$/, '').replace(/(_clean|_bg|_background|_removed)$/, '');
+          const sName = cleanName(s.name);
+          const bName = cleanName(b.name);
+
+          // Check inclusion or Levenshtein (too complex?) -> Check inclusion
+          if (!sName.includes(bName) && !bName.includes(sName)) {
+            mismatches.push(`${s.name} <-> ${b.name}`);
+          }
+        }
+
+        // If mismatches found, warn user
+        if (mismatches.length > 0) {
+          showCombineMismatchModal('name', mismatches, "파일명이 서로 일치하지 않는 것 같습니다. 계속 진행하시겠습니까?", () => {
+            // On Confirm
+            closeModal();
+            processCombinePairs(pairs);
+          });
+          return;
+        }
+      }
+
+      // No issues, proceed
+      processCombinePairs(pairs);
+    });
+  }
+
+  function processCombinePairs(pairs) {
+    if (jobQueue.queue.length === 0 && jobQueue.activeCount === 0) {
+      combineSection.classList.add('hidden');
+      batchControlPanel.classList.remove('hidden');
+      jobListContainer.classList.remove('hidden');
+    }
+
+    // Batch Folder Name
+    const now = new Date();
+    const timeStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
+    const batchFolder = `combine_${timeStr}`;
+    jobQueue.latestBatchFolder = batchFolder;
+
+    pairs.forEach(pair => {
+      const jobId = 'job-c-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+      // Custom Job Object
+      const job = {
+        id: jobId,
+        type: 'combine', // Marker
+        sourceFile: pair.source,
+        bgFile: pair.bg,
+        status: 'pending',
+        element: jobQueue.createJobCard(jobId, `[조합] ${pair.name}`),
+        batchFolder: batchFolder
+      };
+      jobQueue.queue.push(job);
+      jobListContainer.appendChild(job.element);
+    });
+
+    lucide.createIcons();
+    jobQueue.updateGlobalProgress();
+    jobQueue.processQueue();
+  }
+
+  // Mismatch Modal
+  function showCombineMismatchModal(type, details, message, onConfirm = null) {
+    const modal = document.getElementById('previewModal'); // Reuse preview modal or create new?
+    // Reuse logic but custom content
+    const modalTitle = document.getElementById('modalTitle');
+    const modalContainer = document.getElementById('modalPreviewContainer');
+    const modalFooter = document.querySelector('.modal-footer');
+
+    modalTitle.textContent = "⚠️ 파일 매칭 주의";
+    modalContainer.innerHTML = `
+        <div style="text-align: center; padding: 1rem;">
+            <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem; color: #ef4444;">${message}</p>
+            ${details.length > 0 ? `
+                <div style="text-align: left; background: #fff1f2; padding: 1rem; border-radius: 8px; max-height: 200px; overflow-y: auto; text-align: left; border: 1px solid #fecaca;">
+                    <strong style="color: #991b1b;">상세 내역 (원본 <-> 배경):</strong>
+                    <ul style="margin-top: 0.5rem; padding-left: 1.5rem; color: #7f1d1d; font-size: 0.9rem;">
+                        ${details.map(d => `<li>${d}</li>`).join('')}
+                    </ul>
+                </div>
+            ` : ''}
+        </div>
+      `;
+
+    // Hide standard footer buttons, show simple confirm
+    Array.from(modalFooter.children).forEach(c => c.classList.add('hidden'));
+
+    // Clear previous custom buttons if any
+    const existingCustoms = modalFooter.querySelectorAll('.custom-modal-btn');
+    existingCustoms.forEach(c => c.remove());
+
+    if (onConfirm) {
+      let cancelBtn = document.createElement('button');
+      cancelBtn.className = 'btn-secondary small custom-modal-btn';
+      cancelBtn.innerText = '취소';
+      cancelBtn.onclick = () => {
+        closeModal();
+        restoreFooter();
+      };
+
+      let confirmBtn = document.createElement('button');
+      confirmBtn.className = 'btn-primary small custom-modal-btn';
+      confirmBtn.innerText = '계속 진행';
+      confirmBtn.onclick = onConfirm;
+
+      modalFooter.appendChild(cancelBtn);
+      modalFooter.appendChild(confirmBtn);
+    } else {
+      let closeBtn = document.createElement('button');
+      closeBtn.className = 'btn-secondary small custom-modal-btn';
+      closeBtn.innerText = '확인';
+      closeBtn.onclick = () => {
+        closeModal();
+        restoreFooter();
+      };
+      modalFooter.appendChild(closeBtn);
+    }
+
+    modal.classList.remove('hidden');
+
+    function restoreFooter() {
+      Array.from(modalFooter.children).forEach(c => {
+        if (c.classList.contains('custom-modal-btn')) c.remove();
+        else if (!c.id.includes('Download')) c.classList.remove('hidden');
+      });
+    }
+  }
+
+
 
   // --- Event Listeners (Upload, Tab, etc.) ---
   uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('dragover'); });
@@ -735,6 +1032,7 @@ document.addEventListener('DOMContentLoaded', () => {
       jobListContainer.classList.add('hidden');
       document.querySelector('.settings-container').classList.add('hidden'); // Default hide
       document.getElementById('resultReconstruct').classList.add('hidden');
+      if (combineSection) combineSection.classList.add('hidden');
 
       if (target === 'pdf-to-png') {
         // PDF to PNG Mode
@@ -745,6 +1043,9 @@ document.addEventListener('DOMContentLoaded', () => {
         pdfSection.classList.remove('hidden');
         document.querySelector('.settings-container').classList.remove('hidden'); // Show Settings
         if (btnPptxStart) btnPptxStart.classList.remove('hidden'); // Show PPTX start button
+      } else if (target === 'combine') {
+        combineSection.classList.remove('hidden');
+        document.querySelector('.settings-container').classList.remove('hidden');
       } else {
         // Standard Reconstruction / Other Modes
         document.querySelector('.settings-container').classList.remove('hidden');
