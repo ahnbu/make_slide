@@ -51,6 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const pdfSelectAll = document.getElementById('pdfSelectAll');
   const btnDownloadSelected = document.getElementById('btnDownloadSelected');
   const btnDownloadAll = document.getElementById('btnDownloadAll');
+  const btnPptxStart = document.getElementById('btnPptxStart');
 
   // PDF State
   let currentPdfBlobs = []; // Array of { blob, filename, index }
@@ -186,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!response.ok) throw new Error('서버 오류');
         const data = await response.json();
 
-        if (currentTab === 'reconstruct' && data.status === 'processing') {
+        if ((currentTab === 'reconstruct' || currentTab === 'pdf-to-pptx') && data.status === 'processing') {
           await this.monitorProgress(job, data.task_id);
         } else {
           this.completeJob(job, data.data);
@@ -461,6 +462,8 @@ document.addEventListener('DOMContentLoaded', () => {
       currentTab = btn.dataset.tab;
       const titles = {
         'reconstruct': '재구성을 위한 슬라이드 이미지 업로드',
+        'pdf-to-pptx': 'PDF 업로드 -> 이미지 변환 -> 슬라이드 재구성',
+        'pdf-to-png': 'PDF to PNG 변환 (단순 변환)',
         'remove-text': '텍스트 제거를 위한 이미지 업로드 (OpenCV)',
         'remove-text-ai': '텍스트 제거를 위한 이미지 업로드 (AI)',
         'extract-text': '텍스트 추출을 위한 이미지 업로드'
@@ -695,38 +698,68 @@ document.addEventListener('DOMContentLoaded', () => {
   // Handle Tab Switch for PDF
   tabButtons.forEach(btn => {
     btn.addEventListener('click', () => {
-      // ... (Existing logic managed by tabButtons event listener above, we just need to handle visibility)
-      // Actually the existing listener just sets currentTab. We need to toggle sections.
-      // Let's modify the ORIGINAL listener or add logic here.
-      // Wait, the original listener (line 426) only changes styling and title. 
-      // We need to hide/show sections.
-
+      // ... (Existing logic managed by tabButtons event listener above)
       const target = btn.dataset.tab;
+
+      // Common reset
+      pdfSection.classList.add('hidden');
+      uploadZone.classList.add('hidden');
+      batchControlPanel.classList.add('hidden');
+      jobListContainer.classList.add('hidden');
+      document.querySelector('.settings-container').classList.add('hidden'); // Default hide
+      document.getElementById('resultReconstruct').classList.add('hidden');
+
       if (target === 'pdf-to-png') {
-        uploadZone.classList.add('hidden');
-        batchControlPanel.classList.add('hidden');
-        jobListContainer.classList.add('hidden');
+        // PDF to PNG Mode
         pdfSection.classList.remove('hidden');
-        document.getElementById('resultReconstruct').classList.add('hidden'); // Ensure results hidden
-        // Also hide settings? Maybe keep them for consistency or hide if irrelevant.
-        // PDF doesn't use settings.
-        document.querySelector('.settings-container').classList.add('hidden');
+        if (btnPptxStart) btnPptxStart.classList.add('hidden'); // Hide PPTX start button
+      } else if (target === 'pdf-to-pptx') {
+        // PDF to PPTX Mode
+        pdfSection.classList.remove('hidden');
+        document.querySelector('.settings-container').classList.remove('hidden'); // Show Settings
+        if (btnPptxStart) btnPptxStart.classList.remove('hidden'); // Show PPTX start button
       } else {
+        // Standard Reconstruction / Other Modes
+        document.querySelector('.settings-container').classList.remove('hidden');
         if (jobQueue.queue.length > 0) {
-          // If jobs exist
-          uploadZone.classList.add('hidden');
           batchControlPanel.classList.remove('hidden');
           jobListContainer.classList.remove('hidden');
         } else {
           uploadZone.classList.remove('hidden');
-          batchControlPanel.classList.add('hidden');
           jobListContainer.classList.remove('hidden');
         }
-        pdfSection.classList.add('hidden');
-        document.querySelector('.settings-container').classList.remove('hidden');
       }
     });
   });
+
+  // --- PDF to PPTX Trigger ---
+  if (btnPptxStart) {
+    btnPptxStart.addEventListener('click', () => {
+      if (currentPdfBlobs.length === 0) {
+        showToast('변환된 PDF 페이지가 없습니다.');
+        return;
+      }
+
+      if (!confirm(`${currentPdfBlobs.length}개의 페이지를 슬라이드로 재구성하시겠습니까?`)) return;
+
+      // Convert Blobs to Files
+      const files = currentPdfBlobs.map(item => {
+        return new File([item.blob], item.filename, { type: 'image/png' });
+      });
+
+      // Add to Queue
+      jobQueue.addFiles(files);
+
+      // Switch View similar to "reconstruct" tab
+      // Note: we stay on "pdf-to-pptx" tab visually, but show the queue
+      pdfSection.classList.add('hidden');
+      document.querySelector('.settings-container').classList.remove('hidden');
+      batchControlPanel.classList.remove('hidden');
+      jobListContainer.classList.remove('hidden');
+
+      showToast('슬라이드 재구성 작업이 시작되었습니다.');
+    });
+  }
 });
 
 // --- Modal Logic (Global) ---
