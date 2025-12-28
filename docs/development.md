@@ -37,6 +37,9 @@
 
 ### C. 코드 생성 (`src/code_generator.py`)
 - **Algorithmic Logic**: 기본 설정에서는 Gemini를 부르지 않고, 수집된 데이터를 바탕으로 수학적 계산을 통해 HTML 조립. (일반적인 경우 분석 2회 + 생성 0회 = 총 2회 호출)
+- **Custom Font Support**:
+    - `Pretendard Medium`, `Noto Sans KR` 등 사용자 선택 폰트 지원.
+    - 웹폰트(CDN/Google Fonts) 자동 주입으로 클라이언트 환경 무관하게 폰트 렌더링.
 - **Coordinate Mapping**: 0-1000 정규화 좌표를 실제 픽셀 및 `%` 좌표로 변환.
 - **Visual Grouping**: 유사한 크기의 폰트를 클러스터링하여 스타일 일관성 유지.
 - **Responsive CSS**: Container Query Width(`cqw`) 단위를 사용하여 반응형 구현.
@@ -53,12 +56,18 @@
 1.  **이미지 레이아웃 분석**
     - `Gemini 3.0 Flash Preview` + `Visual Feedback Loop`
     - 좌표 정규화 (0-1000)
-2.  **배경 복원**
-    - `OpenCV Inpainting (Telea)` + `Dynamic Masking`
-    - 확장/패딩(Dilation)으로 텍스트 영역 완전 제거
-3.  **HTML 코드 생성**
-    - `Clustering` 기반 폰트 크기 정규화 (Median Snap)
-    - `cqw` 단위 적용으로 반응형 구조 완성
+    - **Dual JSON Strategy**:
+        - `_layout.json`: 워터마크 텍스트 포함 (배경 복원용)
+        - `_layout_filtered.json`: 워터마크 제거됨 (생성용)
+2.  **배경 복원 (Inpainting)**
+    - **Split Logic**: `_layout.json`의 전체 텍스트 영역을 마스킹.
+    - NotebookLM 워터마크 제거됨.
+3.  **HTML/PPTX 코드 생성**
+    - **Source**: `_layout_filtered.json` 사용.
+    - **Font**: 사용자 설정(`font_family`) 적용.
+    - **PDF/PPTX**: 
+        - PDF: Ultra HD(3.0) 고정.
+        - PPTX: Batch 작업 시 `_filtered.json` 우선 사용.
 4.  **AI 텍스트 제거**
     - Multimodal Generation (Text removal)
 
