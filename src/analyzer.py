@@ -136,9 +136,9 @@ class Analyzer:
         logger.info(f"Initial detection: {len(initial_layout_data)} text blocks.")
         return initial_layout_data, width, height
 
-    def analyze_image(self, image_path):
+    def analyze_image_v2(self, image_path, exclude_text=None):
         """
-        Legacy wrapper for full analysis pipeline
+        Legacy wrapper for full analysis pipeline (Forced Update V2)
         """
         try:
             # 1. Initial Detection
@@ -149,9 +149,104 @@ class Analyzer:
             
             # 3. Pixel Conversion
             final_data = self.convert_to_pixels(refined_data, width, height)
+            logger.info("DEBUG: Finished convert_to_pixels")
+            
+            # 4. Text Exclusion Logic
+            # Always check for 'notebooklm' watermark by default
+            default_exclusions = ['notebooklm']
+            
+            # Add user-defined exclusions if any
+            user_exclusions = []
+            if exclude_text:
+                user_exclusions = [t.strip().replace(" ", "").lower() for t in exclude_text.split(',') if t.strip()]
+            
+            # Merge unique
+            target_keywords = list(set(default_exclusions + user_exclusions))
+            logger.info(f"DEBUG: target_keywords = {target_keywords}")
+            
+            if target_keywords:
+                logger.info(f"Applying text exclusion. Keywords: {target_keywords}")
+                filtered_data = []
+                for item in final_data:
+                    text_content = item.get('text', '').replace(" ", "").lower()
+                    bbox = item.get('bbox', [0, 0, 0, 0])
+                    ymin, xmin, ymax, xmax = bbox
+                    
+                    should_exclude = False
+                    for keyword in target_keywords:
+                        if keyword in text_content:
+                            # Special handling for NotebookLM watermark
+                            if keyword == 'notebooklm':
+                                # Check position: Bottom 10% (ymin > 900) AND Right 20% (xmin > 800)
+                                # Note: 'bbox' uses normalized coordinates (0-1000), so 900 = 90%, 800 = 80%.
+                                # This ensures it works across different image resolutions.
+                                is_bottom_right = (ymin > 900) and (xmin > 800)
+                                if is_bottom_right:
+                                    should_exclude = True
+                                    logger.info(f"Detected NotebookLM Watermark at [{ymin}, {xmin}]. Removing.")
+                                    break 
+                                else:
+                                    # It matches 'notebooklm' but is NOT in the footer -> Keep it (Body text)
+                                    pass 
+                            else:
+                                # Generic exclusion for other user-defined keywords (Apply strict removal)
+                                should_exclude = True
+                                break
+
+                    if not should_exclude:
+                        filtered_data.append(item)
+                    elif should_exclude and keyword != 'notebooklm': # Log generic exclusions
+                         logger.info(f"Excluded text block: '{item.get('text')}' (Matched '{keyword}')")
+                
+                final_data = filtered_data
             
             return final_data, width, height
 
         except Exception as e:
             logger.error(f"Analysis failed: {e}")
             raise e
+    def apply_text_exclusion(self, layout_data, exclude_text=None):
+        # Always check for 'notebooklm' watermark by default
+        default_exclusions = ['notebooklm']
+        
+        # Add user-defined exclusions if any
+        user_exclusions = []
+        if exclude_text:
+            user_exclusions = [t.strip().replace(" ", "").lower() for t in exclude_text.split(',') if t.strip()]
+        
+        # Merge unique
+        target_keywords = list(set(default_exclusions + user_exclusions))
+        
+        if target_keywords:
+            logger.info(f"Applying text exclusion. Keywords: {target_keywords}")
+            filtered_data = []
+            for item in layout_data:
+                text_content = item.get('text', '').replace(" ", "").lower()
+                bbox = item.get('bbox', [0, 0, 0, 0])
+                ymin, xmin, ymax, xmax = bbox
+                
+                should_exclude = False
+                for keyword in target_keywords:
+                    if keyword in text_content:
+                        # Special handling for NotebookLM watermark
+                        if keyword == 'notebooklm':
+                            # Check position: Bottom 10% (ymin > 900) AND Right 20% (xmin > 800)
+                            is_bottom_right = (ymin > 900) and (xmin > 800)
+                            if is_bottom_right:
+                                should_exclude = True
+                                logger.info(f"Detected NotebookLM Watermark at [{ymin}, {xmin}]. Removing.")
+                                break 
+                            else:
+                                pass 
+                        else:
+                            should_exclude = True
+                            break
+
+                if not should_exclude:
+                    filtered_data.append(item)
+                elif should_exclude and keyword != 'notebooklm':
+                        logger.info(f"Excluded text block: '{item.get('text')}' (Matched '{keyword}')")
+            
+            return filtered_data
+        
+        return layout_data

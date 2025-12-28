@@ -7,7 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
     inpainting_model: 'opencv-telea',
     codegen_model: 'algorithmic',
     output_format: 'both',
-    max_concurrent: 3
+    exclude_text: '',
+    max_concurrent: 3,
+    font_family: 'Malgun Gothic'
   };
 
   // --- Elements ---
@@ -28,7 +30,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const visionModelSelect = document.getElementById('visionModel');
   const inpaintingModelSelect = document.getElementById('inpaintingModel');
   const codegenModelSelect = document.getElementById('codegenModel');
+  const excludeTextInput = document.getElementById('excludeText');
   const outputFormatSelect = document.getElementById('outputFormat');
+  const fontFamilySelect = document.getElementById('fontFamily');
   const maxConcurrentSelect = document.getElementById('maxConcurrent');
   const btnSaveDefaults = document.getElementById('btnSaveDefaults');
 
@@ -165,6 +169,8 @@ document.addEventListener('DOMContentLoaded', () => {
       // Use AppSettings for Consistency
       formData.append('vision_model', AppSettings.vision_model);
       formData.append('batch_folder', job.batchFolder);
+      formData.append('exclude_text', AppSettings.exclude_text);
+      formData.append('font_family', AppSettings.font_family);
       // Pass Concurrency Setting to Backend
       formData.append('max_concurrent', AppSettings.max_concurrent);
 
@@ -275,11 +281,14 @@ document.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons({ root: badge, attrs: { class: status === 'processing' ? 'animate-spin' : '' } });
       detail.textContent = message;
 
-      // Toggle visibility of status detail text
+      // Toggle visibility of status detail text & progress bar
+      const progressWrapper = job.element.querySelector('.job-progress-wrapper');
       if (status === 'complete') {
         detail.style.display = 'none';
+        if (progressWrapper) progressWrapper.style.display = 'none';
       } else {
         detail.style.display = 'block';
+        if (progressWrapper) progressWrapper.style.display = 'block';
       }
 
       if (progressBar && percent !== undefined) {
@@ -300,6 +309,16 @@ document.addEventListener('DOMContentLoaded', () => {
       const percent = total === 0 ? 0 : (completed / total) * 100;
       batchStatusText.textContent = `완료: ${completed} / ${total}`;
       batchProgressBar.style.width = `${percent}%`;
+
+      // Hide progress bar if 100%
+      const progressContainer = document.querySelector('.progress-container');
+      if (progressContainer) {
+        if (percent >= 100 && total > 0) {
+          progressContainer.style.display = 'none';
+        } else {
+          progressContainer.style.display = 'block';
+        }
+      }
 
       // Show PPTX Download Button if we have completed items
       const btnPPTX = document.getElementById('btnDownloadBatchPPTX');
@@ -392,13 +411,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (settings.inpainting_model) AppSettings.inpainting_model = settings.inpainting_model;
         if (settings.codegen_model) AppSettings.codegen_model = settings.codegen_model;
         if (settings.output_format) AppSettings.output_format = settings.output_format;
+        if (settings.exclude_text) AppSettings.exclude_text = settings.exclude_text;
         if (settings.max_concurrent) AppSettings.max_concurrent = parseInt(settings.max_concurrent);
+        if (settings.font_family) AppSettings.font_family = settings.font_family;
 
         // Sync UI
         visionModelSelect.value = AppSettings.vision_model;
         inpaintingModelSelect.value = AppSettings.inpainting_model;
         codegenModelSelect.value = AppSettings.codegen_model;
+        if (excludeTextInput) excludeTextInput.value = AppSettings.exclude_text || '';
         if (outputFormatSelect) outputFormatSelect.value = AppSettings.output_format;
+        if (fontFamilySelect) fontFamilySelect.value = AppSettings.font_family;
         maxConcurrentSelect.value = AppSettings.max_concurrent;
       }
     } catch (e) {
@@ -412,8 +435,10 @@ document.addEventListener('DOMContentLoaded', () => {
       vision_model: AppSettings.vision_model,
       inpainting_model: AppSettings.inpainting_model,
       codegen_model: AppSettings.codegen_model,
+      exclude_text: AppSettings.exclude_text,
       output_format: AppSettings.output_format,
-      max_concurrent: AppSettings.max_concurrent
+      max_concurrent: AppSettings.max_concurrent,
+      font_family: AppSettings.font_family
     };
 
     try {
@@ -431,6 +456,7 @@ document.addEventListener('DOMContentLoaded', () => {
   visionModelSelect.addEventListener('change', (e) => { AppSettings.vision_model = e.target.value; });
   inpaintingModelSelect.addEventListener('change', (e) => { AppSettings.inpainting_model = e.target.value; });
   codegenModelSelect.addEventListener('change', (e) => { AppSettings.codegen_model = e.target.value; });
+  if (excludeTextInput) excludeTextInput.addEventListener('input', (e) => { AppSettings.exclude_text = e.target.value; });
   if (outputFormatSelect) outputFormatSelect.addEventListener('change', (e) => { AppSettings.output_format = e.target.value; });
 
   maxConcurrentSelect.addEventListener('change', (e) => {
@@ -572,7 +598,8 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const arrayBuffer = await file.arrayBuffer();
       const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
-      const scale = parseFloat(pdfQualitySelect.value);
+      // Fixed: Default to 3.0 (HD) if element is hidden/removed
+      const scale = pdfQualitySelect ? parseFloat(pdfQualitySelect.value) : 3.0;
 
       pdfResultContainer.innerHTML = '';
       const grid = document.createElement('div');
@@ -760,6 +787,11 @@ document.addEventListener('DOMContentLoaded', () => {
       showToast('슬라이드 재구성 작업이 시작되었습니다.');
     });
   }
+
+  // Initial UI Sync (Trigger click on default active tab)
+  const initialActive = document.querySelector('.tab-btn.active');
+  if (initialActive) initialActive.click();
+
 });
 
 // --- Modal Logic (Global) ---

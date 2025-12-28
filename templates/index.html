@@ -38,9 +38,9 @@
 
     <!-- Tabs -->
     <div class="tabs-container">
-      <button class="tab-btn" data-tab="pdf-to-pptx"><i data-lucide="file-symlink"></i> PDF to PPTX</button>
+      <button class="tab-btn active" data-tab="pdf-to-pptx"><i data-lucide="file-symlink"></i> PDF to PPTX</button>
       <button class="tab-btn" data-tab="pdf-to-png"><i data-lucide="file-type-2"></i> PDF to PNG</button>
-      <button class="tab-btn active" data-tab="reconstruct">IMG to PPTX/HTML</button>
+      <button class="tab-btn" data-tab="reconstruct">IMG to PPTX/HTML</button>
       <!-- <button class="tab-btn" data-tab="remove-text">텍스트 제거 (OpenCV) </button> -->
       <!-- <button class="tab-btn" data-tab="remove-text-ai" style="color: var(--accent);">텍스트 제거 (AI 생성)</button> -->
       <!-- <button class="tab-btn" data-tab="extract-text">텍스트 추출</button> -->
@@ -76,12 +76,27 @@
             <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
           </select>
         </div>
+        <!-- <div class="setting-group">
+          <label>제외할 텍스트 (쉼표로 구분)</label>
+          <input type="text" id="excludeText" placeholder="예: NotebookLM, 워터마크"
+            style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 0.5rem; background: var(--bg-secondary); color: var(--text-primary);">
+        </div> -->
         <div class="setting-group">
           <label>출력 포맷</label>
           <select id="outputFormat">
             <option value="html">HTML Only</option>
             <option value="pptx">PPTX Only</option>
             <option value="both" selected>Both (HTML+PPTX)</option>
+          </select>
+        </div>
+        <div class="setting-group">
+          <label>글꼴 (Font)</label>
+          <select id="fontFamily">
+            <option value="Malgun Gothic" selected>맑은 고딕 (기본)</option>
+            <option value="Pretendard Medium">Pretendard Medium (프리텐다드)</option>
+            <option value="Noto Sans KR">Noto Sans KR (구글 폰트)</option>
+            <option value="Apple SD Gothic Neo">Apple SD Gothic Neo</option>
+            <option value="Arial">Arial (영문)</option>
           </select>
         </div>
         <div class="setting-group">
@@ -134,7 +149,7 @@
           <div class="pdf-controls-header">
             <div class="control-group">
               <!-- <label for="pdfQuality"><i data-lucide="image"></i> 변환 화질:</label> -->
-              <div class="setting-group" style="width: 200px;">
+              <div class="setting-group" style="width: 200px; display: none;">
                 <label for="pdfQuality"
                   style="margin-bottom: 0.25rem; font-size: 0.85rem; color: var(--text-secondary);">변환 화질</label>
                 <select id="pdfQuality">

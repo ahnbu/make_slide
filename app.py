@@ -120,7 +120,9 @@ async def upload_file(
     inpainting_model: str = Form("opencv-telea"),
     codegen_model: str = Form("algorithmic"),
     batch_folder: str = Form("single"),
-    max_concurrent: int = Form(3) # Receive concurrency setting
+    max_concurrent: int = Form(3), # Receive concurrency setting
+    exclude_text: str = Form(None),
+    font_family: str = Form("Malgun Gothic") # Default font
 ):
     # Dynamic Concurrency Update (Runtime)
     global MAX_CONCURRENT_TASKS, semaphore
@@ -159,7 +161,9 @@ async def upload_file(
         vision_model, 
         inpainting_model, 
         codegen_model,
-        batch_folder
+        batch_folder,
+        exclude_text,
+        font_family
     )
 
     return JSONResponse({"status": "processing", "task_id": task_id})
@@ -218,7 +222,7 @@ async def cancel_task(task_id: str):
         progress_store[task_id]["message"] = "작업이 취소되었습니다."
     return JSONResponse({"status": "cancelled"})
 
-async def process_slide_task(task_id, input_path, original_name, vision_model, inpainting_model, codegen_model, batch_folder):
+async def process_slide_task(task_id, input_path, original_name, vision_model, inpainting_model, codegen_model, batch_folder, exclude_text=None, font_family="Malgun Gothic"):
     async with semaphore:
         if task_id in cancelled_tasks:
             logger.info(f"Task {task_id} cancelled before starting.")
@@ -279,16 +283,25 @@ async def process_slide_task(task_id, input_path, original_name, vision_model, i
             # Ensure HTML and PPTX usage consistent font sizes
             layout_data = code_generator.normalize_font_sizes(layout_data, width)
             
+            # 1.4 Text Exclusion Strategy
+            # Strategy: We need FULL layout for Inpainting (to erase the watermark pixels)
+            #           But FILTERED layout for Generation (to not re-render the watermark text)
+            full_layout_data = layout_data
+            filtered_layout_data = analyzer.apply_text_exclusion(layout_data, exclude_text)
+            
             # Save things
-            json_filename = f"{original_name}_layout_{file_id}.json"
-            json_path = os.path.join(target_dir, json_filename)
-            with open(json_path, "w", encoding="utf-8") as f:
-                json.dump(layout_data, f, indent=4, ensure_ascii=False)
-                
-            # result_input_path = os.path.join(target_dir, f"{original_name}_{file_id}{os.path.splitext(input_path)[1]}")
-            # Input is already in target dir, no need to copy
-            # shutil.copy2(input_path, result_input_path)
+            # 1. Save FULL Original Layout (for debugging and inpainting reference)
+            json_filename_raw = f"{original_name}_layout_{file_id}.json"
+            json_path_raw = os.path.join(target_dir, json_filename_raw)
+            with open(json_path_raw, "w", encoding="utf-8") as f:
+                json.dump(full_layout_data, f, indent=4, ensure_ascii=False)
 
+            # 2. Save FILTERED Layout (which is used for generation)
+            json_filename_filtered = f"{original_name}_layout_{file_id}_filtered.json"
+            json_path_filtered = os.path.join(target_dir, json_filename_filtered)
+            with open(json_path_filtered, "w", encoding="utf-8") as f:
+                json.dump(filtered_layout_data, f, indent=4, ensure_ascii=False)
+                
             # Check Cancellation
             if task_id in cancelled_tasks:
                 logger.info(f"Task {task_id} cancelled before Step 2.")
@@ -305,7 +318,8 @@ async def process_slide_task(task_id, input_path, original_name, vision_model, i
             bg_path = os.path.join(target_dir, bg_filename) 
             
             # Run blocking inpainting in thread pool
-            await asyncio.to_thread(image_processor.create_clean_background, input_path, layout_data, bg_path)
+            # CRITICAL: Use full_layout_data here to ensure Watermarks are ERASED from background
+            await asyncio.to_thread(image_processor.create_clean_background, input_path, full_layout_data, bg_path)
             
             # Check Cancellation
             if task_id in cancelled_tasks:
@@ -326,7 +340,9 @@ async def process_slide_task(task_id, input_path, original_name, vision_model, i
             # Run blocking HTML generation in thread pool
             # Now passing bg_path (absolute) instead of relative filename
             # normalize=False because we already did it
-            await asyncio.to_thread(code_generator.generate_html, layout_data, width, height, bg_path, html_path, normalize=False)
+            # USE FILTERED LAYOUT
+            # PASS FONT FAMILY
+            await asyncio.to_thread(code_generator.generate_html, filtered_layout_data, width, height, bg_path, html_path, normalize=False, font_family=font_family)
             
             # Log execution
             log_execution(original_name, current_vision_model, inpainting_model, codegen_model)
@@ -361,7 +377,9 @@ async def process_slide_task(task_id, input_path, original_name, vision_model, i
                     # Current PPTXGenerator is designed for multi-slide if we call add_slide multiple times.
                     # Here we just want one slide.
                     
-                    pptx_gen_single.add_slide(layout_data, bg_path, width, height)
+                    # USE FILTERED LAYOUT
+                    # PASS FONT FAMILY
+                    pptx_gen_single.add_slide(filtered_layout_data, bg_path, width, height, font_family=font_family)
                     pptx_gen_single.save(pptx_path)
                     
                     pptx_url = f"/output/{batch_folder}/{pptx_filename}"
@@ -425,9 +443,15 @@ async def remove_text(
         
         with open(input_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
-            
-        analyzer.model_name = vision_model
-        layout_data, width, height = analyzer.analyze_image(input_path)
+          # 1. Analyze
+        # Pass exclude_text to analyzer
+        # FORCE NEW METHOD CALL
+        import sys
+        if 'src.analyzer' in sys.modules:
+             logger.info(f"DEBUG: Analyzer loaded from {sys.modules['src.analyzer'].__file__}")
+        
+        analyzer.model_name = vision_model # Keep this line as it sets the model for the analyzer instance
+        layout_data, width, height = analyzer.analyze_image_v2(input_path, exclude_text) # Changed to analyze_image_v2 and passed exclude_text
         
         # target_dir already defined above
 
@@ -562,9 +586,28 @@ async def generate_pptx_batch(batch_folder: str):
             return JSONResponse(status_code=404, content={"message": "Batch folder not found"})
 
         # Find all JSON layout files
-        json_files = [f for f in os.listdir(target_dir) if f.endswith(".json") and "_layout_" in f]
-        if not json_files:
+        all_json_files = [f for f in os.listdir(target_dir) if f.endswith(".json") and "_layout_" in f]
+        
+        if not all_json_files:
             return JSONResponse(status_code=400, content={"message": "No processed slides found in this batch"})
+
+        # Intelligent Filtering: Prefer _filtered.json over raw .json
+        filtered_files = {f for f in all_json_files if "_filtered.json" in f}
+        json_files = []
+        
+        # Add all filtered files
+        json_files.extend(list(filtered_files))
+        
+        # Add raw files ONLY if their filtered counterpart is missing
+        # Raw file: "name_layout_id.json" -> Expected filtered: "name_layout_id_filtered.json"
+        for f in all_json_files:
+            if "_filtered.json" in f:
+                continue # Already added
+            
+            # Construct expected filtered name
+            expected_filtered = f.replace(".json", "_filtered.json")
+            if expected_filtered not in filtered_files:
+                json_files.append(f)
 
         # Sort files to ensure order (optional, by timestamp usually)
         json_files.sort()
@@ -598,9 +641,12 @@ async def generate_pptx_batch(batch_folder: str):
             # Workaround: Open the BG image to get dimensions.
             
             # Infer BG Filename
-            # Naming convention: {original_name}_layout_{file_id}.json
+            # Naming convention: {original_name}_layout_{file_id}.json (or ..._filtered.json)
             # BG convention:     {original_name}_bg_{file_id}.png
-            base_part = json_file.replace("_layout_", "_bg_").replace(".json", ".png")
+            
+            # Fix: If json_file has _filtered.json, strip it first to find the raw BG image name
+            raw_json_name = json_file.replace("_filtered.json", ".json")
+            base_part = raw_json_name.replace("_layout_", "_bg_").replace(".json", ".png")
             bg_path = os.path.join(target_dir, base_part)
             
             if not os.path.exists(bg_path):

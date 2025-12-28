@@ -57,7 +57,7 @@ class CodeGenerator:
 
         return layout_data
 
-    def generate_html(self, layout_data, width, height, bg_image_path, output_path, normalize=True):
+    def generate_html(self, layout_data, width, height, bg_image_path, output_path, normalize=True, font_family="Malgun Gothic"):
         logger.info(f"Generating HTML (with embedded BG): {output_path}")
         
         if normalize:
@@ -102,7 +102,7 @@ class CodeGenerator:
                 f"font-size: {font_size_cqw:.2f}cqw; " # Geometrically calculated size
                 f"font-weight: {style.get('font_weight', 'normal')}; "
                 f"text-align: {style.get('align', 'left')}; "
-                f"font-family: 'Apple SD Gothic Neo', sans-serif; "
+                f"font-family: '{font_family}', sans-serif; "
                 f"line-height: 1.3;" # Fixed line height matching calculation
                 f"white-space: normal;" # Allow wrapping
                 f"z-index: 10;"
@@ -111,12 +111,30 @@ class CodeGenerator:
             div = f'<div class="slide-text" style="{element_css}">{text_content}</div>'
             html_elements.append(div)
 
+        # Google Font / CDN Injection logic
+        google_font_link = ""
+        if "Noto Sans" in font_family:
+            google_font_link = '<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">'
+        elif "Nanum" in font_family:
+             google_font_link = '<link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&display=swap" rel="stylesheet">'
+        elif "Pretendard" in font_family:
+            google_font_link = '<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />'
+
+        # CSS Font Family Name Normalization
+        # If user selected "Pretendard Medium", we use "Pretendard" for CSS family, 
+        # but might want to enforce weight if we really wanted to. 
+        # For now, let's just use the family name "Pretendard".
+        css_font_family = font_family
+        if "Pretendard" in font_family:
+            css_font_family = "Pretendard"
+
         full_html = f"""<!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Slide Reconstructor Result</title>
+    {google_font_link}
     <style>
         body {{
             margin: 0;
@@ -126,7 +144,7 @@ class CodeGenerator:
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            font-family: sans-serif;
+            font-family: '{css_font_family}', sans-serif;
         }}
         .slide-wrapper {{
             width: 90vw;

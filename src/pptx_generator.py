@@ -25,13 +25,14 @@ class PPTXGenerator:
         except Exception:
             return RGBColor(0, 0, 0) # Default to black
 
-    def add_slide(self, layout_data, bg_image_path, original_width_px, original_height_px):
+    def add_slide(self, layout_data, bg_image_path, original_width_px, original_height_px, font_family="Malgun Gothic"):
         """
         Adds a new slide to the presentation.
         :param layout_data: List of dicts containing text layout info.
         :param bg_image_path: Path to the background image.
         :param original_width_px: Width of the original image source.
         :param original_height_px: Height of the original image source.
+        :param font_family: Font family to use for text.
         """
         # Use blank layout (usually index 6)
         slide_layout = self.prs.slide_layouts[6]
@@ -108,7 +109,7 @@ class PPTXGenerator:
                     p.alignment = PP_ALIGN.LEFT
 
                 # Font Family
-                p.font.name = 'Malgun Gothic'
+                p.font.name = font_family
 
             except Exception as e:
                 logger.error(f"Error adding text to PPTX: {e}")
