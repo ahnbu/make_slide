@@ -1,26 +1,28 @@
-# Make Slide (슬라이드 재구성 도구)
+# NotebookLM to PPTX
 
-**Make Slide**는 슬라이드 이미지를 분석하여 텍스트와 배경을 분리하고, 이를 편집 가능한 HTML/CSS 및 PPTX로 재구성하는 자동화 도구입니다. 
+**NotebookLM to PPTX**는 Google NotebookLM에서 생성된 나노바나나 기반의 인포그래픽 이미지와 슬라이드 PDF를 분석하여, 텍스트와 배경을 분리하고 편집 가능한 HTML/CSS 및 PPTX로 재구성하는 자동화 도구입니다.
 
 Google Gemini 3.0의 강력한 비전 인식 능력과 OpenCV의 이미지 처리 기술을 결합하여, 단순한 OCR을 넘어 **'디자인 레이아웃을 그대로 복원'**하는 것을 목표로 합니다.
 
-## ✨ 주요 기능 (Key Features)
+## ✨ 핵심 기능 (Core Features)
 
-- **Pixel-Perfect Reconstruction**: 원본 슬라이드의 레이아웃, 폰트 크기, 색상을 거의 완벽하게 HTML로 복원합니다.
+- **NotebookLM to PPTX**: 나노바나나 기반의 인포그래픽/PDF를 레이아웃이 살아있는 PPTX로 완벽하게 복원합니다.
+- **Pixel-Perfect Reconstruction**: 원본 슬라이드의 레이아웃, 폰트 크기, 색상을 HTML/PPTX로 정밀하게 구현합니다.
 - **Smart Text Removal**: 배경 이미지에서 텍스트를 깔끔하게 지워(Inpainting), 텍스트와 배경이 분리된 결과물을 제공합니다.
     - *Advanced*: 워터마크(NotebookLM 등)까지 자동으로 제거하는 정교한 필터링 로직 포함.
-- **Custom Font Support**: 
-    - `Pretendard`, `Noto Sans KR` 등 다양한 한글 폰트 지원.
-    - 웹폰트 자동 적용으로 어디서나 동일한 디자인 경험 제공.
-- **Multi-Format Export**:
-    - **HTML**: 반응형(`cqw`) 웹 슬라이드.
-    - **PPTX**: 파워포인트 편집 가능 파일 (Batch 변환 지원).
-    - **PDF**: 고해상도(Ultra HD) 인쇄용 PDF 변환.
+- **Custom Font Support & Multi-Format**:
+    - `Pretendard`, `Noto Sans KR` 등 한글 폰트 지원 및 HTML/PPTX/PDF(Ultra HD) 다양한 포맷 출력.
+
+## 🛠️ 부가 기능 (Auxiliary Features - for External Integration)
+
+외부 툴과의 유연한 결합을 위해 다음 기능들을 별도로 제공합니다.
+
 - **Image + Text Combination**:
     - 텍스트 원본(Source)과 깨끗한 배경(Clean BG)을 각각 업로드하여 고품질 슬라이드를 결합 생성합니다.
-    - **Dual Upload & Validation**: 파일 개수 매칭 및 자동 이름 정렬(Natural Sort) 지원.
-    - **Optimized Pipeline**: Inpainting 과정을 건너뛰고 배경을 직접 병합하여 처리 속도 2배 향상.
-- **Batch Processing**: 여러 장의 슬라이드를 한 번에 변환하고, 하나의 PPTX로 병합할 수 있습니다.
+    - 생성형 AI로 만든 이미지 배경에 텍스트를 입히는 등 다양한 외부 툴 워크플로우와 연동 가능합니다.
+- **PDF to PNG**:
+    - PDF 파일을 고화질 이미지(PNG)로 분리 추출하여 다른 그래픽 툴에서 활용할 수 있도록 돕습니다.
+- **Batch Processing**: 여러 장의 슬라이드를 한 번에 변환하고 병합 처리합니다.
 
 ## 🛠️ 기술 스택 (Tech Stack)
 
