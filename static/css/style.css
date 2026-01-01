@@ -67,6 +67,8 @@ header {
   display: flex;
   align-items: center;
   margin-bottom: 1rem;
+  justify-content: space-between;
+  /* Ensure spacing if needed, though auto margin handles push */
 }
 
 .logo {
@@ -282,8 +284,12 @@ select:focus {
 }
 
 .btn-primary.small {
-  padding: 0.4rem 0.75rem;
+  height: 2.25rem;
+  padding: 0 0.75rem;
   font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-secondary {
@@ -302,8 +308,12 @@ select:focus {
 }
 
 .btn-secondary.small {
-  padding: 0.4rem 0.75rem;
+  height: 2.25rem;
+  padding: 0 0.75rem;
   font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-secondary:hover {
@@ -337,6 +347,12 @@ select:focus {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
+}
+
+.batch-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .batch-info h3 {
@@ -602,6 +618,85 @@ select:focus {
   to {
     opacity: 1;
   }
+}
+
+/* Modal Footer */
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  /* Right align */
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border-color);
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 0 0 1rem 1rem;
+  /* Bottom rounded */
+}
+
+/* Fade In/Out for Copy Message */
+.fade-in {
+  opacity: 1 !important;
+}
+
+/* API Key Modal Specifics */
+.api-key-wrapper {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  height: 2.25rem;
+  box-sizing: border-box;
+  padding: 0 0.5rem;
+  gap: 0.5rem;
+  backdrop-filter: blur(10px);
+  transition: border-color 0.2s;
+}
+
+.api-key-wrapper:focus-within {
+  border-color: var(--primary);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.api-key-input {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  flex-grow: 1;
+  font-size: 0.8rem;
+  padding: 0.25rem 0;
+  outline: none;
+  min-width: 0;
+}
+
+.api-key-actions {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.btn-icon {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  padding: 0.4rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-icon:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+.btn-icon.primary {
+  color: var(--primary);
+}
+
+.btn-icon.primary:hover {
+  background: rgba(99, 102, 241, 0.1);
 }
 
 /* Loading */

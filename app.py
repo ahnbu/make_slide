@@ -92,6 +92,131 @@ async def update_settings(request: Request):
     return JSONResponse({"status": "success", "settings": new_settings})
 
 
+@app.get("/api-key")
+async def get_api_key(request: Request):
+    """
+    Returns the current API Key (full).
+    Frontend will handle masking.
+    """
+    key = os.environ.get("GOOGLE_API_KEY", "")
+    return JSONResponse({"api_key": key})
+
+@app.post("/api-key")
+async def update_api_key(request: Request):
+    """
+    Updates GOOGLE_API_KEY in .env file and reloads environment.
+    """
+    try:
+        data = await request.json()
+        new_key = data.get("api_key", "").strip()
+        
+        if not new_key:
+             return JSONResponse(status_code=400, content={"message": "API Key cannot be empty"})
+
+        # 1. Update .env file
+        env_path = os.path.join(BASE_DIR, ".env")
+        
+        # Read existing content
+        lines = []
+        if os.path.exists(env_path):
+            with open(env_path, "r", encoding="utf-8") as f:
+                lines = f.readlines()
+        
+        found = False
+        new_lines = []
+        for line in lines:
+            if line.strip().startswith("GOOGLE_API_KEY="):
+                new_lines.append(f"GOOGLE_API_KEY={new_key}\n")
+                found = True
+            else:
+                new_lines.append(line)
+        
+        if not found:
+            # If not found (or empty file), append it
+            if new_lines and not new_lines[-1].endswith('\n'):
+                 new_lines.append('\n')
+            new_lines.append(f"GOOGLE_API_KEY={new_key}\n")
+            
+        with open(env_path, "w", encoding="utf-8") as f:
+            f.writelines(new_lines)
+            
+        # 2. Update Runtime Environment
+        os.environ["GOOGLE_API_KEY"] = new_key
+        
+        # 3. Reload Analyzer Client
+        global analyzer
+        # Analyzer re-init will pick up new os.environ key
+        current_vision_model = analyzer.model_name
+        try:
+            analyzer = Analyzer(model_name=current_vision_model)
+            logger.info("Analyzer re-initialized with new API Key.")
+        except Exception as e:
+            logger.error(f"Failed to re-init analyzer: {e}")
+            return JSONResponse(status_code=500, content={"message": "Saved key but failed to reload analyzer. Please restart server."})
+
+        return JSONResponse({"status": "success", "message": "API Key updated successfully."})
+        
+    except Exception as e:
+        logger.error(f"Failed to update API Key: {e}")
+        return JSONResponse(status_code=500, content={"message": str(e)})
+
+
+@app.post("/test-api-key")
+async def test_api_key(request: Request):
+    """
+    Tests the API Key using Gemini 2.5 Flash.
+    Accepts 'api_key' in body. If missing, uses environment variable.
+    """
+    try:
+        data = await request.json()
+        api_key_to_test = data.get("api_key", "").strip()
+        
+        # If no key provided, use current env var
+        if not api_key_to_test:
+            api_key_to_test = os.environ.get("GOOGLE_API_KEY", "")
+
+        if not api_key_to_test:
+             return JSONResponse(status_code=400, content={"message": "No API Key provided to test."})
+
+        # Import explicitly to ensure availability
+        from google import genai
+
+        # Initialize client with the specific key
+        client = genai.Client(api_key=api_key_to_test)
+
+        # Run Test (Using configured vision_model from settings)
+        target_model = current_settings.get("vision_model", "gemini-3-flash-preview")
+        
+        try:
+            response = client.models.generate_content(
+                model=target_model, 
+                contents="Explain how AI works in a few words"
+            )
+            return JSONResponse({
+                "status": "success", 
+                "message": f"API Key is valid! (Tested with {target_model})",
+                "response": response.text
+            })
+        except Exception as e_test:
+            logger.error(f"Model {target_model} Access Failed: {e_test}")
+            error_msg = str(e_test)
+            if "API_KEY_INVALID" in error_msg or "INVALID_ARGUMENT" in error_msg:
+                 return JSONResponse(status_code=400, content={
+                     "status": "error",
+                     "message": f"유효하지 않은 API Key입니다. ({target_model} 테스트 실패)",
+                     "details": str(e_test)
+                 })
+            else:
+                 return JSONResponse(status_code=500, content={
+                     "status": "error",
+                     "message": f"테스트 실패 ({target_model}): {str(e_test)}"
+                 })
+
+    except Exception as e:
+        logger.error(f"API Key Test Failed: {e}")
+        return JSONResponse(status_code=500, content={"message": f"Test Failed: {str(e)}"})
+
+
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})

@@ -33,6 +33,11 @@
           <!-- <span class="badge">v3.11</span> -->
         </div>
       </div>
+      <div class="header-controls">
+        <button id="btnOpenSettings" class="btn-text" title="API Key 설정">
+          <i data-lucide="settings"></i>
+        </button>
+      </div>
     </header>
 
 
@@ -387,6 +392,57 @@
         </div>
       </div>
     </div>
+
+    <!-- API Key Settings Modal -->
+    <div id="settingsModal" class="modal-overlay hidden">
+      <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header">
+          <h3><i data-lucide="key" style="margin-right: 0.5rem; color: var(--accent);"></i> API Key 설정</h3>
+          <button class="btn-text" onclick="closeSettingsModal()"><i data-lucide="x"></i></button>
+        </div>
+        <div class="modal-body" style="flex-direction: column; padding: 1.5rem;">
+          <div style="width: 100%;">
+            <p style="margin-bottom: 1.5rem; color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6;">
+              <!-- <strong style="color: var(--text-primary); display: block; margin-bottom: 0.25rem;">API Key 설정</strong> -->
+              Google Gemini API Key를 입력하세요. 키는 서버의 환경 변수(.env)에 안전하게 저장됩니다.
+            </p>
+
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+              <div class="api-key-wrapper" style="flex-grow: 1; position: relative; padding-right: 2.5rem;">
+                <input type="text" id="apiKeyInput" class="api-key-input" placeholder="AIza..." readonly>
+                <button id="btnCopyApiKey" class="btn-icon" title="복사"
+                  style="position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%);">
+                  <i data-lucide="copy" style="width: 1.2rem;"></i>
+                </button>
+              </div>
+
+              <button id="btnModEdit" class="btn-secondary small" style="white-space: nowrap;">수정</button>
+              <button id="btnModTest" class="btn-secondary small" style="white-space: nowrap;">API테스트</button>
+              <button id="btnModSave" class="btn-primary small hidden" style="white-space: nowrap;">저장</button>
+              <button id="btnModCancel" class="btn-secondary small hidden" style="white-space: nowrap;">취소</button>
+            </div>
+
+            <!-- Copy Feedback Message -->
+            <p id="apiKeyCopyMsg"
+              style="color: var(--success); font-size: 0.85rem; margin-top: 0.5rem; min-height: 1.2rem; opacity: 0; transition: opacity 0.3s;">
+            </p>
+
+            <!-- API Test Result -->
+            <div id="apiTestResult" class="hidden"
+              style="margin-top: 0.5rem; padding: 0.8rem; background: rgba(255, 255, 255, 0.05); border-radius: 8px; font-size: 0.85rem;">
+              <div id="testStatusIcon" style="margin-bottom: 0.3rem; font-weight: bold;"></div>
+              <div id="testResponseText" style="color: var(--text-secondary); max-height: 100px; overflow-y: auto;">
+              </div>
+            </div>
+
+            <p id="apiKeyStatus"
+              style="font-size: 0.8rem; margin-top: 0.2rem; color: var(--text-secondary); min-height: 1.2rem; text-align: right;">
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   </div>
 
   <script src="/static/js/script.js?v=3.13"></script>

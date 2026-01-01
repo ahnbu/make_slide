@@ -806,6 +806,7 @@ document.addEventListener('DOMContentLoaded', () => {
     toast.classList.remove('hidden');
     setTimeout(() => { toast.classList.add('hidden'); }, 3000);
   }
+  window.showToast = showToast;
 
   // --- PDF to PNG Logic (Client Side) ---
   pdfDropZone.addEventListener('click', () => pdfInput.click());
@@ -1160,3 +1161,208 @@ function closeModal() {
 document.getElementById('previewModal').addEventListener('click', (e) => { if (e.target.id === 'previewModal') closeModal(); });
 window.openModal = openModal;
 window.closeModal = closeModal;
+
+// --- API Key Settings Modal Logic ---
+; (function () {
+  const settingsModal = document.getElementById('settingsModal');
+  const btnOpenSettings = document.getElementById('btnOpenSettings');
+  const apiKeyInput = document.getElementById('apiKeyInput');
+  const apiKeyStatus = document.getElementById('apiKeyStatus');
+  const apiKeyCopyMsg = document.getElementById('apiKeyCopyMsg');
+
+  // New Buttons
+  const btnCopyApiKey = document.getElementById('btnCopyApiKey');
+  const btnModEdit = document.getElementById('btnModEdit');
+  const btnModSave = document.getElementById('btnModSave');
+  const btnModCancel = document.getElementById('btnModCancel');
+
+  let currentRealApiKey = "";
+
+  // 1. Define Functions First (Assign to window for global access logic)
+
+  window.closeSettingsModal = function () {
+    settingsModal.classList.add('hidden');
+    cancelEditApiKey();
+  };
+
+  window.openSettingsModal = async function () {
+    settingsModal.classList.remove('hidden');
+    apiKeyStatus.textContent = "API Key를 불러오는 중...";
+    try {
+      const res = await fetch('/api-key');
+      if (res.ok) {
+        const data = await res.json();
+        currentRealApiKey = data.api_key || "";
+        displayMaskedKey(currentRealApiKey);
+        apiKeyStatus.textContent = "";
+      } else {
+        apiKeyStatus.textContent = "API Key 로드 실패";
+      }
+    } catch (e) {
+      console.error(e);
+      apiKeyStatus.textContent = "서버 통신 오류";
+    }
+  };
+
+  window.saveApiKey = async function () {
+    const newKey = apiKeyInput.value.trim();
+    if (!newKey) {
+      apiKeyStatus.textContent = "API Key를 입력해주세요.";
+      return;
+    }
+    apiKeyStatus.textContent = "저장 중...";
+    try {
+      const res = await fetch('/api-key', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ api_key: newKey })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        currentRealApiKey = newKey;
+        // Go back to view mode
+        cancelEditApiKey();
+        displayMaskedKey(currentRealApiKey);
+        apiKeyStatus.textContent = "저장되었습니다.";
+        showToast("✅ API Key가 업데이트되었습니다.");
+      } else {
+        apiKeyStatus.textContent = `저장 실패: ${data.message}`;
+      }
+    } catch (e) {
+      console.error(e);
+      apiKeyStatus.textContent = "저장 중 오류 발생";
+    }
+  };
+
+  // Test API Key Logic
+  window.testApiKey = async function () {
+    const keyToTest = apiKeyInput.readOnly ? currentRealApiKey : apiKeyInput.value.trim();
+    const testResultBox = document.getElementById('apiTestResult');
+    const testStatusIcon = document.getElementById('testStatusIcon');
+    const testResponseText = document.getElementById('testResponseText');
+
+    if (!keyToTest) {
+      showToast("⚠️ 테스트할 API 키가 없습니다.");
+      return;
+    }
+
+    // Get currently selected model name for display
+    const selectedModel = document.getElementById('visionModel').value || "gemini-3-flash-preview";
+
+    // UI Reset
+    testResultBox.classList.remove('hidden');
+    testStatusIcon.textContent = `⏳ API 연결 테스트 중... (${selectedModel})`;
+    testStatusIcon.style.color = "var(--text-primary)";
+    testResponseText.textContent = "";
+
+    try {
+      const res = await fetch('/test-api-key', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ api_key: keyToTest })
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        testStatusIcon.textContent = "✅ 테스트 성공";
+        testStatusIcon.style.color = "var(--success)";
+        testResponseText.textContent = `응답: "${data.response}"`;
+      } else {
+        testStatusIcon.textContent = "❌ 테스트 실패";
+        testStatusIcon.style.color = "var(--error)";
+        testResponseText.textContent = data.message + (data.details ? ` (${data.details})` : "");
+      }
+    } catch (e) {
+      testStatusIcon.textContent = "❌ 통신 오류";
+      testStatusIcon.style.color = "var(--error)";
+      testResponseText.textContent = String(e);
+    }
+  };
+
+  window.cancelEditApiKey = function () {
+    displayMaskedKey(currentRealApiKey);
+    apiKeyInput.readOnly = true;
+    apiKeyInput.style.borderColor = "var(--border)";
+
+    // UI Toggle: Hide Save/Cancel, Show Edit/Test
+    btnModSave.classList.add('hidden');
+    btnModCancel.classList.add('hidden');
+    btnModEdit.classList.remove('hidden');
+    const btnModTest = document.getElementById('btnModTest');
+    if (btnModTest) btnModTest.classList.remove('hidden');
+
+    // Hide Test Result on Cancel/Reset
+    const resBox = document.getElementById('apiTestResult');
+    if (resBox) resBox.classList.add('hidden');
+
+    apiKeyStatus.textContent = "";
+  };
+
+  window.enableEditApiKey = function () {
+    apiKeyInput.value = currentRealApiKey;
+    apiKeyInput.readOnly = false;
+    apiKeyInput.focus();
+    apiKeyInput.style.borderColor = "var(--accent)";
+
+    // UI Toggle: Show Save/Cancel, Hide Edit/Test
+    btnModSave.classList.remove('hidden');
+    btnModCancel.classList.remove('hidden');
+    btnModEdit.classList.add('hidden');
+    const btnModTest = document.getElementById('btnModTest');
+    if (btnModTest) btnModTest.classList.add('hidden');
+
+    // Hide Test Result when starting edit to avoid confusion
+    const resBox = document.getElementById('apiTestResult');
+    if (resBox) resBox.classList.add('hidden');
+
+    apiKeyStatus.textContent = "새로운 키를 입력(수정)하세요.";
+  };
+
+  function copyApiKey() {
+    if (!currentRealApiKey) return;
+    navigator.clipboard.writeText(currentRealApiKey).then(() => {
+      // Inline Feedback Message
+      apiKeyCopyMsg.textContent = "API 키가 클립보드에 복사되었습니다";
+      apiKeyCopyMsg.classList.add('fade-in');
+
+      // Auto-hide after 2 seconds
+      setTimeout(() => {
+        apiKeyCopyMsg.classList.remove('fade-in');
+        // Clear text after fade out (approx 300ms transition)
+        setTimeout(() => { apiKeyCopyMsg.textContent = ""; }, 300);
+      }, 2000);
+    });
+  }
+
+  function displayMaskedKey(key) {
+    if (!key) {
+      apiKeyInput.value = "(설정된 키 없음)";
+      return;
+    }
+    if (key.length < 10) {
+      apiKeyInput.value = "******";
+      return;
+    }
+    const prefix = key.substring(0, 6);
+    const suffix = key.substring(key.length - 4);
+    apiKeyInput.value = `${prefix}...${"•".repeat(10)}...${suffix}`;
+  }
+
+  // 2. Bind Listeners
+  if (btnOpenSettings) {
+    btnOpenSettings.addEventListener('click', window.openSettingsModal);
+  }
+
+  if (btnCopyApiKey) btnCopyApiKey.addEventListener('click', copyApiKey);
+
+  // New Footer Button Listeners
+  if (btnModEdit) btnModEdit.addEventListener('click', window.enableEditApiKey);
+  if (btnModCancel) btnModCancel.addEventListener('click', window.cancelEditApiKey);
+  if (btnModSave) btnModSave.addEventListener('click', window.saveApiKey);
+
+  const btnModTest = document.getElementById('btnModTest');
+  if (btnModTest) btnModTest.addEventListener('click', window.testApiKey);
+
+})();
+
+

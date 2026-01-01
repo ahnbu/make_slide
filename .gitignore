@@ -7,5 +7,6 @@ static/uploads/
 sample_image/
 docs/antigravity-workflow-ppt-main
 output/
+test/
 logs/
 logs/execution_log.txt
