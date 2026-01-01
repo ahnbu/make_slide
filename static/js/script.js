@@ -447,6 +447,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (settings.exclude_text) AppSettings.exclude_text = settings.exclude_text;
         if (settings.max_concurrent) AppSettings.max_concurrent = parseInt(settings.max_concurrent);
         if (settings.font_family) AppSettings.font_family = settings.font_family;
+        if (settings.refine_layout !== undefined) AppSettings.refine_layout = settings.refine_layout;
 
         // Sync UI
         visionModelSelect.value = AppSettings.vision_model;
@@ -456,6 +457,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (outputFormatSelect) outputFormatSelect.value = AppSettings.output_format;
         if (fontFamilySelect) fontFamilySelect.value = AppSettings.font_family;
         maxConcurrentSelect.value = AppSettings.max_concurrent;
+        if (refineLayoutSelect) refineLayoutSelect.value = AppSettings.refine_layout.toString();
       }
     } catch (e) {
       console.error("Failed to load settings", e);
@@ -471,7 +473,8 @@ document.addEventListener('DOMContentLoaded', () => {
       exclude_text: AppSettings.exclude_text,
       output_format: AppSettings.output_format,
       max_concurrent: AppSettings.max_concurrent,
-      font_family: AppSettings.font_family
+      font_family: AppSettings.font_family,
+      refine_layout: AppSettings.refine_layout
     };
 
     try {
@@ -491,6 +494,7 @@ document.addEventListener('DOMContentLoaded', () => {
   codegenModelSelect.addEventListener('change', (e) => { AppSettings.codegen_model = e.target.value; });
   if (excludeTextInput) excludeTextInput.addEventListener('input', (e) => { AppSettings.exclude_text = e.target.value; });
   if (outputFormatSelect) outputFormatSelect.addEventListener('change', (e) => { AppSettings.output_format = e.target.value; });
+  if (fontFamilySelect) fontFamilySelect.addEventListener('change', (e) => { AppSettings.font_family = e.target.value; });
 
   maxConcurrentSelect.addEventListener('change', (e) => {
     AppSettings.max_concurrent = parseInt(e.target.value);

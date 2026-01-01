@@ -44,7 +44,9 @@ DEFAULT_SETTINGS = {
     "vision_model": "gemini-3-flash-preview",
     "inpainting_model": "opencv-telea",
     "codegen_model": "algorithmic",
-    "output_format": "both"
+    "output_format": "both",
+    "font_family": "Malgun Gothic",
+    "refine_layout": False
 }
 
 SETTINGS_FILE = os.path.join(BASE_DIR, "settings.json")
@@ -122,7 +124,8 @@ async def upload_file(
     batch_folder: str = Form("single"),
     max_concurrent: int = Form(3), # Receive concurrency setting
     exclude_text: str = Form(None),
-    font_family: str = Form("Malgun Gothic") # Default font
+    font_family: str = Form("Malgun Gothic"), # Default font
+    refine_layout: bool = Form(False)
 ):
     # Dynamic Concurrency Update (Runtime)
     global MAX_CONCURRENT_TASKS, semaphore
@@ -163,7 +166,8 @@ async def upload_file(
         codegen_model,
         batch_folder,
         exclude_text,
-        font_family
+        font_family,
+        refine_layout
     )
 
     return JSONResponse({"status": "processing", "task_id": task_id})
@@ -344,7 +348,7 @@ async def process_combine_task(task_id, source_path, bg_path, original_name, vis
             logger.error(f"Combine Task Error: {e}")
             progress_store[task_id] = {"status": "error", "message": str(e), "percent": 0}
 
-async def process_slide_task(task_id, input_path, original_name, vision_model, inpainting_model, codegen_model, batch_folder, exclude_text=None, font_family="Malgun Gothic"):
+async def process_slide_task(task_id, input_path, original_name, vision_model, inpainting_model, codegen_model, batch_folder, exclude_text=None, font_family="Malgun Gothic", refine_layout=False):
     async with semaphore:
         if task_id in cancelled_tasks:
             logger.info(f"Task {task_id} cancelled before starting.")
@@ -396,7 +400,8 @@ async def process_slide_task(task_id, input_path, original_name, vision_model, i
             progress_store[task_id] = {"status": "processing", "message": "[2단계 of 4단계] 디자인 전문가 피드백 루프 수행 중...", "percent": 30}
 
             # 1.2 Refinement (Feedback Loop)
-            layout_data = await asyncio.to_thread(analyzer.refine_layout, input_path, layout_data)
+            if refine_layout:
+                 layout_data = await asyncio.to_thread(analyzer.refine_layout, input_path, layout_data)
             
             # 1.3 Pixel Conversion
             layout_data = analyzer.convert_to_pixels(layout_data, width, height)
@@ -464,7 +469,7 @@ async def process_slide_task(task_id, input_path, original_name, vision_model, i
             # normalize=False because we already did it
             # USE FILTERED LAYOUT
             # PASS FONT FAMILY
-            await asyncio.to_thread(code_generator.generate_html, filtered_layout_data, width, height, bg_path, html_path, normalize=False, font_family=font_family)
+            await asyncio.to_thread(code_generator.generate_html, filtered_layout_data, width, height, bg_path, html_path, normalize=False, font_family=font_family, model_name=codegen_model)
             
             # Log execution
             log_execution(original_name, current_vision_model, inpainting_model, codegen_model)

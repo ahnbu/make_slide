@@ -57,7 +57,7 @@ class CodeGenerator:
 
         return layout_data
 
-    def generate_html(self, layout_data, width, height, bg_image_path, output_path, normalize=True, font_family="Malgun Gothic"):
+    def generate_html(self, layout_data, width, height, bg_image_path, output_path, normalize=True, font_family="Malgun Gothic", model_name="algorithmic"):
         logger.info(f"Generating HTML (with embedded BG): {output_path}")
         
         if normalize:
