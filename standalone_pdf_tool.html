@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF to Slide Converter</title>
+  <!-- Favicon (Layers Icon) -->
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z'/><path d='m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65'/><path d='m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65'/></svg>">
+
+  <!-- Dependencies (CDN) -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+
+  <style>
+    /* Embedded CSS from style.css */
+    :root {
+      --bg-dark: #0f172a;
+      --bg-card: #1e293b;
+      --bg-card-hover: #334155;
+      --border-color: #334155;
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent: #38bdf8;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Pretendard', 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .lucide {
+      vertical-align: middle;
+    }
+
+    .animate-spin {
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .app-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo-icon {
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+    }
+
+    .logo-text h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0;
+      background: linear-gradient(to right, #fff, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .glass-panel {
+      background-color: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .upload-content {
+      text-align: center;
+      padding: 3rem;
+    }
+
+    .icon-cloud {
+      color: var(--primary);
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .icon-cloud svg {
+      width: 48px;
+      height: 48px;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .btn-secondary {
+      background-color: var(--bg-card-hover);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--border-color);
+    }
+
+    .btn-primary.small,
+    .btn-secondary.small {
+      height: 2.25rem;
+      padding: 0 0.75rem;
+      font-size: 0.8rem;
+    }
+
+    .btn-text {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      text-decoration: underline;
+      cursor: pointer;
+      margin-left: 1rem;
+      font-size: 0.875rem;
+    }
+
+    .btn-icon {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      padding: 0.4rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-icon:hover {
+      color: var(--text-primary);
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Specific PDF Tool Styles */
+    .pdf-top-area {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .pdf-drop {
+      border: 2px dashed var(--border-color);
+      border-radius: 0.75rem;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .pdf-drop:hover {
+      border-color: var(--primary);
+      background-color: rgba(99, 102, 241, 0.1);
+    }
+
+    .file-info {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1rem;
+      font-size: 1.1rem;
+    }
+
+    .file-name {
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      background: var(--bg-card-hover);
+      color: var(--accent);
+      padding: 0.1rem 0.5rem;
+      border-radius: 9999px;
+      font-weight: 600;
+      margin-left: 0.5rem;
+    }
+
+    .pdf-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      background-color: rgba(15, 23, 42, 0.3);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .toolbar-right {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    /* Custom Checkbox */
+    .custom-checkbox {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      position: relative;
+      padding-left: 30px;
+      user-select: none;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .custom-checkbox input {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+      height: 0;
+      width: 0;
+    }
+
+    .checkmark {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 20px;
+      width: 20px;
+      background-color: var(--bg-card-hover);
+      border-radius: 4px;
+      border: 1px solid var(--border-color);
+      transition: all 0.2s;
+    }
+
+    .custom-checkbox:hover input~.checkmark {
+      background-color: var(--border-color);
+    }
+
+    .custom-checkbox input:checked~.checkmark {
+      background-color: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .checkmark:after {
+      content: "";
+      position: absolute;
+      display: none;
+    }
+
+    .custom-checkbox input:checked~.checkmark:after {
+      display: block;
+    }
+
+    .custom-checkbox .checkmark:after {
+      left: 7px;
+      top: 3px;
+      width: 5px;
+      height: 10px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+
+    /* Grid - Updated to ~3 columns */
+    .pdf-results {
+      padding: 1.5rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .pdf-page-card {
+      position: relative;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 0.5rem;
+      overflow: hidden;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .pdf-page-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--primary);
+      box-shadow: var(--shadow-md);
+    }
+
+    .pdf-page-card.selected {
+      border-color: var(--primary);
+      ring: 2px solid var(--primary);
+    }
+
+    .pdf-thumb-container {
+      width: 100%;
+      /* height: auto; */
+      background-color: transparent;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pdf-thumb-img {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: contain;
+    }
+
+    .page-checkbox {
+      position: absolute;
+      top: 0.5rem;
+      left: 0.5rem;
+      z-index: 10;
+      transform: scale(1.2);
+    }
+
+    .page-info {
+      padding: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      text-align: center;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: var(--card-bg);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 999px;
+      box-shadow: var(--shadow-lg);
+      font-size: 0.9rem;
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border: 1px solid var(--border-color);
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    .modal-content {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+      width: 90%;
+      max-width: 1200px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .modal-body {
+      flex-grow: 1;
+      padding: 2rem;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.2);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-preview-container {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: white;
+      border-radius: 0.5rem;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .modal-footer {
+      padding: 1.5rem;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="app-container">
+    <header>
+      <div class="logo">
+        <div class="logo-icon"><i data-lucide="layers" size="32"></i></div>
+        <div class="logo-text">
+          <h1>PDF to Slide Converter</h1>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section id="pdfSection" class="glass-panel">
+        <!-- Top: Info & Upload -->
+        <div id="pdfTopArea" class="pdf-top-area">
+          <div id="pdfDropZone" class="upload-content pdf-drop">
+            <div class="icon-cloud"><i data-lucide="file-text"></i></div>
+            <h2>PDF 파일 업로드</h2>
+            <p>여기에 PDF를 드래그하거나 클릭하세요. (서버 전송 없음, 100% 로컬 처리)</p>
+            <input type="file" id="pdfInput" accept="application/pdf" hidden>
+          </div>
+
+          <div id="pdfFileInfo" class="file-info hidden">
+            <i data-lucide="file" style="margin-right: 0.5rem;"></i>
+            <span id="pdfFileName" class="file-name">filename.pdf</span>
+            <span id="pdfPageCount" class="badge">0 pages</span>
+            <button id="btnPdfReset" class="btn-text small">다른 파일 업로드</button>
+          </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div id="pdfToolbar" class="pdf-toolbar hidden">
+          <div class="toolbar-left">
+            <label class="custom-checkbox">
+              <input type="checkbox" id="pdfSelectAll">
+              <span class="checkmark"></span>
+              <span class="label-text">전체 선택</span>
+            </label>
+          </div>
+          <div class="toolbar-right">
+            <button id="btnDownloadPptxSimple" class="btn-primary small">
+              <i data-lucide="presentation"></i> PPTX 다운로드
+            </button>
+            <button id="btnDownloadSelected" class="btn-secondary small" disabled>
+              <i data-lucide="check-square"></i> 선택 다운로드 (0)
+            </button>
+            <button id="btnDownloadAll" class="btn-primary small">
+              <i data-lucide="archive"></i> 전체 다운로드
+            </button>
+          </div>
+        </div>
+
+        <!-- Results Grid -->
+        <div id="pdfResultContainer" class="pdf-results hidden"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal -->
+  <div id="previewModal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modalTitle">Slide Preview</h3>
+        <button class="btn-icon" onclick="closeModal()"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <div id="modalPreviewContainer" class="modal-preview-container"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal()">닫기</button>
+        <a id="modalBtnDownloadBg" class="btn-primary" href="#" download>
+          <i data-lucide="download"></i> 이미지 다운로드
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast">
+    <i data-lucide="info"></i>
+    <span id="toastMessage">알림</span>
+  </div>
+
+  <script>
+    // Initialize Icons
+    lucide.createIcons();
+
+    // PDF.js Worker
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    // State
+    let currentPdfDoc = null;
+    let currentPdfBlobs = []; // { blob, filename, index }
+
+    // Elements
+    const dropZone = document.getElementById('pdfDropZone');
+    const fileInput = document.getElementById('pdfInput');
+    const fileInfo = document.getElementById('pdfFileInfo');
+    const fileNameEl = document.getElementById('pdfFileName');
+    const pageCountEl = document.getElementById('pdfPageCount');
+    const btnReset = document.getElementById('btnPdfReset');
+    const toolbar = document.getElementById('pdfToolbar');
+    const resultContainer = document.getElementById('pdfResultContainer');
+
+    const selectAllCheck = document.getElementById('pdfSelectAll');
+    const btnDlPptx = document.getElementById('btnDownloadPptxSimple');
+    const btnDlSelected = document.getElementById('btnDownloadSelected');
+    const btnDlAll = document.getElementById('btnDownloadAll');
+
+    // Toast Function
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const msgEl = document.getElementById('toastMessage');
+      msgEl.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // --- File Handling ---
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = 'var(--primary)'; });
+    dropZone.addEventListener('dragleave', (e) => { e.preventDefault(); dropZone.style.borderColor = 'var(--border-color)'; });
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.style.borderColor = 'var(--border-color)';
+      if (e.dataTransfer.files.length > 0) handlePdf(e.dataTransfer.files[0]);
+    });
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) handlePdf(e.target.files[0]);
+    });
+
+    btnReset.addEventListener('click', () => {
+      currentPdfDoc = null;
+      currentPdfBlobs = [];
+      resultContainer.innerHTML = '';
+      resultContainer.classList.add('hidden');
+      toolbar.classList.add('hidden');
+      fileInfo.classList.add('hidden');
+      dropZone.classList.remove('hidden');
+      fileInput.value = '';
+    });
+
+    async function handlePdf(file) {
+      if (file.type !== 'application/pdf') {
+        showToast('PDF 파일만 업로드 가능합니다.');
+        return;
+      }
+
+      try {
+        showToast('PDF를 로딩 중입니다...');
+        dropZone.classList.add('hidden');
+        fileInfo.classList.remove('hidden');
+        fileNameEl.textContent = file.name;
+
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+        currentPdfDoc = pdf;
+        pageCountEl.textContent = `${pdf.numPages} pages`;
+
+        // Render Pages
+        await renderPdfPages(pdf, file.name);
+      } catch (e) {
+        console.error(e);
+        showToast('PDF 로드 실패: ' + e.message);
+        dropZone.classList.remove('hidden');
+        fileInfo.classList.add('hidden');
+      }
+    }
+
+    async function renderPdfPages(pdf, originalFilename) {
+      resultContainer.innerHTML = '';
+      resultContainer.classList.remove('hidden');
+      toolbar.classList.remove('hidden');
+      currentPdfBlobs = [];
+
+      // Simple base name
+      const baseName = originalFilename.replace('.pdf', '');
+
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const viewport = page.getViewport({ scale: 1.5 }); // Good quality preview
+
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+
+        await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+
+        // To Blob
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        const filename = `${baseName}_page_${String(i).padStart(3, '0')}.png`;
+
+        currentPdfBlobs.push({
+          index: i,
+          blob: blob,
+          filename: filename
+        });
+
+        // Create UI Card
+        const card = document.createElement('div');
+        card.className = 'pdf-page-card';
+        card.dataset.index = i;
+
+        const thumbUrl = URL.createObjectURL(blob);
+
+        card.innerHTML = `
+                <div class="pdf-thumb-container">
+                    <label class="custom-checkbox page-checkbox">
+                        <input type="checkbox" class="pdf-check-input" data-index="${i}">
+                        <span class="checkmark"></span>
+                    </label>
+                    <img src="${thumbUrl}" class="pdf-thumb-img" alt="Page ${i}">
+                </div>
+                <div class="page-info">
+                    <span>Page ${i}</span>
+                    <button class="btn-icon" onclick="openModal('${thumbUrl}', 'Page ${i}')" title="크게 보기">
+                        <i data-lucide="eye"></i>
+                    </button>
+                </div>
+            `;
+        resultContainer.appendChild(card);
+      }
+
+      // Attach Checkbox Listeners
+      const checkboxes = document.querySelectorAll('.pdf-check-input');
+      checkboxes.forEach(cb => {
+        cb.addEventListener('change', updateSelectionState);
+      });
+
+      // Initialize new icons
+      lucide.createIcons();
+
+      showToast('PDF 변환 완료! (총 ' + pdf.numPages + '페이지)');
+    }
+
+    // --- Selection Logic ---
+    function updateSelectionState() {
+      const checked = document.querySelectorAll('.pdf-check-input:checked');
+      const count = checked.length;
+
+      btnDlSelected.disabled = count === 0;
+      btnDlSelected.innerHTML = `<i data-lucide="check-square"></i> 선택 다운로드 (${count})`;
+      lucide.createIcons({ root: btnDlSelected });
+
+      // Visual Selection
+      document.querySelectorAll('.pdf-page-card').forEach(card => {
+        const cb = card.querySelector('.pdf-check-input');
+        if (cb.checked) card.classList.add('selected');
+        else card.classList.remove('selected');
+      });
+
+      // Select All Checkbox Sync
+      selectAllCheck.checked = (count === currentPdfBlobs.length && count > 0);
+    }
+
+    selectAllCheck.addEventListener('change', (e) => {
+      const isChecked = e.target.checked;
+      document.querySelectorAll('.pdf-check-input').forEach(cb => {
+        cb.checked = isChecked;
+      });
+      updateSelectionState();
+    });
+
+    // --- Download Functions ---
+
+    // 1. Download Selected
+    btnDlSelected.addEventListener('click', () => {
+      const checked = document.querySelectorAll('.pdf-check-input:checked');
+      const indices = Array.from(checked).map(cb => parseInt(cb.dataset.index));
+      const items = currentPdfBlobs.filter(b => indices.includes(b.index));
+      downloadImages(items);
+    });
+
+    // 2. Download All
+    btnDlAll.addEventListener('click', () => {
+      downloadImages(currentPdfBlobs);
+    });
+
+    async function downloadImages(items) {
+      if (items.length === 0) return;
+
+      // No Zip, individual sequential download
+      showToast(`${items.length}개의 파일 다운로드를 시작합니다.`);
+
+      let count = 0;
+      for (const item of items) {
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(item.blob);
+        link.download = item.filename;
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        count++;
+        // 200ms Delay to avoid block
+        await new Promise(r => setTimeout(r, 200));
+      }
+
+      showToast('다운로드 완료');
+    }
+
+    function saveBlob(blob, filename) {
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // 3. PPTX Download (Client-side)
+    btnDlPptx.addEventListener('click', async () => {
+      if (currentPdfBlobs.length === 0) return;
+
+      // Target Determination
+      const checked = document.querySelectorAll('.pdf-check-input:checked');
+      let targetBlobs = currentPdfBlobs;
+      if (checked.length > 0) {
+        const indices = Array.from(checked).map(cb => parseInt(cb.dataset.index));
+        targetBlobs = currentPdfBlobs.filter(b => indices.includes(b.index));
+      }
+
+      const originalText = btnDlPptx.innerHTML;
+      btnDlPptx.innerHTML = `<i data-lucide="loader-2" class="animate-spin"></i> 생성 중...`;
+      btnDlPptx.disabled = true;
+      lucide.createIcons({ root: btnDlPptx });
+
+      try {
+        const pptx = new PptxGenJS();
+        // pptx.layout = 'LAYOUT_16x9'; // Default
+
+        for (const item of targetBlobs) {
+          const slide = pptx.addSlide();
+          const imgUrl = URL.createObjectURL(item.blob);
+          slide.addImage({ path: imgUrl, x: 0, y: 0, w: '100%', h: '100%' });
+        }
+
+        const now = new Date();
+        const timeStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+        await pptx.writeFile({ fileName: `PDF_Slides_${timeStr}.pptx` });
+
+        showToast(`PPTX 다운로드 완료! (${targetBlobs.length} 페이지)`);
+      } catch (e) {
+        console.error(e);
+        showToast('PPTX 생성 실패');
+      } finally {
+        btnDlPptx.innerHTML = originalText;
+        btnDlPptx.disabled = false;
+        lucide.createIcons({ root: btnDlPptx });
+      }
+    });
+
+    // --- Modal ---
+    window.openModal = function (url, title) {
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalPreviewContainer').innerHTML = `<img src="${url}" style="width:100%; height:100%; object-fit:contain;">`;
+      document.getElementById('modalBtnDownloadBg').href = url;
+      document.getElementById('previewModal').classList.remove('hidden');
+    }
+    window.closeModal = function () {
+      document.getElementById('previewModal').classList.add('hidden');
+    }
+    document.getElementById('previewModal').addEventListener('click', (e) => {
+      if (e.target.id === 'previewModal') closeModal();
+    });
+
+  </script>
+</body>
+
+</html>

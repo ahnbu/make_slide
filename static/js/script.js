@@ -1056,33 +1056,49 @@ document.addEventListener('DOMContentLoaded', () => {
       btnDownloadPptxSimple.disabled = true;
 
       try {
-        const formData = new FormData();
-        targetBlobs.forEach(item => {
-          formData.append('images', item.blob, item.filename);
-        });
+        // --- Client-Side PPTX Generation (PptxGenJS) ---
+        // Requires: <script src="https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
 
-        const res = await fetch('/pdf-to-pptx-download', {
-          method: 'POST',
-          body: formData
-        });
-        const data = await res.json();
+        const pptx = new PptxGenJS();
 
-        if (res.ok && data.status === 'success') {
-          // Trigger Download
-          const link = document.createElement('a');
-          link.href = data.download_url;
-          link.download = data.filename;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          showToast(`PPTX 다운로드 완료! (${targetBlobs.length} 페이지)`);
-        } else {
-          showToast(`오류: ${data.message || '생성 실패'}`);
+        // Settings to match standard 16:9 
+        // PptxGenJS default is 16:9 (10 x 5.625 inches)
+
+        // Loop through images and add slides
+        for (const item of targetBlobs) {
+          const slide = pptx.addSlide();
+
+          // Create Object URL for the blob
+          const imgUrl = URL.createObjectURL(item.blob);
+
+          // Add Image to Slide (Cover)
+          // x, y, w, h in inches (or percentage '100%')
+          // PptxGenJS supports data URLs or paths. Blob URL works in modern browsers.
+          slide.addImage({
+            path: imgUrl,
+            x: 0,
+            y: 0,
+            w: '100%',
+            h: '100%'
+          });
+
+          // Note: We should revoke URL later, but PptxGenJS needs it during generation. 
+          // It's tricky to know when it's done reading. 
+          // Usually fine to let browser handle cleanup on page unload or keep small number.
         }
+
+        // Generate and Download
+        const now = new Date();
+        const timeStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+        const filename = `PDF_Slides_${timeStr}.pptx`;
+
+        await pptx.writeFile({ fileName: filename });
+
+        showToast(`PPTX 다운로드 완료! (${targetBlobs.length} 페이지)`);
 
       } catch (e) {
         console.error(e);
-        showToast('PPTX 생성 중 서버 오류가 발생했습니다.');
+        showToast('PPTX 생성 중 오류가 발생했습니다.');
       } finally {
         btnDownloadPptxSimple.innerHTML = originalText;
         btnDownloadPptxSimple.disabled = false;

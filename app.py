@@ -831,63 +831,7 @@ async def remove_text_ai(
         logger.error(f"Remove Text AI Error: {e}")
         return JSONResponse(status_code=500, content={"message": str(e)})
 
-@app.post("/pdf-to-pptx-download")
-async def pdf_to_pptx_download(images: List[UploadFile] = File(...)):
-    """
-    Receives a list of images (converted from PDF pages).
-    Generates a PPTX where each slide contains one image as background.
-    No text extraction or AI analysis.
-    """
-    try:
-        from PIL import Image
-        
-        timestamp = generate_timestamp()
-        batch_id = str(uuid.uuid4())[:8]
-        
-        # Create output directory
-        output_subfolder = f"pdf_pptx_{timestamp}_{batch_id}"
-        target_dir = os.path.join(OUTPUT_DIR, output_subfolder)
-        ensure_directory(target_dir)
-        
-        # Initialize PPTX Generator
-        pptx_gen = PPTXGenerator()
-        
-        # Process each image
-        for idx, img_file in enumerate(images):
-            # Save image temporarily
-            original_name = img_file.filename or f"page_{idx+1}.png"
-            temp_img_path = os.path.join(target_dir, original_name)
-            
-            with open(temp_img_path, "wb") as buffer:
-                shutil.copyfileobj(img_file.file, buffer)
-            
-            # Get dimensions
-            try:
-                with Image.open(temp_img_path) as img:
-                    width, height = img.size
-            except Exception as e:
-                logger.error(f"Failed to read image dimensions for {original_name}: {e}")
-                width, height = 1280, 720 # Fallback
 
-            # Add slide (Empty layout data -> Just background)
-            pptx_gen.add_slide([], temp_img_path, width, height)
-            
-        # Save PPTX
-        pptx_filename = f"PDF_Slides_{timestamp}.pptx"
-        pptx_path = os.path.join(target_dir, pptx_filename)
-        pptx_gen.save(pptx_path)
-        
-        download_url = f"/output/{output_subfolder}/{pptx_filename}"
-        
-        return JSONResponse({
-            "status": "success",
-            "download_url": download_url,
-            "filename": pptx_filename
-        })
-
-    except Exception as e:
-        logger.error(f"PDF to PPTX Download Failed: {e}")
-        return JSONResponse(status_code=500, content={"message": str(e)})
 
 @app.post("/generate-pptx-batch/{batch_folder}")
 async def generate_pptx_batch(batch_folder: str):
