@@ -816,9 +816,9 @@
           slide.addImage({ path: imgUrl, x: 0, y: 0, w: '100%', h: '100%' });
         }
 
-        const now = new Date();
-        const timeStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
-        await pptx.writeFile({ fileName: `PDF_Slides_${timeStr}.pptx` });
+        const originalName = fileNameEl.textContent.trim();
+        const baseName = originalName.toLowerCase().endsWith('.pdf') ? originalName.slice(0, -4) : originalName;
+        await pptx.writeFile({ fileName: `${baseName}_변환.pptx` });
 
         showToast(`PPTX 다운로드 완료! (${targetBlobs.length} 페이지)`);
       } catch (e) {
