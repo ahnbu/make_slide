@@ -70,6 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnDownloadSelected = document.getElementById('btnDownloadSelected');
   const btnDownloadAll = document.getElementById('btnDownloadAll');
   const btnPptxStart = document.getElementById('btnPptxStart');
+  const btnDownloadPptxSimple = document.getElementById('btnDownloadPptxSimple'); // New Button
 
   // PDF State
   let currentPdfBlobs = []; // Array of { blob, filename, index }
@@ -1022,6 +1023,72 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     showToast(`${count}개 파일 다운로드 완료`);
+  }
+
+  // New Function for Simple PPTX Download
+  if (btnDownloadPptxSimple) {
+    btnDownloadPptxSimple.addEventListener('click', async () => {
+      if (currentPdfBlobs.length === 0) {
+        showToast('변환된 데이터가 없습니다.');
+        return;
+      }
+
+      // Determine targets: Selected or All
+      const selectedIndices = Array.from(document.querySelectorAll('.pdf-check-input:checked'))
+        .map(cb => parseInt(cb.dataset.index));
+
+      // If selections exist, filter. Else take ALL.
+      let targetBlobs = [];
+      if (selectedIndices.length > 0) {
+        targetBlobs = currentPdfBlobs.filter(item => selectedIndices.includes(item.index));
+      } else {
+        targetBlobs = currentPdfBlobs;
+      }
+
+      if (targetBlobs.length === 0) {
+        showToast('다운로드할 이미지가 없습니다.');
+        return;
+      }
+
+      // UI Feedback
+      const originalText = btnDownloadPptxSimple.innerHTML;
+      btnDownloadPptxSimple.innerHTML = `<i data-lucide="loader-2" class="animate-spin"></i> 생성 중...`;
+      btnDownloadPptxSimple.disabled = true;
+
+      try {
+        const formData = new FormData();
+        targetBlobs.forEach(item => {
+          formData.append('images', item.blob, item.filename);
+        });
+
+        const res = await fetch('/pdf-to-pptx-download', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+
+        if (res.ok && data.status === 'success') {
+          // Trigger Download
+          const link = document.createElement('a');
+          link.href = data.download_url;
+          link.download = data.filename;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          showToast(`PPTX 다운로드 완료! (${targetBlobs.length} 페이지)`);
+        } else {
+          showToast(`오류: ${data.message || '생성 실패'}`);
+        }
+
+      } catch (e) {
+        console.error(e);
+        showToast('PPTX 생성 중 서버 오류가 발생했습니다.');
+      } finally {
+        btnDownloadPptxSimple.innerHTML = originalText;
+        btnDownloadPptxSimple.disabled = false;
+        lucide.createIcons({ root: btnDownloadPptxSimple });
+      }
+    });
   }
 
   // Handle Tab Switch for PDF
