@@ -7,6 +7,9 @@ from fastapi.templating import Jinja2Templates
 from fastapi.requests import Request
 from dotenv import load_dotenv
 import asyncio
+import urllib.request
+import urllib.error
+import mimetypes
 
 from src.analyzer import Analyzer
 from src.image_processor import ImageProcessor
@@ -1046,6 +1049,85 @@ async def combine_upload(
     )
     
     return JSONResponse({"status": "processing", "task_id": task_id})
+
+
+
+@app.post("/api/remove-text-photoroom")
+async def remove_text_photoroom(
+    file: UploadFile = File(...),
+    batch_folder: str = Form("single"),
+    mode: str = Form("ai.all")
+):
+    try:
+        # Check for Sandbox Key first as requested, then Fallback
+        api_key = os.environ.get("PHOTOROOM_API_KEY_SANDBOX") or os.environ.get("PHOTOROOM_API_KEY")
+        if not api_key:
+             return JSONResponse(status_code=500, content={"message": "PHOTOROOM_API_KEY_SANDBOX not found in environment"})
+             
+        # Generate paths
+        timestamp = generate_timestamp()
+        original_name = os.path.splitext(file.filename)[0]
+        
+        target_dir = os.path.join(OUTPUT_DIR, batch_folder)
+        ensure_directory(target_dir)
+        
+        # Read file content
+        file_content = await file.read()
+        
+        boundary = '----WebKitFormBoundary' + uuid.uuid4().hex
+        
+        # Construct Body
+        body = []
+        # Image Part
+        body.append(f'--{boundary}'.encode())
+        body.append(f'Content-Disposition: form-data; name="imageFile"; filename="{file.filename}"'.encode())
+        mime_type = mimetypes.guess_type(file.filename)[0] or 'application/octet-stream'
+        body.append(f'Content-Type: {mime_type}'.encode())
+        body.append(b'')
+        body.append(file_content)
+        
+        # End Boundary
+        body.append(f'--{boundary}--'.encode())
+        body.append(b'')
+        
+        payload = b'\r\n'.join(body)
+        
+        # Use user-provided mode
+        url = f"https://image-api.photoroom.com/v2/edit?textRemoval.mode={mode}"
+        req = urllib.request.Request(url, data=payload)
+        req.add_header('x-api-key', api_key)
+        req.add_header('Content-Type', f'multipart/form-data; boundary={boundary}')
+        
+        try:
+            # Execute Request (blocking, so maybe wrap in thread if heavy traffic, but okay for single use)
+            def _execute_request(request):
+                with urllib.request.urlopen(request) as response:
+                    return response.read()
+
+            result_data = await asyncio.to_thread(_execute_request, req)
+                
+            # Save result
+            output_filename = f"{original_name}_photoroom_{timestamp}.png"
+            output_path = os.path.join(target_dir, output_filename)
+            
+            with open(output_path, "wb") as f:
+                f.write(result_data)
+                
+            return JSONResponse({
+                "status": "success",
+                "data": {
+                    "bg_url": f"/output/{batch_folder}/{output_filename}"
+                }
+            })
+            
+        except urllib.error.HTTPError as e:
+            err_content = e.read().decode()
+            logger.error(f"Photoroom API Error: {err_content}")
+            return JSONResponse(status_code=e.code, content={"message": f"Photoroom API Failed: {err_content}"})
+            
+    except Exception as e:
+        logger.error(f"Remove Text Photoroom Error: {e}")
+        return JSONResponse(status_code=500, content={"message": str(e)})
 
 
 if __name__ == "__main__":

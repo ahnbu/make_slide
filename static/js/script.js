@@ -28,16 +28,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const batchProgressBar = document.getElementById('batchProgressBar');
   const batchStatusText = document.getElementById('batchStatusText');
 
-  // Settings Elements
-  const visionModelSelect = document.getElementById('visionModel');
-  const inpaintingModelSelect = document.getElementById('inpaintingModel');
-  const codegenModelSelect = document.getElementById('codegenModel');
-  const excludeTextInput = document.getElementById('excludeText');
-  const outputFormatSelect = document.getElementById('outputFormat');
-  const fontFamilySelect = document.getElementById('fontFamily');
-  const maxConcurrentSelect = document.getElementById('maxConcurrent');
-  const btnSaveDefaults = document.getElementById('btnSaveDefaults');
-  const refineLayoutSelect = document.getElementById('refineLayout');
+  // Settings Elements (Legacy Global removed, now dynamic or scoped)
+  // We don't need global references anymore for most things, but `loadSettings` will grab them by ID.
+  const btnSaveDefaults = document.getElementById('btnSaveDefaults'); // This button might be removed or needs to be re-added to each tab if requested.
+  // For now, let's remove the global bindings since elements are gone.
+
 
   // Combine Mode Elements
   const combineSection = document.getElementById('combineSection');
@@ -93,6 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Dynamic Getter for Config from AppSettings
     get maxConcurrent() {
+      // Use AppSettings, which we keep matched to the active tab's concurrent setting
       return AppSettings.max_concurrent;
     }
 
@@ -181,35 +177,73 @@ document.addEventListener('DOMContentLoaded', () => {
     async runJob(job) {
       const formData = new FormData();
       formData.append('file', job.file);
-      // Use AppSettings for Consistency
-      formData.append('vision_model', AppSettings.vision_model);
+
+      // --- Dynamic Settings Retrieval based on Job Context ---
+      // Determine which tab/context this job originated from or use currentTab if job doesn't specify
+      // JobQueue adds 'type' or we rely on 'currentTab' at the moment of submission? 
+      // Issue: If batch is processing and user switches tabs, 'currentTab' changes.
+      // Fix: Job object should store the settings snapshot OR the tab it belongs to.
+      // Valid Tab Suffixes: 'reconstruct', 'pdf', 'combine', 'removeText'
+
+      let tabSuffix = 'reconstruct'; // Default
+      if (job.type === 'combine') tabSuffix = 'combine';
+      else if (currentTab === 'pdf-to-pptx' || currentTab === 'pdf-to-png') tabSuffix = 'pdf';
+      else if (currentTab === 'remove-text-photoroom') tabSuffix = 'removeText';
+      else if (currentTab === 'reconstruct') tabSuffix = 'reconstruct';
+
+      // Helper to safely get value by ID
+      const getVal = (key) => {
+        const el = document.getElementById(`${key}_${tabSuffix}`);
+        return el ? el.value : (AppSettings[key] || ''); // Fallback to AppSettings defaults if element missing
+      };
+
+      // Construct Settings
+      const vision_model = getVal('visionModel');
+      const inpainting_model = getVal('inpaintingModel');
+      const codegen_model = getVal('codegenModel');
+      const output_format = getVal('outputFormat');
+      const font_family = getVal('fontFamily');
+      const refine_layout = getVal('refineLayout');
+      // max_concurrent is global queue limit? Or per tab? 
+      // JobQueue logic uses 'maxConcurrent' getter. We should update that getter to use valid source.
+      // But for formData, we can send it.
+
+      formData.append('vision_model', vision_model);
       formData.append('batch_folder', job.batchFolder);
-      formData.append('exclude_text', AppSettings.exclude_text);
-      formData.append('font_family', AppSettings.font_family);
-      // Pass Concurrency Setting to Backend
-      formData.append('max_concurrent', AppSettings.max_concurrent);
-      // New: Refine Layout Setting
-      formData.append('refine_layout', AppSettings.refine_layout);
+      formData.append('exclude_text', AppSettings.exclude_text); // Keeping global for now or hidden
+      formData.append('font_family', font_family);
+      formData.append('max_concurrent', getVal('maxConcurrent'));
+      formData.append('refine_layout', refine_layout);
 
       let endpoint = '/upload';
       if (job.type === 'combine') {
         endpoint = '/combine-upload';
         formData.append('source_file', job.sourceFile);
         formData.append('background_file', job.bgFile);
-        // Remove default 'file' as we sent specific ones
         formData.delete('file');
       } else if (currentTab === 'reconstruct') {
         endpoint = '/upload';
-        formData.append('inpainting_model', AppSettings.inpainting_model);
-        formData.append('codegen_model', AppSettings.codegen_model);
+        formData.append('inpainting_model', inpainting_model);
+        formData.append('codegen_model', codegen_model);
+      } else if (currentTab === 'pdf-to-pptx') {
+        // PDF is special, usually handled by handlePdf, not runJob directly for conversion?
+        // Check handlePdf... PDF logic uses 'btnPptxStart' which calls 'uploadAndConvertPdf'.
+        // So runJob here is mostly for 'reconstruct' (images) and 'combine'.
+        // PDF tab uses its own logic. We need to update that too.
+      } else if (currentTab === 'remove-text-photoroom') {
+        // Photoroom uses its own embedded script? 
+        // Yes, index.html has embedded script for Photoroom.
+        // But we should support it here if we migrate control.
+        // For now, Photoroom is separate.
       } else if (currentTab === 'remove-text') {
         endpoint = '/remove-text';
-        formData.append('inpainting_model', AppSettings.inpainting_model);
+        formData.append('inpainting_model', inpainting_model);
       } else if (currentTab === 'remove-text-ai') {
         endpoint = '/remove-text-ai';
       } else if (currentTab === 'extract-text') {
         endpoint = '/extract-text';
       }
+
 
       try {
         const response = await fetch(endpoint, { method: 'POST', body: formData });
@@ -435,30 +469,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- 2. State Sync Logic ---
   // Load Settings from Server
+  // Load Settings from Server and Populate All Tabs
   async function loadSettings() {
     try {
       const res = await fetch('/settings');
       if (res.ok) {
         const settings = await res.json();
-        // Update AppSettings
-        if (settings.vision_model) AppSettings.vision_model = settings.vision_model;
-        if (settings.inpainting_model) AppSettings.inpainting_model = settings.inpainting_model;
-        if (settings.codegen_model) AppSettings.codegen_model = settings.codegen_model;
-        if (settings.output_format) AppSettings.output_format = settings.output_format;
-        if (settings.exclude_text) AppSettings.exclude_text = settings.exclude_text;
-        if (settings.max_concurrent) AppSettings.max_concurrent = parseInt(settings.max_concurrent);
-        if (settings.font_family) AppSettings.font_family = settings.font_family;
-        if (settings.refine_layout !== undefined) AppSettings.refine_layout = settings.refine_layout;
+        const fill = (suffix) => {
+          const setVal = (key, val) => {
+            const el = document.getElementById(`${key}_${suffix}`);
+            if (el) {
+              if (key === 'refineLayout') el.value = val.toString();
+              else el.value = val;
+            }
+          };
+          if (settings.vision_model) setVal('visionModel', settings.vision_model);
+          if (settings.inpainting_model) setVal('inpaintingModel', settings.inpainting_model);
+          if (settings.codegen_model) setVal('codegenModel', settings.codegen_model);
+          if (settings.output_format) setVal('outputFormat', settings.output_format);
+          if (settings.font_family) setVal('fontFamily', settings.font_family);
+          if (settings.max_concurrent) setVal('maxConcurrent', settings.max_concurrent);
+          if (settings.refine_layout !== undefined) setVal('refineLayout', settings.refine_layout);
+        };
 
-        // Sync UI
-        visionModelSelect.value = AppSettings.vision_model;
-        inpaintingModelSelect.value = AppSettings.inpainting_model;
-        codegenModelSelect.value = AppSettings.codegen_model;
-        if (excludeTextInput) excludeTextInput.value = AppSettings.exclude_text || '';
-        if (outputFormatSelect) outputFormatSelect.value = AppSettings.output_format;
-        if (fontFamilySelect) fontFamilySelect.value = AppSettings.font_family;
-        maxConcurrentSelect.value = AppSettings.max_concurrent;
-        if (refineLayoutSelect) refineLayoutSelect.value = AppSettings.refine_layout.toString();
+        ['reconstruct', 'pdf', 'combine'].forEach(suffix => fill(suffix));
+        // Note: Remove Text Photoroom settings are not in generic settings API, handled by its own UI/Defaults.
+
+        // Also update PDF Quality (Shared ID) and potentially others
+        if (settings.pdf_quality) { // Assuming we save this?
+          const pq = document.getElementById('pdfQuality');
+          if (pq) pq.value = settings.pdf_quality;
+        }
+
+        // Global Sync (Optional, if we want to keep AppSettings updated for fallback)
+        Object.assign(AppSettings, settings);
       }
     } catch (e) {
       console.error("Failed to load settings", e);
@@ -489,23 +533,47 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (e) { showToast('❌ 설정 저장 중 오류가 발생했습니다.'); }
   }
 
-  // Bind UI Changes to AppSettings (Instant Update)
-  visionModelSelect.addEventListener('change', (e) => { AppSettings.vision_model = e.target.value; });
-  inpaintingModelSelect.addEventListener('change', (e) => { AppSettings.inpainting_model = e.target.value; });
-  codegenModelSelect.addEventListener('change', (e) => { AppSettings.codegen_model = e.target.value; });
-  if (excludeTextInput) excludeTextInput.addEventListener('input', (e) => { AppSettings.exclude_text = e.target.value; });
-  if (outputFormatSelect) outputFormatSelect.addEventListener('change', (e) => { AppSettings.output_format = e.target.value; });
-  if (fontFamilySelect) fontFamilySelect.addEventListener('change', (e) => { AppSettings.font_family = e.target.value; });
+  // Bind UI Changes? No, we read on demand in runJob.
+  // Exception: maxConcurrent might change immediate queue behavior.
+  // If we want dynamic maxConcurrent updates:
+  const bindMaxConcurrent = (suffix) => {
+    const el = document.getElementById(`maxConcurrent_${suffix}`);
+    if (el) {
+      el.addEventListener('change', (e) => {
+        // Update AppSettings if checking globally? 
+        // JobQueue checks 'AppSettings.max_concurrent'.
+        // We should update that if the active tab changes it.
+        if (getTabSuffix(currentTab) === suffix) {
+          AppSettings.max_concurrent = parseInt(e.target.value);
+          jobQueue.processQueue();
+        }
+      });
+    }
+  };
+  ['reconstruct', 'pdf', 'combine'].forEach(bindMaxConcurrent);
 
-  maxConcurrentSelect.addEventListener('change', (e) => {
-    AppSettings.max_concurrent = parseInt(e.target.value);
-    // Do NOT auto-save to server defaults. Only update runtime state.
-    jobQueue.processQueue(); // Retry queue with new limit immediately
+  // Helper to get suffix from tab name
+  function getTabSuffix(tab) {
+    if (tab === 'combine') return 'combine';
+    if (tab === 'pdf-to-pptx' || tab === 'pdf-to-png') return 'pdf';
+    if (tab === 'remove-text-photoroom') return 'removeText';
+    return 'reconstruct';
+  }
+
+  // Update AppSettings.max_concurrent on tab switch
+  tabButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      // ... existing logic ...
+      const suffix = getTabSuffix(btn.dataset.tab);
+      const el = document.getElementById(`maxConcurrent_${suffix}`);
+      if (el) {
+        AppSettings.max_concurrent = parseInt(el.value);
+        jobQueue.processQueue();
+      }
+    });
   });
 
-  if (refineLayoutSelect) refineLayoutSelect.addEventListener('change', (e) => { AppSettings.refine_layout = e.target.value === 'true'; });
 
-  if (btnSaveDefaults) btnSaveDefaults.addEventListener('click', saveSettings);
 
   // --- Initial Load ---
   loadSettings();
@@ -1109,343 +1177,379 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Handle Tab Switch for PDF
   tabButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      // ... (Existing logic managed by tabButtons event listener above)
-      const target = btn.dataset.tab;
+    tabButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Update Active State
+        tabButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentTab = btn.dataset.tab;
 
-      // Common reset
-      pdfSection.classList.add('hidden');
-      uploadZone.classList.add('hidden');
-      batchControlPanel.classList.add('hidden');
-      jobListContainer.classList.add('hidden');
-      document.querySelector('.settings-container').classList.add('hidden'); // Default hide
-      document.getElementById('resultReconstruct').classList.add('hidden');
-      if (combineSection) combineSection.classList.add('hidden');
+        // 1. HIDDEN ALL SECTIONS (Reset)
+        const reconstructSection = document.getElementById('reconstructSection');
+        const removeTextPhotoroomSection = document.getElementById('removeTextPhotoroomSection');
 
-      if (target === 'pdf-to-png') {
-        // PDF to PNG Mode
-        pdfSection.classList.remove('hidden');
-        if (btnPptxStart) btnPptxStart.classList.add('hidden'); // Hide PPTX start button
-      } else if (target === 'pdf-to-pptx') {
-        // PDF to PPTX Mode
-        pdfSection.classList.remove('hidden');
-        document.querySelector('.settings-container').classList.remove('hidden'); // Show Settings
-        if (btnPptxStart) btnPptxStart.classList.remove('hidden'); // Show PPTX start button
-      } else if (target === 'combine') {
-        combineSection.classList.remove('hidden');
-        document.querySelector('.settings-container').classList.remove('hidden');
-      } else {
-        // Standard Reconstruction / Other Modes
-        document.querySelector('.settings-container').classList.remove('hidden');
-        if (jobQueue.queue.length > 0) {
-          batchControlPanel.classList.remove('hidden');
-          jobListContainer.classList.remove('hidden');
+        if (reconstructSection) reconstructSection.classList.add('hidden');
+        if (pdfSection) pdfSection.classList.add('hidden');
+        if (combineSection) combineSection.classList.add('hidden');
+        if (removeTextPhotoroomSection) removeTextPhotoroomSection.classList.add('hidden');
+
+        if (batchControlPanel) batchControlPanel.classList.add('hidden');
+        if (jobListContainer) jobListContainer.classList.add('hidden');
+
+        // Update Title (Legacy support)
+        const titles = {
+          'reconstruct': '재구성을 위한 슬라이드 이미지 업로드',
+          'pdf-to-pptx': 'PDF 업로드 -> 이미지 변환 -> 슬라이드 재구성',
+          'pdf-to-png': 'PDF to PNG 변환 (단순 변환)',
+          'remove-text': '텍스트 제거를 위한 이미지 업로드 (OpenCV)',
+          'remove-text-ai': '텍스트 제거를 위한 이미지 업로드 (AI)',
+          'remove-text-photoroom': '이미지 텍스트 제거 (Photoroom)',
+          'extract-text': '텍스트 추출을 위한 이미지 업로드'
+        };
+        const titleEl = document.getElementById('uploadTitle');
+        if (titleEl) titleEl.textContent = titles[currentTab] || '이미지 업로드';
+
+
+        // 2. SHOW CURRENT SECTION
+        if (currentTab === 'pdf-to-png') {
+          // PDF Mode
+          pdfSection.classList.remove('hidden');
+          if (btnPptxStart) btnPptxStart.classList.add('hidden');
+
+        } else if (currentTab === 'pdf-to-pptx') {
+          // PDF to PPTX Mode
+          pdfSection.classList.remove('hidden');
+          if (btnPptxStart) btnPptxStart.classList.remove('hidden');
+
+        } else if (currentTab === 'combine') {
+          combineSection.classList.remove('hidden');
+
+        } else if (currentTab === 'remove-text-photoroom') {
+          if (removeTextPhotoroomSection) removeTextPhotoroomSection.classList.remove('hidden');
+
         } else {
-          uploadZone.classList.remove('hidden');
-          jobListContainer.classList.remove('hidden');
+          // Standard Reconstruction (reconstruct)
+          // Ensure Parent is Visible
+          if (reconstructSection) reconstructSection.classList.remove('hidden');
+
+          // Ensure Child Settings is Visible (in case it was hidden previously)
+          const reconstructSettings = document.getElementById('reconstructSettings');
+          if (reconstructSettings) reconstructSettings.classList.remove('hidden');
+
+          // Manage Upload vs Queue Visibility
+          if (jobQueue.queue.length > 0) {
+            // If jobs exist, show Queue, Hide Upload Panel
+            batchControlPanel.classList.remove('hidden');
+            jobListContainer.classList.remove('hidden');
+            if (uploadZone) uploadZone.classList.add('hidden');
+          } else {
+            // If no jobs, Show Upload Panel
+            if (uploadZone) uploadZone.classList.remove('hidden');
+            jobListContainer.classList.remove('hidden'); // Keep list visible if empty? or hidden? Previously removed hidden.
+          }
         }
-      }
+      });
     });
+
+    // --- PDF to PPTX Trigger ---
+    if (btnPptxStart) {
+      btnPptxStart.addEventListener('click', () => {
+        if (currentPdfBlobs.length === 0) {
+          showToast('변환된 PDF 페이지가 없습니다.');
+          return;
+        }
+
+        if (!confirm(`${currentPdfBlobs.length}개의 페이지를 슬라이드로 재구성하시겠습니까?`)) return;
+
+        // Convert Blobs to Files
+        const files = currentPdfBlobs.map(item => {
+          return new File([item.blob], item.filename, { type: 'image/png' });
+        });
+
+        // Add to Queue
+        jobQueue.addFiles(files);
+
+        // Switch View similar to "reconstruct" tab
+        // Note: we stay on "pdf-to-pptx" tab visually, but show the queue
+        pdfSection.classList.add('hidden');
+        batchControlPanel.classList.remove('hidden');
+        jobListContainer.classList.remove('hidden');
+
+        showToast('슬라이드 재구성 작업이 시작되었습니다.');
+      });
+    }
+
+    // Initial UI Sync (Trigger click on default active tab)
+    const initialActive = document.querySelector('.tab-btn.active');
+    if (initialActive) initialActive.click();
+
   });
 
-  // --- PDF to PPTX Trigger ---
-  if (btnPptxStart) {
-    btnPptxStart.addEventListener('click', () => {
-      if (currentPdfBlobs.length === 0) {
-        showToast('변환된 PDF 페이지가 없습니다.');
+  // --- Modal Logic (Global) ---
+  function openModal(data, title, previewOverrideUrl = null) {
+    const modal = document.getElementById('previewModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const container = document.getElementById('modalPreviewContainer');
+    // Updated selectors for Bug Fix
+    const btnDlHtml = document.getElementById('modalBtnDownloadHtml');
+    const btnDlBg = document.getElementById('modalBtnDownloadBg');
+    const btnDlPptx = document.getElementById('modalBtnDownloadPptx');
+
+    modalTitle.textContent = title || "Slide Preview";
+    container.innerHTML = '';
+
+    // Setup Download Links (Always use data)
+    if (data.html_url) {
+      btnDlHtml.href = data.html_url;
+      btnDlHtml.classList.remove('hidden');
+    } else {
+      btnDlHtml.classList.add('hidden');
+    }
+
+    // PPTX Setup
+    if (data.pptx_url && btnDlPptx) {
+      btnDlPptx.href = data.pptx_url;
+      btnDlPptx.classList.remove('hidden');
+    } else if (btnDlPptx) {
+      btnDlPptx.classList.add('hidden');
+    }
+
+    if (data.bg_url) {
+      btnDlBg.href = data.bg_url;
+      btnDlBg.setAttribute('download', 'image.png');
+      btnDlBg.classList.remove('hidden');
+    } else {
+      btnDlBg.classList.add('hidden'); // Fix: hide if no bg_url
+    }
+
+    // Setup Display Content
+    if (previewOverrideUrl) {
+      // Show Override (e.g., Original Image)
+      container.innerHTML = `<img src="${previewOverrideUrl}" style="width:100%; height:100%; object-fit:contain;">`;
+    } else {
+      // Default Logic
+      if (data.html_url) {
+        container.innerHTML = `<iframe src="${data.html_url}" style="width:100%; height:100%; border:none;"></iframe>`;
+      } else if (data.bg_url) {
+        container.innerHTML = `<img src="${data.bg_url}" style="width:100%; height:100%; object-fit:contain;">`;
+      }
+    }
+
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal() {
+    document.getElementById('previewModal').classList.add('hidden');
+    document.getElementById('modalPreviewContainer').innerHTML = '';
+    document.body.style.overflow = '';
+  }
+  document.getElementById('previewModal').addEventListener('click', (e) => { if (e.target.id === 'previewModal') closeModal(); });
+  window.openModal = openModal;
+  window.closeModal = closeModal;
+
+  // --- API Key Settings Modal Logic ---
+  ; (function () {
+    const settingsModal = document.getElementById('settingsModal');
+    const btnOpenSettings = document.getElementById('btnOpenSettings');
+    const apiKeyInput = document.getElementById('apiKeyInput');
+    const apiKeyStatus = document.getElementById('apiKeyStatus');
+    const apiKeyCopyMsg = document.getElementById('apiKeyCopyMsg');
+
+    // New Buttons
+    const btnCopyApiKey = document.getElementById('btnCopyApiKey');
+    const btnModEdit = document.getElementById('btnModEdit');
+    const btnModSave = document.getElementById('btnModSave');
+    const btnModCancel = document.getElementById('btnModCancel');
+
+    let currentRealApiKey = "";
+
+    // 1. Define Functions First (Assign to window for global access logic)
+
+    window.closeSettingsModal = function () {
+      settingsModal.classList.add('hidden');
+      cancelEditApiKey();
+    };
+
+    window.openSettingsModal = async function () {
+      settingsModal.classList.remove('hidden');
+      apiKeyStatus.textContent = "API Key를 불러오는 중...";
+      try {
+        const res = await fetch('/api-key');
+        if (res.ok) {
+          const data = await res.json();
+          currentRealApiKey = data.api_key || "";
+          displayMaskedKey(currentRealApiKey);
+          apiKeyStatus.textContent = "";
+        } else {
+          apiKeyStatus.textContent = "API Key 로드 실패";
+        }
+      } catch (e) {
+        console.error(e);
+        apiKeyStatus.textContent = "서버 통신 오류";
+      }
+    };
+
+    window.saveApiKey = async function () {
+      const newKey = apiKeyInput.value.trim();
+      if (!newKey) {
+        apiKeyStatus.textContent = "API Key를 입력해주세요.";
+        return;
+      }
+      apiKeyStatus.textContent = "저장 중...";
+      try {
+        const res = await fetch('/api-key', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ api_key: newKey })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          currentRealApiKey = newKey;
+          // Go back to view mode
+          cancelEditApiKey();
+          displayMaskedKey(currentRealApiKey);
+          apiKeyStatus.textContent = "저장되었습니다.";
+          showToast("✅ API Key가 업데이트되었습니다.");
+        } else {
+          apiKeyStatus.textContent = `저장 실패: ${data.message}`;
+        }
+      } catch (e) {
+        console.error(e);
+        apiKeyStatus.textContent = "저장 중 오류 발생";
+      }
+    };
+
+    // Test API Key Logic
+    window.testApiKey = async function () {
+      const keyToTest = apiKeyInput.readOnly ? currentRealApiKey : apiKeyInput.value.trim();
+      const testResultBox = document.getElementById('apiTestResult');
+      const testStatusIcon = document.getElementById('testStatusIcon');
+      const testResponseText = document.getElementById('testResponseText');
+
+      if (!keyToTest) {
+        showToast("⚠️ 테스트할 API 키가 없습니다.");
         return;
       }
 
-      if (!confirm(`${currentPdfBlobs.length}개의 페이지를 슬라이드로 재구성하시겠습니까?`)) return;
+      // Get currently selected model name for display
+      const selectedModel = document.getElementById('visionModel').value || "gemini-3-flash-preview";
 
-      // Convert Blobs to Files
-      const files = currentPdfBlobs.map(item => {
-        return new File([item.blob], item.filename, { type: 'image/png' });
+      // UI Reset
+      testResultBox.classList.remove('hidden');
+      testStatusIcon.textContent = `⏳ API 연결 테스트 중... (${selectedModel})`;
+      testStatusIcon.style.color = "var(--text-primary)";
+      testResponseText.textContent = "";
+
+      try {
+        const res = await fetch('/test-api-key', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ api_key: keyToTest })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          testStatusIcon.textContent = "✅ 테스트 성공";
+          testStatusIcon.style.color = "var(--success)";
+          testResponseText.textContent = `응답: "${data.response}"`;
+        } else {
+          testStatusIcon.textContent = "❌ 테스트 실패";
+          testStatusIcon.style.color = "var(--error)";
+          testResponseText.textContent = data.message + (data.details ? ` (${data.details})` : "");
+        }
+      } catch (e) {
+        testStatusIcon.textContent = "❌ 통신 오류";
+        testStatusIcon.style.color = "var(--error)";
+        testResponseText.textContent = String(e);
+      }
+    };
+
+    window.cancelEditApiKey = function () {
+      displayMaskedKey(currentRealApiKey);
+      apiKeyInput.readOnly = true;
+      apiKeyInput.style.borderColor = "var(--border)";
+
+      // UI Toggle: Hide Save/Cancel, Show Edit/Test
+      btnModSave.classList.add('hidden');
+      btnModCancel.classList.add('hidden');
+      btnModEdit.classList.remove('hidden');
+      const btnModTest = document.getElementById('btnModTest');
+      if (btnModTest) btnModTest.classList.remove('hidden');
+
+      // Hide Test Result on Cancel/Reset
+      const resBox = document.getElementById('apiTestResult');
+      if (resBox) resBox.classList.add('hidden');
+
+      apiKeyStatus.textContent = "";
+    };
+
+    window.enableEditApiKey = function () {
+      apiKeyInput.value = currentRealApiKey;
+      apiKeyInput.readOnly = false;
+      apiKeyInput.focus();
+      apiKeyInput.style.borderColor = "var(--accent)";
+
+      // UI Toggle: Show Save/Cancel, Hide Edit/Test
+      btnModSave.classList.remove('hidden');
+      btnModCancel.classList.remove('hidden');
+      btnModEdit.classList.add('hidden');
+      const btnModTest = document.getElementById('btnModTest');
+      if (btnModTest) btnModTest.classList.add('hidden');
+
+      // Hide Test Result when starting edit to avoid confusion
+      const resBox = document.getElementById('apiTestResult');
+      if (resBox) resBox.classList.add('hidden');
+
+      apiKeyStatus.textContent = "새로운 키를 입력(수정)하세요.";
+    };
+
+    function copyApiKey() {
+      if (!currentRealApiKey) return;
+      navigator.clipboard.writeText(currentRealApiKey).then(() => {
+        // Inline Feedback Message
+        apiKeyCopyMsg.textContent = "API 키가 클립보드에 복사되었습니다";
+        apiKeyCopyMsg.classList.add('fade-in');
+
+        // Auto-hide after 2 seconds
+        setTimeout(() => {
+          apiKeyCopyMsg.classList.remove('fade-in');
+          // Clear text after fade out (approx 300ms transition)
+          setTimeout(() => { apiKeyCopyMsg.textContent = ""; }, 300);
+        }, 2000);
       });
+    }
 
-      // Add to Queue
-      jobQueue.addFiles(files);
+    function displayMaskedKey(key) {
+      if (!key) {
+        apiKeyInput.value = "(설정된 키 없음)";
+        return;
+      }
+      if (key.length < 10) {
+        apiKeyInput.value = "******";
+        return;
+      }
+      const prefix = key.substring(0, 6);
+      const suffix = key.substring(key.length - 4);
+      apiKeyInput.value = `${prefix}...${"•".repeat(10)}...${suffix}`;
+    }
 
-      // Switch View similar to "reconstruct" tab
-      // Note: we stay on "pdf-to-pptx" tab visually, but show the queue
-      pdfSection.classList.add('hidden');
-      document.querySelector('.settings-container').classList.remove('hidden');
-      batchControlPanel.classList.remove('hidden');
-      jobListContainer.classList.remove('hidden');
+    // 2. Bind Listeners
+    if (btnOpenSettings) {
+      btnOpenSettings.addEventListener('click', window.openSettingsModal);
+    }
 
-      showToast('슬라이드 재구성 작업이 시작되었습니다.');
-    });
-  }
+    if (btnCopyApiKey) btnCopyApiKey.addEventListener('click', copyApiKey);
 
-  // Initial UI Sync (Trigger click on default active tab)
-  const initialActive = document.querySelector('.tab-btn.active');
-  if (initialActive) initialActive.click();
+    // New Footer Button Listeners
+    if (btnModEdit) btnModEdit.addEventListener('click', window.enableEditApiKey);
+    if (btnModCancel) btnModCancel.addEventListener('click', window.cancelEditApiKey);
+    if (btnModSave) btnModSave.addEventListener('click', window.saveApiKey);
+
+    const btnModTest = document.getElementById('btnModTest');
+    if (btnModTest) btnModTest.addEventListener('click', window.testApiKey);
+
+  })();
+
+
 
 });
-
-// --- Modal Logic (Global) ---
-function openModal(data, title, previewOverrideUrl = null) {
-  const modal = document.getElementById('previewModal');
-  const modalTitle = document.getElementById('modalTitle');
-  const container = document.getElementById('modalPreviewContainer');
-  // Updated selectors for Bug Fix
-  const btnDlHtml = document.getElementById('modalBtnDownloadHtml');
-  const btnDlBg = document.getElementById('modalBtnDownloadBg');
-  const btnDlPptx = document.getElementById('modalBtnDownloadPptx');
-
-  modalTitle.textContent = title || "Slide Preview";
-  container.innerHTML = '';
-
-  // Setup Download Links (Always use data)
-  if (data.html_url) {
-    btnDlHtml.href = data.html_url;
-    btnDlHtml.classList.remove('hidden');
-  } else {
-    btnDlHtml.classList.add('hidden');
-  }
-
-  // PPTX Setup
-  if (data.pptx_url && btnDlPptx) {
-    btnDlPptx.href = data.pptx_url;
-    btnDlPptx.classList.remove('hidden');
-  } else if (btnDlPptx) {
-    btnDlPptx.classList.add('hidden');
-  }
-
-  if (data.bg_url) {
-    btnDlBg.href = data.bg_url;
-    btnDlBg.setAttribute('download', 'image.png');
-    btnDlBg.classList.remove('hidden');
-  } else {
-    btnDlBg.classList.add('hidden'); // Fix: hide if no bg_url
-  }
-
-  // Setup Display Content
-  if (previewOverrideUrl) {
-    // Show Override (e.g., Original Image)
-    container.innerHTML = `<img src="${previewOverrideUrl}" style="width:100%; height:100%; object-fit:contain;">`;
-  } else {
-    // Default Logic
-    if (data.html_url) {
-      container.innerHTML = `<iframe src="${data.html_url}" style="width:100%; height:100%; border:none;"></iframe>`;
-    } else if (data.bg_url) {
-      container.innerHTML = `<img src="${data.bg_url}" style="width:100%; height:100%; object-fit:contain;">`;
-    }
-  }
-
-  modal.classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
-}
-function closeModal() {
-  document.getElementById('previewModal').classList.add('hidden');
-  document.getElementById('modalPreviewContainer').innerHTML = '';
-  document.body.style.overflow = '';
-}
-document.getElementById('previewModal').addEventListener('click', (e) => { if (e.target.id === 'previewModal') closeModal(); });
-window.openModal = openModal;
-window.closeModal = closeModal;
-
-// --- API Key Settings Modal Logic ---
-; (function () {
-  const settingsModal = document.getElementById('settingsModal');
-  const btnOpenSettings = document.getElementById('btnOpenSettings');
-  const apiKeyInput = document.getElementById('apiKeyInput');
-  const apiKeyStatus = document.getElementById('apiKeyStatus');
-  const apiKeyCopyMsg = document.getElementById('apiKeyCopyMsg');
-
-  // New Buttons
-  const btnCopyApiKey = document.getElementById('btnCopyApiKey');
-  const btnModEdit = document.getElementById('btnModEdit');
-  const btnModSave = document.getElementById('btnModSave');
-  const btnModCancel = document.getElementById('btnModCancel');
-
-  let currentRealApiKey = "";
-
-  // 1. Define Functions First (Assign to window for global access logic)
-
-  window.closeSettingsModal = function () {
-    settingsModal.classList.add('hidden');
-    cancelEditApiKey();
-  };
-
-  window.openSettingsModal = async function () {
-    settingsModal.classList.remove('hidden');
-    apiKeyStatus.textContent = "API Key를 불러오는 중...";
-    try {
-      const res = await fetch('/api-key');
-      if (res.ok) {
-        const data = await res.json();
-        currentRealApiKey = data.api_key || "";
-        displayMaskedKey(currentRealApiKey);
-        apiKeyStatus.textContent = "";
-      } else {
-        apiKeyStatus.textContent = "API Key 로드 실패";
-      }
-    } catch (e) {
-      console.error(e);
-      apiKeyStatus.textContent = "서버 통신 오류";
-    }
-  };
-
-  window.saveApiKey = async function () {
-    const newKey = apiKeyInput.value.trim();
-    if (!newKey) {
-      apiKeyStatus.textContent = "API Key를 입력해주세요.";
-      return;
-    }
-    apiKeyStatus.textContent = "저장 중...";
-    try {
-      const res = await fetch('/api-key', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ api_key: newKey })
-      });
-      const data = await res.json();
-      if (res.ok) {
-        currentRealApiKey = newKey;
-        // Go back to view mode
-        cancelEditApiKey();
-        displayMaskedKey(currentRealApiKey);
-        apiKeyStatus.textContent = "저장되었습니다.";
-        showToast("✅ API Key가 업데이트되었습니다.");
-      } else {
-        apiKeyStatus.textContent = `저장 실패: ${data.message}`;
-      }
-    } catch (e) {
-      console.error(e);
-      apiKeyStatus.textContent = "저장 중 오류 발생";
-    }
-  };
-
-  // Test API Key Logic
-  window.testApiKey = async function () {
-    const keyToTest = apiKeyInput.readOnly ? currentRealApiKey : apiKeyInput.value.trim();
-    const testResultBox = document.getElementById('apiTestResult');
-    const testStatusIcon = document.getElementById('testStatusIcon');
-    const testResponseText = document.getElementById('testResponseText');
-
-    if (!keyToTest) {
-      showToast("⚠️ 테스트할 API 키가 없습니다.");
-      return;
-    }
-
-    // Get currently selected model name for display
-    const selectedModel = document.getElementById('visionModel').value || "gemini-3-flash-preview";
-
-    // UI Reset
-    testResultBox.classList.remove('hidden');
-    testStatusIcon.textContent = `⏳ API 연결 테스트 중... (${selectedModel})`;
-    testStatusIcon.style.color = "var(--text-primary)";
-    testResponseText.textContent = "";
-
-    try {
-      const res = await fetch('/test-api-key', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ api_key: keyToTest })
-      });
-      const data = await res.json();
-
-      if (res.ok) {
-        testStatusIcon.textContent = "✅ 테스트 성공";
-        testStatusIcon.style.color = "var(--success)";
-        testResponseText.textContent = `응답: "${data.response}"`;
-      } else {
-        testStatusIcon.textContent = "❌ 테스트 실패";
-        testStatusIcon.style.color = "var(--error)";
-        testResponseText.textContent = data.message + (data.details ? ` (${data.details})` : "");
-      }
-    } catch (e) {
-      testStatusIcon.textContent = "❌ 통신 오류";
-      testStatusIcon.style.color = "var(--error)";
-      testResponseText.textContent = String(e);
-    }
-  };
-
-  window.cancelEditApiKey = function () {
-    displayMaskedKey(currentRealApiKey);
-    apiKeyInput.readOnly = true;
-    apiKeyInput.style.borderColor = "var(--border)";
-
-    // UI Toggle: Hide Save/Cancel, Show Edit/Test
-    btnModSave.classList.add('hidden');
-    btnModCancel.classList.add('hidden');
-    btnModEdit.classList.remove('hidden');
-    const btnModTest = document.getElementById('btnModTest');
-    if (btnModTest) btnModTest.classList.remove('hidden');
-
-    // Hide Test Result on Cancel/Reset
-    const resBox = document.getElementById('apiTestResult');
-    if (resBox) resBox.classList.add('hidden');
-
-    apiKeyStatus.textContent = "";
-  };
-
-  window.enableEditApiKey = function () {
-    apiKeyInput.value = currentRealApiKey;
-    apiKeyInput.readOnly = false;
-    apiKeyInput.focus();
-    apiKeyInput.style.borderColor = "var(--accent)";
-
-    // UI Toggle: Show Save/Cancel, Hide Edit/Test
-    btnModSave.classList.remove('hidden');
-    btnModCancel.classList.remove('hidden');
-    btnModEdit.classList.add('hidden');
-    const btnModTest = document.getElementById('btnModTest');
-    if (btnModTest) btnModTest.classList.add('hidden');
-
-    // Hide Test Result when starting edit to avoid confusion
-    const resBox = document.getElementById('apiTestResult');
-    if (resBox) resBox.classList.add('hidden');
-
-    apiKeyStatus.textContent = "새로운 키를 입력(수정)하세요.";
-  };
-
-  function copyApiKey() {
-    if (!currentRealApiKey) return;
-    navigator.clipboard.writeText(currentRealApiKey).then(() => {
-      // Inline Feedback Message
-      apiKeyCopyMsg.textContent = "API 키가 클립보드에 복사되었습니다";
-      apiKeyCopyMsg.classList.add('fade-in');
-
-      // Auto-hide after 2 seconds
-      setTimeout(() => {
-        apiKeyCopyMsg.classList.remove('fade-in');
-        // Clear text after fade out (approx 300ms transition)
-        setTimeout(() => { apiKeyCopyMsg.textContent = ""; }, 300);
-      }, 2000);
-    });
-  }
-
-  function displayMaskedKey(key) {
-    if (!key) {
-      apiKeyInput.value = "(설정된 키 없음)";
-      return;
-    }
-    if (key.length < 10) {
-      apiKeyInput.value = "******";
-      return;
-    }
-    const prefix = key.substring(0, 6);
-    const suffix = key.substring(key.length - 4);
-    apiKeyInput.value = `${prefix}...${"•".repeat(10)}...${suffix}`;
-  }
-
-  // 2. Bind Listeners
-  if (btnOpenSettings) {
-    btnOpenSettings.addEventListener('click', window.openSettingsModal);
-  }
-
-  if (btnCopyApiKey) btnCopyApiKey.addEventListener('click', copyApiKey);
-
-  // New Footer Button Listeners
-  if (btnModEdit) btnModEdit.addEventListener('click', window.enableEditApiKey);
-  if (btnModCancel) btnModCancel.addEventListener('click', window.cancelEditApiKey);
-  if (btnModSave) btnModSave.addEventListener('click', window.saveApiKey);
-
-  const btnModTest = document.getElementById('btnModTest');
-  if (btnModTest) btnModTest.addEventListener('click', window.testApiKey);
-
-})();
-
-

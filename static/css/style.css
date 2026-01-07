@@ -1,4 +1,6 @@
 /* Tailwind-inspired Design System */
+@import url('layout.css');
+
 :root {
   /* Slate Palette */
   --bg-dark: #0f172a;
@@ -823,7 +825,7 @@ iframe {
 .pdf-top-area {
   padding: 1.5rem;
   border-bottom: 1px solid var(--border-color);
-  background: rgba(0, 0, 0, 0.2);
+  /* background: rgba(0, 0, 0, 0.2); Removed for consistency */
   border-radius: 1rem 1rem 0 0;
 }
 

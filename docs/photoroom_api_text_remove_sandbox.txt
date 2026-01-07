@@ -1,0 +1,59 @@
+# AI Text Removal
+
+The Image Editing API allows you to automatically remove any unwanted text from your images.
+
+To remove text from the input image, set the argument `textRemoval.mode` with one of the following values:
+
+* `ai.artificial`: artificial text will be automatically removed. Artificial text includes all text added on an image through post-precessing, such as company name, watermarks, discounts, etc.
+* `ai.natural`: natural text will be automatically removed. Natural text includes text that naturally occurs in an image such as writing on buildings or clothings, road signs, etc.
+* `ai.all`: all text (natural and artificial) will be automatically removed.
+
+If we take the example of this image:
+
+<figure><img src="https://2855892273-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F1SYxn7dWbQYsNtUdJE3f%2Fuploads%2FAsv6KSbNeKXjHfMhQKGR%2FGroup-2.jpeg?alt=media&#x26;token=03d93ea9-3650-405c-9eaf-5e8d70b0dbea" alt=""><figcaption></figcaption></figure>
+
+Here are the results you will get for each possible value of `textRemoval.mode`:
+
+<table data-header-hidden data-full-width="true"><thead><tr><th width="225" align="center"></th><th align="center"></th></tr></thead><tbody><tr><td align="center"><em>(original image)</em></td><td align="center"><img src="https://2855892273-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F1SYxn7dWbQYsNtUdJE3f%2Fuploads%2FRcLvjyGMIDp7MunXtIgr%2FGroup.jpeg?alt=media&#x26;token=26bcbafe-1ccc-4450-87b9-d2c9305964c2" alt=""></td></tr><tr><td align="center"><code>ai.artificial</code></td><td align="center"><img src="https://2855892273-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F1SYxn7dWbQYsNtUdJE3f%2Fuploads%2FOxGfwmYCPRUzXb5sl9b5%2Ftext-artificial.jpeg?alt=media&#x26;token=2f79e9ea-bc63-4d51-a20f-ea1eaf52c54d" alt=""></td></tr><tr><td align="center"><code>ai.natural</code></td><td align="center"><img src="https://2855892273-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F1SYxn7dWbQYsNtUdJE3f%2Fuploads%2F1E3Mf7LNqaXxQP10PVci%2Ftext-natural.jpeg?alt=media&#x26;token=65c5d5a9-2626-4b42-b515-db625da4082d" alt=""></td></tr><tr><td align="center"><code>ai.all</code></td><td align="center"><img src="https://2855892273-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F1SYxn7dWbQYsNtUdJE3f%2Fuploads%2FXYvC4J2l1lH9XF28UoLU%2Ftext-all.jpeg?alt=media&#x26;token=f2205aa1-c658-402e-aa49-94a656e42cce" alt=""></td></tr></tbody></table>
+
+If you want to give it a try, here's the code to reproduce the examples above:
+
+{% code overflow="wrap" %}
+
+```bash
+curl 'https://image-api.photoroom.com/v2/edit?removeBackground=false&referenceBox=originalImage&textRemoval.mode=ai.all&imageUrl=URL_OF_YOUR_IMAGE' \
+  --header 'x-api-key: YOUR_API_KEY' \
+  --output with-text-removed.png
+```
+
+{% endcode %}
+
+
+
+
+# Sandbox Mode
+
+You can make up to 1,000 free calls by month to the Image Editing API using sandbox mode (the max per day is 100 calls).
+
+Sandbox mode is meant to be used for testing and prototyping, and will produce an image with a watermark.
+
+{% hint style="info" %}
+All the features of the Image Editing API are available in sandbox mode, including AI features such as [AI Backgrounds](https://docs.photoroom.com/image-editing-api-plus-plan/ai-backgrounds), [AI Shadows](https://docs.photoroom.com/image-editing-api-plus-plan/ai-shadows) or [AI Expand](https://docs.photoroom.com/image-editing-api-plus-plan/ai-expand).&#x20;
+{% endhint %}
+
+To use sandbox mode, prepend `sandbox_` to your API key. (Example: `sandbox_xxxxxxxxxxxxxxxx`)
+
+```bash
+curl --request POST \
+  --url https://image-api.photoroom.com/v2/edit \
+  --header 'x-api-key: sandbox_xxxxxxxxxxxxxxxx' \
+  --form imageFile=@/path/to/image.jpg \
+  --form shadow.mode=ai.soft \
+  --form background.color=FFFFFF \
+  --form padding=0.1 \
+  --output result-sandbox-mode.png
+```
+
+| ![](https://2855892273-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F1SYxn7dWbQYsNtUdJE3f%2Fuploads%2FSfNyqw4ZvJfkjQhTrCtu%2Fshoes.jpeg?alt=media\&token=3d01688a-b234-4a5e-badf-5b99d4a3df53) | ![](https://2855892273-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F1SYxn7dWbQYsNtUdJE3f%2Fuploads%2Fo1fM80rxroasyKbU19Xn%2Fregular-call.jpeg?alt=media\&token=f233879f-b629-49e8-8ead-459d0ed5cecb) | ![](https://2855892273-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F1SYxn7dWbQYsNtUdJE3f%2Fuploads%2Fyy1Bz22OwlRKGHrNhZKR%2Fsandbox-call.jpeg?alt=media\&token=617655cb-7064-4e62-abd0-bea47715f498) |
+| :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+|                                                                                                  *(original image)*                                                                                                  |                                                                                                      *regular API call*                                                                                                     |                                                                                                   *sandbox mode API call*                                                                                                   |

@@ -1,0 +1,70 @@
+/* Common Tab Layout Components */
+
+/* 1. Main Wrapper for each Tab Content */
+.tab-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  /* Children handle their own spacing if needed, or we use margins */
+  width: 100%;
+  max-width: 1200px;
+  /* Optional constraint */
+  margin: 0 auto;
+}
+
+/* 2. Top Control Group (Settings + Upload) */
+/* This replaces 'pdf-top-area' and provides the background wrapper */
+.control-panel-group {
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  /* Removed background to match user preference for 'Clean' look, 
+     but structure is kept for alignment. 
+     If we want the PDF-style background back later, we add it here. */
+  border-bottom: 1px solid var(--border-color);
+  border-radius: 1rem 1rem 0 0;
+  gap: 2rem;
+  /* Spacing between Settings and Upload */
+}
+
+/* 3. Settings Panel (The visual box for controls) */
+.settings-panel {
+  /* Inherits glass-panel styles but enforces specific padding/margin */
+  padding: 1.5rem;
+  margin-bottom: 0;
+  /* Group handles gap */
+}
+
+/* 4. Upload Panel (The visual box for file drop) */
+.upload-panel {
+  /* Inherits glass-panel styles */
+  padding: 1.5rem;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  border: 2px dashed var(--border-color);
+  background: rgba(30, 41, 59, 0.4);
+  transition: all 0.3s;
+}
+
+.upload-panel:hover,
+.upload-panel.dragover {
+  border-color: var(--primary);
+  background: rgba(99, 102, 241, 0.1);
+}
+
+/* 5. Result/Grid Area */
+.result-area {
+  padding: 1.5rem;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 0 0 1rem 1rem;
+  min-height: 100px;
+}
+
+/* Helper for hidden state consistency */
+.hidden {
+  display: none !important;
+}
