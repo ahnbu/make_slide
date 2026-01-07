@@ -468,6 +468,31 @@ document.addEventListener('DOMContentLoaded', () => {
   window.jobQueue = jobQueue;
 
   // --- 2. State Sync Logic ---
+
+  // Helper: Update PDF UI from specific settings object
+  function updatePdfUi(settingsObj) {
+    if (!settingsObj) return;
+    const setVal = (key, val) => {
+      const el = document.getElementById(`${key}_pdf`);
+      if (el) {
+        if (key === 'refineLayout') el.value = val.toString();
+        else el.value = val;
+      }
+    };
+    if (settingsObj.vision_model) setVal('visionModel', settingsObj.vision_model);
+    if (settingsObj.inpainting_model) setVal('inpaintingModel', settingsObj.inpainting_model);
+    if (settingsObj.codegen_model) setVal('codegenModel', settingsObj.codegen_model);
+    if (settingsObj.output_format) setVal('outputFormat', settingsObj.output_format);
+    if (settingsObj.font_family) setVal('fontFamily', settingsObj.font_family);
+    if (settingsObj.max_concurrent) setVal('maxConcurrent', settingsObj.max_concurrent);
+    if (settingsObj.refine_layout !== undefined) setVal('refineLayout', settingsObj.refine_layout);
+
+    if (settingsObj.pdf_quality) {
+      const pq = document.getElementById('pdfQuality');
+      if (pq) pq.value = settingsObj.pdf_quality;
+    }
+  }
+
   // Load Settings from Server
   // Load Settings from Server and Populate All Tabs
   async function loadSettings() {
@@ -475,7 +500,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const res = await fetch('/settings');
       if (res.ok) {
         const settings = await res.json();
-        const fill = (suffix) => {
+
+        // Helper to fill UI from a specific section
+        const fillParam = (sectionName, suffix) => {
+          const section = settings[sectionName] || {};
           const setVal = (key, val) => {
             const el = document.getElementById(`${key}_${suffix}`);
             if (el) {
@@ -483,25 +511,34 @@ document.addEventListener('DOMContentLoaded', () => {
               else el.value = val;
             }
           };
-          if (settings.vision_model) setVal('visionModel', settings.vision_model);
-          if (settings.inpainting_model) setVal('inpaintingModel', settings.inpainting_model);
-          if (settings.codegen_model) setVal('codegenModel', settings.codegen_model);
-          if (settings.output_format) setVal('outputFormat', settings.output_format);
-          if (settings.font_family) setVal('fontFamily', settings.font_family);
-          if (settings.max_concurrent) setVal('maxConcurrent', settings.max_concurrent);
-          if (settings.refine_layout !== undefined) setVal('refineLayout', settings.refine_layout);
+
+          if (section.vision_model) setVal('visionModel', section.vision_model);
+          if (section.inpainting_model) setVal('inpaintingModel', section.inpainting_model);
+          if (section.codegen_model) setVal('codegenModel', section.codegen_model);
+          if (section.output_format) setVal('outputFormat', section.output_format);
+          if (section.font_family) setVal('fontFamily', section.font_family);
+          if (section.max_concurrent) setVal('maxConcurrent', section.max_concurrent);
+          if (section.refine_layout !== undefined) setVal('refineLayout', section.refine_layout);
         };
 
-        ['reconstruct', 'pdf', 'combine'].forEach(suffix => fill(suffix));
-        // Note: Remove Text Photoroom settings are not in generic settings API, handled by its own UI/Defaults.
+        // Fill Reconstruct Tab
+        fillParam('reconstruct', 'reconstruct');
+        // Fill PDF Tab (Default to stored current PDF tab or just PPTX)
+        updatePdfUi(settings.pdf_pptx);
 
-        // Also update PDF Quality (Shared ID) and potentially others
-        if (settings.pdf_quality) { // Assuming we save this?
-          const pq = document.getElementById('pdfQuality');
-          if (pq) pq.value = settings.pdf_quality;
+        // Combine Tab (uses reconstruct settings or common? historically reconstruct)
+        fillParam('reconstruct', 'combine');
+
+        // Common Settings handled? (None visible in UI yet except maybe exclude_text but no input for it)
+
+        // Update Photoroom Mode
+        if (settings.photoroom && settings.photoroom.mode) {
+          const prMode = document.getElementById('textRemovalMode_photoroom');
+          if (prMode) prMode.value = settings.photoroom.mode;
         }
 
-        // Global Sync (Optional, if we want to keep AppSettings updated for fallback)
+        // Global Sync (Keep explicit split in AppSettings or just store raw?)
+        // Let's store raw for reference
         Object.assign(AppSettings, settings);
       }
     } catch (e) {
@@ -509,26 +546,96 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Save Settings to Server (Defaults)
+  // Save Settings to Server
   async function saveSettings() {
-    const settings = {
-      vision_model: AppSettings.vision_model,
-      inpainting_model: AppSettings.inpainting_model,
-      codegen_model: AppSettings.codegen_model,
-      exclude_text: AppSettings.exclude_text,
-      output_format: AppSettings.output_format,
-      max_concurrent: AppSettings.max_concurrent,
-      font_family: AppSettings.font_family,
-      refine_layout: AppSettings.refine_layout
+    // Identify Context
+    const tab = currentTab;
+    let section = 'reconstruct'; // default
+    // Explicit PDF Split
+    if (tab === 'pdf-to-pptx') section = 'pdf_pptx';
+    else if (tab === 'pdf-to-png') section = 'pdf_png';
+    else if (tab.includes('photoroom') || tab === 'remove-text-photoroom') section = 'photoroom';
+
+    // If we are in 'combine', we probably save to 'reconstruct' or 'common'? Let's stick to reconstruct for now.
+
+    // Suffix resolution for UI Element ID
+    let suffix = 'reconstruct';
+    if (section === 'pdf_pptx' || section === 'pdf_png') suffix = 'pdf';
+
+    // Helper to get value from UI
+    const getVal = (key) => {
+      const el = document.getElementById(`${key}_${suffix}`);
+      return el ? el.value : null;
     };
+
+    let payload = {};
+
+    if (section === 'photoroom') {
+      const prMode = document.getElementById('textRemovalMode_photoroom');
+      payload = {
+        "photoroom": {
+          "mode": prMode ? prMode.value : "ai.all"
+        }
+      };
+    } else {
+      // Construct Section Payload
+      const sectionData = {
+        vision_model: getVal('visionModel'),
+        inpainting_model: getVal('inpaintingModel'),
+        codegen_model: getVal('codegenModel'),
+        output_format: getVal('outputFormat'),
+        max_concurrent: parseInt(getVal('maxConcurrent')) || 3,
+        font_family: getVal('fontFamily'),
+        refine_layout: getVal('refineLayout') === 'true'
+      };
+      // Exclude text is common?
+      // if (AppSettings.common) payload.common = ...
+
+      payload[section] = sectionData;
+    }
 
     try {
       const res = await fetch('/settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(settings)
+        body: JSON.stringify(payload)
       });
-      if (res.ok) showToast('✅ 설정이 기본값으로 저장되었습니다!');
+      if (res.ok) {
+        // Calculate Changes and Show Toast
+        const changes = [];
+        const labelMap = {
+          'vision_model': '비전 모델',
+          'inpainting_model': '인페인팅 모델',
+          'codegen_model': 'HTML생성 모델',
+          'output_format': '출력 포맷',
+          'max_concurrent': '동시 처리 개수',
+          'font_family': '글꼴',
+          'refine_layout': '정밀 분석 모드',
+          'mode': '텍스트 제거 모드'
+        };
+
+        // Compare payload with current AppSettings[section]
+        const targetSection = Object.keys(payload)[0]; // 'reconstruct', 'pdf', or 'photoroom'
+        const newData = payload[targetSection];
+        const oldData = AppSettings[targetSection] || {};
+
+        for (const [key, val] of Object.entries(newData)) {
+          if (oldData[key] != val) {
+            const label = labelMap[key] || key;
+            changes.push(`${label}: ${val}`);
+          }
+        }
+
+        if (changes.length > 0) {
+          showToast(`✅ [${targetSection}] ${changes.join(', ')} (으)로 저장되었습니다.`);
+        } else {
+          showToast('✅ 변경된 내용이 없습니다.');
+        }
+
+        // Update Local State
+        if (!AppSettings[targetSection]) AppSettings[targetSection] = {};
+        Object.assign(AppSettings[targetSection], newData);
+      }
       else showToast('❌ 설정 저장 실패.');
     } catch (e) { showToast('❌ 설정 저장 중 오류가 발생했습니다.'); }
   }
@@ -856,6 +963,14 @@ document.addEventListener('DOMContentLoaded', () => {
       tabButtons.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       currentTab = btn.dataset.tab;
+
+      // Switch PDF Settings UI based on tab
+      if (currentTab === 'pdf-to-pptx') {
+        updatePdfUi(AppSettings.pdf_pptx);
+      } else if (currentTab === 'pdf-to-png') {
+        updatePdfUi(AppSettings.pdf_png);
+      }
+
       const titles = {
         'reconstruct': '재구성을 위한 슬라이드 이미지 업로드',
         'pdf-to-pptx': 'PDF 업로드 -> 이미지 변환 -> 슬라이드 재구성',
@@ -1546,8 +1661,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnModTest = document.getElementById('btnModTest');
     if (btnModTest) btnModTest.addEventListener('click', window.testApiKey);
 
+    // Expose functions to global scope for HTML onclick access
+    window.saveSettings = saveSettings;
+    window.openSettingsModal = openSettingsModal;
+    window.closeSettingsModal = closeSettingsModal;
+    window.enableEditApiKey = enableEditApiKey;
+    window.cancelEditApiKey = cancelEditApiKey;
+    window.saveApiKey = saveApiKey;
+    window.testApiKey = testApiKey;
+    window.copyApiKey = copyApiKey;
+
   })();
-
-
 
 });

@@ -1,10 +1,35 @@
 {
-    "vision_model": "gemini-3-flash-preview",
-    "inpainting_model": "opencv-ns",
-    "codegen_model": "algorithmic",
-    "exclude_text": "",
-    "output_format": "both",
-    "max_concurrent": 15,
-    "font_family": "Pretendard Medium",
-    "refine_layout": true
+    "common": {
+        "exclude_text": ""
+    },
+    "reconstruct": {
+        "vision_model": "gemini-3-flash-preview",
+        "inpainting_model": "opencv-ns",
+        "codegen_model": "algorithmic",
+        "output_format": "both",
+        "max_concurrent": 4,
+        "font_family": "Pretendard Medium",
+        "refine_layout": true
+    },
+    "pdf_pptx": {
+        "vision_model": null,
+        "inpainting_model": "opencv-ns",
+        "codegen_model": "algorithmic",
+        "output_format": "both",
+        "max_concurrent": 2,
+        "font_family": "Pretendard Medium",
+        "refine_layout": true
+    },
+    "pdf_png": {
+        "vision_model": null,
+        "inpainting_model": "opencv-ns",
+        "codegen_model": "algorithmic",
+        "output_format": "both",
+        "max_concurrent": 3,
+        "font_family": "Pretendard Medium",
+        "refine_layout": true
+    },
+    "photoroom": {
+        "mode": "ai.all"
+    }
 }

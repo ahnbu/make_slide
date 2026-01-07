@@ -126,7 +126,6 @@
                 <option value="3" selected>3개</option>
                 <option value="4">4개</option>
                 <option value="5">5개</option>
-                <option value="8">8개</option>
                 <option value="10">10개</option>
                 <option value="15">15개</option>
               </select>
@@ -225,6 +224,7 @@
                   <option value="4">4개</option>
                   <option value="5">5개</option>
                   <option value="10">10개</option>
+                  <option value="15">15개</option>
                 </select>
               </div>
             </div>
@@ -363,6 +363,7 @@
                 <option value="4">4개</option>
                 <option value="5">5개</option>
                 <option value="10">10개</option>
+                <option value="15">15개</option>
               </select>
             </div>
           </div>
@@ -433,44 +434,49 @@
   </section>
 
   <!-- Photoroom Remove Text Section -->
-  <section id="removeTextPhotoroomSection" class="hidden">
-    <!-- Options: Mode Selection (Moved to Top as Settings) -->
-    <div class="glass-panel" style="margin-bottom: 2rem; padding: 1.5rem;">
-      <div class="settings-grid"
-        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem;">
-        <div class="setting-group">
-          <label>제거 모드 선택 (Mode)</label>
-          <select id="textRemovalMode_photoroom">
-            <option value="ai.all" selected>모든 텍스트 제거 (AI.All)</option>
-            <option value="ai.artificial">인공 텍스트만 (AI.Artificial)</option>
-            <option value="ai.natural">자연 텍스트만 (AI.Natural)</option>
-          </select>
+  <section id="removeTextPhotoroomSection" class="tab-content-wrapper hidden">
+
+    <!-- Top Group: Settings & Upload -->
+    <div class="control-panel-group">
+      <!-- Settings Panel -->
+      <div class="glass-panel settings-panel">
+        <div class="settings-grid"
+          style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem;">
+          <div class="setting-group">
+            <label>제거 모드 선택 (Mode)</label>
+            <select id="textRemovalMode_photoroom">
+              <option value="ai.all" selected>모든 텍스트 제거 (AI.All)</option>
+              <option value="ai.artificial">인공 텍스트만 (AI.Artificial)</option>
+              <option value="ai.natural">자연 텍스트만 (AI.Natural)</option>
+            </select>
+          </div>
+        </div>
+        <div class="settings-actions" style="margin-top: 1rem; text-align: right;">
+          <button class="btn-secondary small" onclick="saveSettings()">
+            <i data-lucide="save"></i> 현재 설정을 기본값으로 저장
+          </button>
         </div>
       </div>
-      <div class="settings-actions" style="margin-top: 1rem; text-align: right;">
-        <button class="btn-secondary small" onclick="saveSettings()">
-          <i data-lucide="save"></i> 현재 설정을 기본값으로 저장
-        </button>
+
+      <!-- Upload Panel -->
+      <div class="glass-panel upload-panel">
+        <div id="photoroomDropZone" class="upload-content">
+          <div class="icon-cloud"><i data-lucide="eraser"></i></div>
+          <h2>이미지 텍스트 제거 (Photoroom AI)</h2>
+          <p>이미지를 드래그하거나 클릭하세요. (Sandbox Key 사용 시 워터마크 포함)</p>
+          <input type="file" id="photoroomInput" accept="image/*" hidden>
+        </div>
+
+        <div id="photoroomFileInfo" class="file-info hidden" style="margin-top: 1rem;">
+          <i data-lucide="image" style="margin-right: 0.5rem;"></i>
+          <span id="photoroomFileName" class="file-name">filename.png</span>
+          <button id="btnPhotoroomReset" class="btn-text small">다른 파일 업로드</button>
+        </div>
       </div>
     </div>
 
-    <!-- Upload Area -->
-    <div class="glass-panel" style="margin-bottom: 2rem; padding: 1.5rem;">
-      <div id="photoroomDropZone" class="upload-content pdf-drop">
-        <div class="icon-cloud"><i data-lucide="eraser"></i></div>
-        <h2>이미지 텍스트 제거 (Photoroom AI)</h2>
-        <p>이미지를 드래그하거나 클릭하세요. (Sandbox Key 사용 시 워터마크 포함)</p>
-        <input type="file" id="photoroomInput" accept="image/*" hidden>
-      </div>
-
-      <div id="photoroomFileInfo" class="file-info hidden" style="margin-bottom: 1rem;">
-        <i data-lucide="image" style="margin-right: 0.5rem;"></i>
-        <span id="photoroomFileName" class="file-name">filename.png</span>
-        <button id="btnPhotoroomReset" class="btn-text small">다른 파일 업로드</button>
-      </div>
-    </div>
-
-    <div style="margin-top: 1.5rem; text-align: center;">
+    <!-- Action Button -->
+    <div style="margin: 1.5rem 0; text-align: center;">
       <button id="btnRunPhotoroom" class="btn-primary">
         <i data-lucide="wand-2"></i> 텍스트 제거 실행
       </button>
@@ -478,7 +484,7 @@
 
     <!-- Result Preview -->
     <div id="photoroomResultContainer" class="pdf-results hidden glass-panel"
-      style="margin-top: 2rem; padding: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+      style="padding: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
       <div class="pdf-page-card">
         <div class="page-info" style="text-align: center; font-weight: bold; background: rgba(0,0,0,0.3);">원본 이미지</div>
         <div class="pdf-thumb-container" style="background: transparent;">

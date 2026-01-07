@@ -45,13 +45,41 @@ app.mount("/output", StaticFiles(directory=OUTPUT_DIR), name="output")
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
 # Default Settings
+# Default Settings (New Structure)
 DEFAULT_SETTINGS = {
-    "vision_model": "gemini-3-flash-preview",
-    "inpainting_model": "opencv-telea",
-    "codegen_model": "algorithmic",
-    "output_format": "both",
-    "font_family": "Malgun Gothic",
-    "refine_layout": False
+    "common": {
+        "exclude_text": ""
+    },
+    "reconstruct": {
+        "vision_model": "gemini-3-flash-preview",
+        "inpainting_model": "opencv-telea",
+        "codegen_model": "algorithmic",
+        "output_format": "both",
+        "max_concurrent": 15,
+        "font_family": "Malgun Gothic",
+        "refine_layout": False
+    },
+    "pdf_pptx": {
+        "vision_model": "gemini-3-flash-preview",
+        "inpainting_model": "opencv-telea",
+        "codegen_model": "algorithmic",
+        "output_format": "both",
+        "max_concurrent": 15,
+        "font_family": "Malgun Gothic",
+        "refine_layout": False
+    },
+    "pdf_png": {
+        "vision_model": "gemini-3-flash-preview",
+        "inpainting_model": "opencv-telea",
+        "codegen_model": "algorithmic",
+        "output_format": "both",
+        "max_concurrent": 15,
+        "font_family": "Malgun Gothic",
+        "refine_layout": False
+    },
+    "photoroom": {
+        "mode": "ai.all"
+    }
 }
 
 SETTINGS_FILE = os.path.join(BASE_DIR, "settings.json")
@@ -76,7 +104,10 @@ def save_settings_to_file(settings):
 
 # Initialize Core Modules
 current_settings = load_settings()
-analyzer = Analyzer(model_name=current_settings["vision_model"])
+# Use reconstruct settings as default for analyzer if specific context not provided
+default_vision_model = current_settings.get("reconstruct", {}).get("vision_model", "gemini-3-flash-preview")
+analyzer = Analyzer(model_name=default_vision_model)
+
 image_processor = ImageProcessor()
 code_generator = CodeGenerator()
 pptx_generator = PPTXGenerator()
@@ -87,14 +118,26 @@ async def get_settings():
 
 @app.post("/settings")
 async def update_settings(request: Request):
-    new_settings = await request.json()
-    save_settings_to_file(new_settings)
+    # Partial update logic
+    incoming_data = await request.json()
+    current_data = load_settings()
     
-    # Update active analyzer implementation if vision model changed
-    if "vision_model" in new_settings:
-        analyzer.model_name = new_settings["vision_model"]
+    # Merge existing structure with incoming changes (deep merge preferred, or key-level repl)
+    # Incoming might be { "reconstruct": { ... } } or { "common": { ... } }
+    
+    for section, values in incoming_data.items():
+        if section in current_data and isinstance(values, dict):
+             current_data[section].update(values)
+        else:
+             current_data[section] = values
+             
+    save_settings_to_file(current_data)
+    
+    # Update active analyzer if reconstruct vision model changed
+    if "reconstruct" in incoming_data and "vision_model" in incoming_data["reconstruct"]:
+        analyzer.model_name = incoming_data["reconstruct"]["vision_model"]
         
-    return JSONResponse({"status": "success", "settings": new_settings})
+    return JSONResponse({"status": "success", "settings": current_data})
 
 
 @app.get("/api-key")
@@ -680,6 +723,22 @@ def log_execution(filename, vision, inpaint, codegen):
     except Exception as e:
         logger.error(f"Failed to write execution log: {e}")
 
+def log_photoroom_execution(filename, mode):
+    try:
+        log_dir = os.path.join(BASE_DIR, "logs")
+        ensure_directory(log_dir)
+        log_file = os.path.join(log_dir, "execution_log.txt")
+        
+        timestamp = datetime.now().isoformat()
+        log_entry = f"[{timestamp}] [Photoroom] File: {filename} | Mode: {mode}\n"
+        
+        with open(log_file, "a", encoding="utf-8") as f:
+            f.write(log_entry)
+            
+        logger.info(f"Photoroom execution logged to {log_file}")
+    except Exception as e:
+        logger.error(f"Failed to write Photoroom execution log: {e}")
+
 @app.post("/remove-text")
 async def remove_text(
     file: UploadFile = File(...), 
@@ -1105,6 +1164,9 @@ async def remove_text_photoroom(
         
         with open(output_path, "wb") as f:
             f.write(result_data)
+            
+        # Log Execution
+        log_photoroom_execution(file.filename, mode)
             
         return JSONResponse({
             "status": "success",
