@@ -1,16 +1,16 @@
-<!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" class="trancy-ko">
+<script src="chrome-extension://kagjkiiecagemklhmhkabbalfpbianbe/inject-web.js"></script>
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NotebookLM to PPTX</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap"
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&amp;display=swap"
     rel="stylesheet">
   <link rel="icon"
-    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>">
+    href="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text y=%22.9em%22 font-size=%2290%22&gt;✨&lt;/text&gt;&lt;/svg&gt;">
   <link rel="stylesheet" href="/static/css/style.css?v=3.4">
 
 
@@ -22,13 +22,23 @@
   <script src="https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
   <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
 </head>
+<link rel="stylesheet" asset="eduser.css" href="chrome-extension://mjdbhokoopacimoekfgkcoogikbfgngb/assets/eduser.css">
 
 <body>
   <div class="app-container">
     <!-- Header -->
     <header>
       <div class="logo">
-        <span class="logo-icon"><i data-lucide="sparkles"></i></span>
+        <span class="logo-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            data-lucide="sparkles" class="lucide lucide-sparkles">
+            <path
+              d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z">
+            </path>
+            <path d="M20 2v4"></path>
+            <path d="M22 4h-4"></path>
+            <circle cx="4" cy="20" r="2"></circle>
+          </svg></span>
         <div class="logo-text">
           <h1>NotebookLM to PPTX</h1>
           <!-- <span class="badge">v3.11</span> -->
@@ -36,7 +46,14 @@
       </div>
       <div class="header-controls">
         <button id="btnOpenSettings" class="btn-text" title="API Key 설정">
-          <i data-lucide="settings"></i>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="settings"
+            class="lucide lucide-settings">
+            <path
+              d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915">
+            </path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
         </button>
       </div>
     </header>
@@ -44,11 +61,43 @@
 
     <!-- Tabs -->
     <div class="tabs-container">
-      <button class="tab-btn active" data-tab="pdf-to-pptx"><i data-lucide="file-symlink"></i> PDF to PPTX</button>
-      <button class="tab-btn" data-tab="pdf-to-png"><i data-lucide="file-type-2"></i> PDF to PNG</button>
+      <button class="tab-btn" data-tab="pdf-to-pptx"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+          viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round" data-lucide="file-symlink" class="lucide lucide-file-symlink">
+          <path
+            d="M4 11V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.706.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h7">
+          </path>
+          <path d="M14 2v5a1 1 0 0 0 1 1h5"></path>
+          <path d="m10 18 3-3-3-3"></path>
+        </svg> PDF to PPTX</button>
+      <button class="tab-btn active" data-tab="pdf-to-png"><svg xmlns="http://www.w3.org/2000/svg" width="24"
+          height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round" data-lucide="file-type-2" class="lucide lucide-file-type-2">
+          <path d="M12 22h6a2 2 0 0 0 2-2V8a2.4 2.4 0 0 0-.706-1.706l-3.588-3.588A2.4 2.4 0 0 0 14 2H6a2 2 0 0 0-2 2v6">
+          </path>
+          <path d="M14 2v5a1 1 0 0 0 1 1h5"></path>
+          <path d="M3 16v-1.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5V16"></path>
+          <path d="M6 22h2"></path>
+          <path d="M7 14v8"></path>
+        </svg> PDF to PNG</button>
       <button class="tab-btn" data-tab="reconstruct">IMG to PPTX/HTML</button>
-      <button class="tab-btn" data-tab="combine"><i data-lucide="layers"></i> 이미지+텍스트 조합</button>
-      <button class="tab-btn" data-tab="remove-text-photoroom"><i data-lucide="eraser"></i> 이미지 텍스트 제거</button>
+      <button class="tab-btn" data-tab="combine"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+          viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round" data-lucide="layers" class="lucide lucide-layers">
+          <path
+            d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z">
+          </path>
+          <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"></path>
+          <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"></path>
+        </svg> 이미지+텍스트 조합</button>
+      <button class="tab-btn" data-tab="remove-text-photoroom"><svg xmlns="http://www.w3.org/2000/svg" width="24"
+          height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round" data-lucide="eraser" class="lucide lucide-eraser">
+          <path
+            d="M21 21H8a2 2 0 0 1-1.42-.587l-3.994-3.999a2 2 0 0 1 0-2.828l10-10a2 2 0 0 1 2.829 0l5.999 6a2 2 0 0 1 0 2.828L12.834 21">
+          </path>
+          <path d="m5.082 11.09 8.828 8.828"></path>
+        </svg> 이미지 텍스트 제거</button>
     </div>
 
     <!-- Global Settings REMOVED -->
@@ -68,7 +117,7 @@
           <div class="setting-group">
             <label>비전모델(분석)</label>
             <select id="visionModel_reconstruct" class="vision-model-select">
-              <option value="gemini-3-flash-preview" selected>Gemini 3.0 Flash (Preview)</option>
+              <option value="gemini-3-flash-preview" selected="">Gemini 3.0 Flash (Preview)</option>
               <option value="gemini-2.5-flash">Gemini 2.5 Flash (Experimental)</option>
             </select>
           </div>
@@ -93,7 +142,7 @@
           <div class="setting-group">
             <label>정밀 분석 모드 (Refine)</label>
             <select id="refineLayout_reconstruct">
-              <option value="false" selected>OFF (빠름)</option>
+              <option value="false" selected="">OFF (빠름)</option>
               <option value="true">ON (정밀 보정)</option>
             </select>
           </div>
@@ -103,14 +152,14 @@
             <select id="outputFormat_reconstruct">
               <option value="html">HTML Only</option>
               <option value="pptx">PPTX Only</option>
-              <option value="both" selected>Both (HTML+PPTX)</option>
+              <option value="both" selected="">Both (HTML+PPTX)</option>
             </select>
           </div>
           <!-- Font -->
           <div class="setting-group">
             <label>글꼴 (Font)</label>
             <select id="fontFamily_reconstruct">
-              <option value="Malgun Gothic" selected>맑은 고딕 (기본)</option>
+              <option value="Malgun Gothic" selected="">맑은 고딕 (기본)</option>
               <option value="Pretendard Medium">Pretendard Medium (프리텐다드)</option>
               <option value="Noto Sans KR">Noto Sans KR (구글 폰트)</option>
               <option value="Apple SD Gothic Neo">Apple SD Gothic Neo</option>
@@ -122,7 +171,7 @@
             <label>동시 처리 개수 (Batch)</label>
             <select id="maxConcurrent_reconstruct">
               <option value="2">2개</option>
-              <option value="3" selected>3개</option>
+              <option value="3" selected="">3개</option>
               <option value="4">4개</option>
               <option value="5">5개</option>
               <option value="8">8개</option>
@@ -133,7 +182,15 @@
         </div>
         <div class="settings-actions" style="margin-top: 1rem; text-align: right;">
           <button class="btn-secondary small" onclick="saveSettings()">
-            <i data-lucide="save"></i> 현재 설정을 기본값으로 저장
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="save"
+              class="lucide lucide-save">
+              <path
+                d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z">
+              </path>
+              <path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"></path>
+              <path d="M7 3v4a1 1 0 0 0 1 1h7"></path>
+            </svg> 현재 설정을 기본값으로 저장
           </button>
         </div>
       </section>
@@ -141,10 +198,16 @@
       <!-- Upload Section (Reconstruct Tab) -->
       <section id="uploadSection" class="glass-panel upload-zone" style="margin-bottom: 2rem; padding: 1.5rem;">
         <div class="upload-content">
-          <div class="icon-cloud"><i data-lucide="upload-cloud" size="48"></i></div>
-          <h2 id="uploadTitle">슬라이드 이미지 업로드</h2>
+          <div class="icon-cloud"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              data-lucide="upload-cloud" size="48" class="lucide lucide-upload-cloud">
+              <path d="M12 13v8"></path>
+              <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path>
+              <path d="m8 17 4-4 4 4"></path>
+            </svg></div>
+          <h2 id="uploadTitle">PDF to PNG 변환 (단순 변환)</h2>
           <p id="uploadDesc">이미지를 이곳에 드래그하거나 클릭하여 선택하세요. (여러 장 가능)</p>
-          <input type="file" id="fileInput" accept="image/*" multiple hidden>
+          <input type="file" id="fileInput" accept="image/*" multiple="" hidden="">
           <button class="btn-primary" onclick="document.getElementById('fileInput').click()">
             파일 선택 (다중 가능)
           </button>
@@ -152,7 +215,7 @@
       </section>
 
       <!-- Tab: PDF to PPTX & PDF to PNG -->
-      <section id="pdfSection" class="tab-content-wrapper hidden">
+      <section id="pdfSection" class="tab-content-wrapper">
 
         <!-- 1. Top: Info & Upload -->
         <div id="pdfTopArea" class="control-panel-group">
@@ -166,7 +229,7 @@
                 <select id="pdfQuality">
                   <option value="1.5">화면용 (Standard)</option>
                   <option value="2.0">고화질 (HD - Slide)</option>
-                  <option value="3.0" selected>인쇄용 (Ultra HD)</option>
+                  <option value="3.0" selected="">인쇄용 (Ultra HD)</option>
                 </select>
               </div>
               <!-- 2. Inpainting (New) -->
@@ -190,7 +253,7 @@
               <div class="setting-group">
                 <label>정밀 분석 모드 (Refine)</label>
                 <select id="refineLayout_pdf">
-                  <option value="false" selected>OFF (빠름)</option>
+                  <option value="false" selected="">OFF (빠름)</option>
                   <option value="true">ON (정밀 보정)</option>
                 </select>
               </div>
@@ -200,14 +263,14 @@
                 <select id="outputFormat_pdf">
                   <option value="html">HTML Only</option>
                   <option value="pptx">PPTX Only</option>
-                  <option value="both" selected>Both (HTML+PPTX)</option>
+                  <option value="both" selected="">Both (HTML+PPTX)</option>
                 </select>
               </div>
               <!-- 6. Font -->
               <div class="setting-group">
                 <label>글꼴 (Font)</label>
                 <select id="fontFamily_pdf">
-                  <option value="Malgun Gothic" selected>맑은 고딕 (기본)</option>
+                  <option value="Malgun Gothic" selected="">맑은 고딕 (기본)</option>
                   <option value="Pretendard Medium">Pretendard Medium (프리텐다드)</option>
                   <option value="Noto Sans KR">Noto Sans KR (구글 폰트)</option>
                   <option value="Apple SD Gothic Neo">Apple SD Gothic Neo</option>
@@ -219,7 +282,7 @@
                 <label>동시 처리 개수</label>
                 <select id="maxConcurrent_pdf">
                   <option value="2">2개</option>
-                  <option value="3" selected>3개</option>
+                  <option value="3" selected="">3개</option>
                   <option value="4">4개</option>
                   <option value="5">5개</option>
                   <option value="10">10개</option>
@@ -228,17 +291,35 @@
             </div>
             <div class="settings-actions" style="margin-top: 1rem; text-align: right;">
               <button class="btn-secondary small" onclick="saveSettings()">
-                <i data-lucide="save"></i> 현재 설정을 기본값으로 저장
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                  data-lucide="save" class="lucide lucide-save">
+                  <path
+                    d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z">
+                  </path>
+                  <path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"></path>
+                  <path d="M7 3v4a1 1 0 0 0 1 1h7"></path>
+                </svg> 현재 설정을 기본값으로 저장
               </button>
             </div>
           </div>
 
           <!-- PDF Upload Panel -->
           <div id="pdfDropZone" class="glass-panel upload-panel">
-            <div class="icon-cloud"><i data-lucide="file-text" size="48"></i></div>
+            <div class="icon-cloud"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                data-lucide="file-text" size="48" class="lucide lucide-file-text">
+                <path
+                  d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z">
+                </path>
+                <path d="M14 2v5a1 1 0 0 0 1 1h5"></path>
+                <path d="M10 9H8"></path>
+                <path d="M16 13H8"></path>
+                <path d="M16 17H8"></path>
+              </svg></div>
             <h2>PDF 파일 업로드</h2>
             <p>여기에 PDF를 드래그하거나 클릭하세요. (서버 전송 없음)</p>
-            <input type="file" id="pdfInput" accept="application/pdf" hidden>
+            <input type="file" id="pdfInput" accept="application/pdf" hidden="">
             <!-- File Info (Hidden by default) -->
             <div id="pdfFileInfo" class="file-info hidden" style="margin-top: 1rem;">
               <span id="pdfFileName" class="file-name">filename.pdf</span>
@@ -262,16 +343,42 @@
           </div>
           <div class="toolbar-right">
             <button id="btnPptxStart" class="btn-primary small hidden">
-              <i data-lucide="sparkles"></i> PPTX 생성하기
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                data-lucide="sparkles" class="lucide lucide-sparkles">
+                <path
+                  d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z">
+                </path>
+                <path d="M20 2v4"></path>
+                <path d="M22 4h-4"></path>
+                <circle cx="4" cy="20" r="2"></circle>
+              </svg> PPTX 생성하기
             </button>
             <button id="btnDownloadPptxSimple" class="btn-primary small">
-              <i data-lucide="presentation"></i> PPTX 다운로드
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                data-lucide="presentation" class="lucide lucide-presentation">
+                <path d="M2 3h20"></path>
+                <path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3"></path>
+                <path d="m7 21 5-5 5 5"></path>
+              </svg> PPTX 다운로드
             </button>
-            <button id="btnDownloadSelected" class="btn-secondary small" disabled>
-              <i data-lucide="check-square"></i> 선택 다운로드 (0)
+            <button id="btnDownloadSelected" class="btn-secondary small" disabled="">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                data-lucide="check-square" class="lucide lucide-check-square">
+                <path d="M21 10.656V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h12.344"></path>
+                <path d="m9 11 3 3L22 4"></path>
+              </svg> 선택 다운로드 (0)
             </button>
             <button id="btnDownloadAll" class="btn-primary small">
-              <i data-lucide="archive"></i> 전체 다운로드
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                data-lucide="archive" class="lucide lucide-archive">
+                <rect width="20" height="5" x="2" y="3" rx="1"></rect>
+                <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"></path>
+                <path d="M10 12h4"></path>
+              </svg> 전체 다운로드
             </button>
           </div>
         </div>
@@ -303,7 +410,7 @@
             <div class="setting-group">
               <label>비전모델(분석)</label>
               <select id="visionModel_combine" class="vision-model-select">
-                <option value="gemini-3-flash-preview" selected>Gemini 3.0 Flash (Preview)</option>
+                <option value="gemini-3-flash-preview" selected="">Gemini 3.0 Flash (Preview)</option>
                 <option value="gemini-2.5-flash">Gemini 2.5 Flash (Experimental)</option>
               </select>
             </div>
@@ -328,7 +435,7 @@
             <div class="setting-group">
               <label>정밀 분석 모드 (Refine)</label>
               <select id="refineLayout_combine">
-                <option value="false" selected>OFF (빠름)</option>
+                <option value="false" selected="">OFF (빠름)</option>
                 <option value="true">ON (정밀 보정)</option>
               </select>
             </div>
@@ -338,14 +445,14 @@
               <select id="outputFormat_combine">
                 <option value="html">HTML Only</option>
                 <option value="pptx">PPTX Only</option>
-                <option value="both" selected>Both (HTML+PPTX)</option>
+                <option value="both" selected="">Both (HTML+PPTX)</option>
               </select>
             </div>
             <!-- 6. Font -->
             <div class="setting-group">
               <label>글꼴 (Font)</label>
               <select id="fontFamily_combine">
-                <option value="Malgun Gothic" selected>맑은 고딕 (기본)</option>
+                <option value="Malgun Gothic" selected="">맑은 고딕 (기본)</option>
                 <option value="Pretendard Medium">Pretendard Medium (프리텐다드)</option>
                 <option value="Noto Sans KR">Noto Sans KR (구글 폰트)</option>
                 <option value="Apple SD Gothic Neo">Apple SD Gothic Neo</option>
@@ -357,7 +464,7 @@
               <label>동시 처리 개수</label>
               <select id="maxConcurrent_combine">
                 <option value="2">2개</option>
-                <option value="3" selected>3개</option>
+                <option value="3" selected="">3개</option>
                 <option value="4">4개</option>
                 <option value="5">5개</option>
                 <option value="10">10개</option>
@@ -366,7 +473,15 @@
           </div>
           <div class="settings-actions" style="margin-top: 1rem; text-align: right;">
             <button class="btn-secondary small" onclick="saveSettings()">
-              <i data-lucide="save"></i> 현재 설정을 기본값으로 저장
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="save"
+                class="lucide lucide-save">
+                <path
+                  d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z">
+                </path>
+                <path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"></path>
+                <path d="M7 3v4a1 1 0 0 0 1 1h7"></path>
+              </svg> 현재 설정을 기본값으로 저장
             </button>
           </div>
         </div>
@@ -378,11 +493,17 @@
             <!-- <div class="icon-area" style="margin-bottom: 1.5rem; color: var(--accent);"><i data-lucide="type"
                 size="48"></i></div> -->
             <h3 style="margin-bottom: 0.5rem; font-size: 1.2rem;">
-              <i data-lucide="type" size="48" style="margin-right: 0.3rem; color: var(--accent)"></i> 텍스트 원본 (Source)
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="type"
+                size="48" style="margin-right: 0.3rem; color: var(--accent)" class="lucide lucide-type">
+                <path d="M12 4v16"></path>
+                <path d="M4 7V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2"></path>
+                <path d="M9 20h6"></path>
+              </svg> 텍스트 원본 (Source)
             </h3>
             <!-- <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 2rem;">텍스트가 포함된 원본 이미지/PDF</p> -->
 
-            <input type="file" id="combineSourceInput" accept="image/*,application/pdf" multiple hidden>
+            <input type="file" id="combineSourceInput" accept="image/*,application/pdf" multiple="" hidden="">
             <!-- Updated Button Style -->
             <button class="btn-primary" onclick="document.getElementById('combineSourceInput').click()"
               style="width: 100%;">
@@ -402,11 +523,18 @@
             <!-- <div class="icon-area" style="margin-bottom: 1.5rem; color: var(--primary);"><i data-lucide="image"
                 size="48"></i></div> -->
             <h3 style="margin-bottom: 0.5rem; font-size: 1.2rem;">
-              <i data-lucide="image" size="48" style="margin-right: 0.3rem; color: var(--primary)"></i> 클린 배경 (Clean BG)
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                data-lucide="image" size="48" style="margin-right: 0.3rem; color: var(--primary)"
+                class="lucide lucide-image">
+                <rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect>
+                <circle cx="9" cy="9" r="2"></circle>
+                <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path>
+              </svg> 클린 배경 (Clean BG)
             </h3>
             <!-- <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 2rem;">텍스트가 제거된 배경 이미지/PDF</p> -->
 
-            <input type="file" id="combineBgInput" accept="image/*,application/pdf" multiple hidden>
+            <input type="file" id="combineBgInput" accept="image/*,application/pdf" multiple="" hidden="">
             <!-- Updated Button Style -->
             <button class="btn-primary" onclick="document.getElementById('combineBgInput').click()"
               style="width: 100%;">
@@ -422,13 +550,24 @@
         </div>
 
         <div class="combine-actions" style="margin-top: 2rem; text-align: center;">
-          <button id="btnCombineStart" class="btn-primary" disabled
+          <button id="btnCombineStart" class="btn-primary" disabled=""
             style="width: 50%; padding: 1rem; font-size: 1.1rem;">
-            <i data-lucide="sparkles" style="margin-right: 0.5rem;"></i> 조합 및 생성 시작
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              data-lucide="sparkles" style="margin-right: 0.5rem;" class="lucide lucide-sparkles">
+              <path
+                d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z">
+              </path>
+              <path d="M20 2v4"></path>
+              <path d="M22 4h-4"></path>
+              <circle cx="4" cy="20" r="2"></circle>
+            </svg> 조합 및 생성 시작
           </button>
         </div>
+      </section>
+    </main>
   </div>
-  </section>
+
 
   <!-- Photoroom Remove Text Section -->
   <section id="removeTextPhotoroomSection" class="hidden">
@@ -439,7 +578,7 @@
         <div class="setting-group">
           <label>제거 모드 선택 (Mode)</label>
           <select id="textRemovalMode_photoroom">
-            <option value="ai.all" selected>모든 텍스트 제거 (AI.All)</option>
+            <option value="ai.all" selected="">모든 텍스트 제거 (AI.All)</option>
             <option value="ai.artificial">인공 텍스트만 (AI.Artificial)</option>
             <option value="ai.natural">자연 텍스트만 (AI.Natural)</option>
           </select>
@@ -447,7 +586,15 @@
       </div>
       <div class="settings-actions" style="margin-top: 1rem; text-align: right;">
         <button class="btn-secondary small" onclick="saveSettings()">
-          <i data-lucide="save"></i> 현재 설정을 기본값으로 저장
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="save"
+            class="lucide lucide-save">
+            <path
+              d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z">
+            </path>
+            <path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"></path>
+            <path d="M7 3v4a1 1 0 0 0 1 1h7"></path>
+          </svg> 현재 설정을 기본값으로 저장
         </button>
       </div>
     </div>
@@ -455,14 +602,27 @@
     <!-- Upload Area -->
     <div class="glass-panel" style="margin-bottom: 2rem; padding: 1.5rem;">
       <div id="photoroomDropZone" class="upload-content pdf-drop">
-        <div class="icon-cloud"><i data-lucide="eraser"></i></div>
+        <div class="icon-cloud"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            data-lucide="eraser" class="lucide lucide-eraser">
+            <path
+              d="M21 21H8a2 2 0 0 1-1.42-.587l-3.994-3.999a2 2 0 0 1 0-2.828l10-10a2 2 0 0 1 2.829 0l5.999 6a2 2 0 0 1 0 2.828L12.834 21">
+            </path>
+            <path d="m5.082 11.09 8.828 8.828"></path>
+          </svg></div>
         <h2>이미지 텍스트 제거 (Photoroom AI)</h2>
         <p>이미지를 드래그하거나 클릭하세요. (Sandbox Key 사용 시 워터마크 포함)</p>
-        <input type="file" id="photoroomInput" accept="image/*" hidden>
+        <input type="file" id="photoroomInput" accept="image/*" hidden="">
       </div>
 
       <div id="photoroomFileInfo" class="file-info hidden" style="margin-bottom: 1rem;">
-        <i data-lucide="image" style="margin-right: 0.5rem;"></i>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="image"
+          style="margin-right: 0.5rem;" class="lucide lucide-image">
+          <rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect>
+          <circle cx="9" cy="9" r="2"></circle>
+          <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path>
+        </svg>
         <span id="photoroomFileName" class="file-name">filename.png</span>
         <button id="btnPhotoroomReset" class="btn-text small">다른 파일 업로드</button>
       </div>
@@ -470,7 +630,20 @@
 
     <div style="margin-top: 1.5rem; text-align: center;">
       <button id="btnRunPhotoroom" class="btn-primary">
-        <i data-lucide="wand-2"></i> 텍스트 제거 실행
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="wand-2"
+          class="lucide lucide-wand-2">
+          <path
+            d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72">
+          </path>
+          <path d="m14 7 3 3"></path>
+          <path d="M5 6v4"></path>
+          <path d="M19 14v4"></path>
+          <path d="M10 2v2"></path>
+          <path d="M7 8H3"></path>
+          <path d="M21 16h-4"></path>
+          <path d="M11 3H9"></path>
+        </svg> 텍스트 제거 실행
       </button>
     </div>
 
@@ -490,9 +663,15 @@
           <img id="imgPrResult" class="pdf-thumb-img" src="" style="max-height: 400px; object-fit: contain;">
         </div>
         <div class="page-info">
-          <a id="btnDlPrResult" class="btn-primary small" href="#" download
+          <a id="btnDlPrResult" class="btn-primary small" href="#" download=""
             style="width: 100%; justify-content: center;">
-            <i data-lucide="download"></i> 다운로드
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              data-lucide="download" class="lucide lucide-download">
+              <path d="M12 15V3"></path>
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <path d="m7 10 5 5 5-5"></path>
+            </svg> 다운로드
           </a>
         </div>
       </div>
@@ -503,21 +682,59 @@
   <section id="batchControlPanel" class="glass-panel batch-controls hidden">
     <div class="batch-header">
       <div class="batch-info">
-        <h3><i data-lucide="package-open" style="vertical-align: middle; margin-right: 0.5rem;"></i> 일괄 작업 </h3>
+        <h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            data-lucide="package-open" style="vertical-align: middle; margin-right: 0.5rem;"
+            class="lucide lucide-package-open">
+            <path d="M12 22v-9"></path>
+            <path
+              d="M15.17 2.21a1.67 1.67 0 0 1 1.63 0L21 4.57a1.93 1.93 0 0 1 0 3.36L8.82 14.79a1.655 1.655 0 0 1-1.64 0L3 12.43a1.93 1.93 0 0 1 0-3.36z">
+            </path>
+            <path
+              d="M20 13v3.87a2.06 2.06 0 0 1-1.11 1.83l-6 3.08a1.93 1.93 0 0 1-1.78 0l-6-3.08A2.06 2.06 0 0 1 4 16.87V13">
+            </path>
+            <path
+              d="M21 12.43a1.93 1.93 0 0 0 0-3.36L8.83 2.2a1.64 1.64 0 0 0-1.63 0L3 4.57a1.93 1.93 0 0 0 0 3.36l12.18 6.86a1.636 1.636 0 0 0 1.63 0z">
+            </path>
+          </svg> 일괄 작업 </h3>
         <span id="batchStatusText">완료: 0 / 0</span>
       </div>
       <div class="batch-actions">
-        <button id="btnPause" class="btn-secondary" title="일시정지" onclick="jobQueue.pause()"><i data-lucide="pause"></i>
+        <button id="btnPause" class="btn-secondary" title="일시정지" onclick="jobQueue.pause()"><svg
+            xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="pause"
+            class="lucide lucide-pause">
+            <rect x="14" y="3" width="5" height="18" rx="1"></rect>
+            <rect x="5" y="3" width="5" height="18" rx="1"></rect>
+          </svg>
           일시정지</button>
-        <button id="btnResume" class="btn-secondary hidden" title="재개" onclick="jobQueue.resume()"><i
-            data-lucide="play"></i> 재개</button>
+        <button id="btnResume" class="btn-secondary hidden" title="재개" onclick="jobQueue.resume()"><svg
+            xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="play"
+            class="lucide lucide-play">
+            <path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"></path>
+          </svg> 재개</button>
         <button id="btnStop" class="btn-secondary" title="중단" onclick="jobQueue.stop()">
           <!-- <i data-lucide="square" style="color: #ef4444;"></i> 작업 중단 -->
-          <i data-lucide="square"></i> 작업 중단
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="square"
+            class="lucide lucide-square">
+            <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+          </svg> 작업 중단
         </button>
         <button id="btnDownloadBatchPPTX" class="btn-secondary hidden" title="PPTX 다운"
           onclick="jobQueue.downloadBatchPPTX()">
-          <i data-lucide="file-text"></i> PPTX 다운
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            data-lucide="file-text" class="lucide lucide-file-text">
+            <path
+              d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z">
+            </path>
+            <path d="M14 2v5a1 1 0 0 0 1 1h5"></path>
+            <path d="M10 9H8"></path>
+            <path d="M16 13H8"></path>
+            <path d="M16 17H8"></path>
+          </svg> PPTX 다운
         </button>
       </div>
     </div>
@@ -527,7 +744,7 @@
   </section>
 
   <!-- Job List (Replaces Single Result View for Batch) -->
-  <div id="jobList" class="job-list-container"></div>
+  <div id="jobList" class="job-list-container hidden"></div>
 
   <!-- Loading Section (Legacy/Single - keep hidden or reuse for single) -->
   <section id="loadingSection" class="glass-panel loading-zone hidden">
@@ -546,7 +763,13 @@
         <p>텍스트가 제거된 클린 배경입니다.</p>
       </div>
       <div class="actions">
-        <a id="btnDownloadBgOnly" href="#" class="btn-secondary" download><i data-lucide="image"></i> 이미지 다운로드</a>
+        <a id="btnDownloadBgOnly" href="#" class="btn-secondary" download=""><svg xmlns="http://www.w3.org/2000/svg"
+            width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" data-lucide="image" class="lucide lucide-image">
+            <rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect>
+            <circle cx="9" cy="9" r="2"></circle>
+            <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path>
+          </svg> 이미지 다운로드</a>
         <button class="btn-text btn-retry">다른 파일 작업</button>
       </div>
     </div>
@@ -563,15 +786,20 @@
         <p>이미지 내 텍스트 내용입니다.</p>
       </div>
       <div class="actions">
-        <button id="btnCopyText" class="btn-secondary"><i data-lucide="copy"></i> 클립보드 복사</button>
+        <button id="btnCopyText" class="btn-secondary"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" data-lucide="copy" class="lucide lucide-copy">
+            <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
+            <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+          </svg> 클립보드 복사</button>
         <button class="btn-text btn-retry">다른 파일 작업</button>
       </div>
     </div>
     <div class="glass-panel text-preview">
-      <textarea id="extractedTextArea" readonly></textarea>
+      <textarea id="extractedTextArea" readonly=""></textarea>
     </div>
   </section>
-  </main>
+
 
   <div id="toast" class="toast hidden">알림 메시지</div>
 
@@ -580,7 +808,12 @@
     <div class="modal-content">
       <div class="modal-header">
         <h3 id="modalTitle">Slide Preview</h3>
-        <button class="btn-text" onclick="closeModal()"><i data-lucide="x"></i></button>
+        <button class="btn-text" onclick="closeModal()"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" data-lucide="x" class="lucide lucide-x">
+            <path d="M18 6 6 18"></path>
+            <path d="m6 6 12 12"></path>
+          </svg></button>
       </div>
       <div class="modal-body">
         <div id="modalPreviewContainer" class="modal-preview-container">
@@ -588,11 +821,39 @@
         </div>
       </div>
       <div class="modal-footer">
-        <a id="modalBtnDownloadHtml" href="#" class="btn-primary small" download><i data-lucide="file-code-2"></i>
+        <a id="modalBtnDownloadHtml" href="#" class="btn-primary small" download=""><svg
+            xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            data-lucide="file-code-2" class="lucide lucide-file-code-2">
+            <path
+              d="M4 12.15V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.706.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2h-3.35">
+            </path>
+            <path d="M14 2v5a1 1 0 0 0 1 1h5"></path>
+            <path d="m5 16-3 3 3 3"></path>
+            <path d="m9 22 3-3-3-3"></path>
+          </svg>
           HTML</a>
-        <a id="modalBtnDownloadPptx" href="#" class="btn-primary small hidden" download><i data-lucide="file-text"></i>
+        <a id="modalBtnDownloadPptx" href="#" class="btn-primary small hidden" download=""><svg
+            xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            data-lucide="file-text" class="lucide lucide-file-text">
+            <path
+              d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z">
+            </path>
+            <path d="M14 2v5a1 1 0 0 0 1 1h5"></path>
+            <path d="M10 9H8"></path>
+            <path d="M16 13H8"></path>
+            <path d="M16 17H8"></path>
+          </svg>
           PPTX</a>
-        <a id="modalBtnDownloadBg" href="#" class="btn-secondary small" download><i data-lucide="image"></i> 배경 </a>
+        <a id="modalBtnDownloadBg" href="#" class="btn-secondary small" download=""><svg
+            xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="image"
+            class="lucide lucide-image">
+            <rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect>
+            <circle cx="9" cy="9" r="2"></circle>
+            <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path>
+          </svg> 배경 </a>
         <button class="btn-secondary small" onclick="closeModal()">닫기</button>
       </div>
     </div>
@@ -602,8 +863,19 @@
   <div id="settingsModal" class="modal-overlay hidden">
     <div class="modal-content" style="max-width: 500px;">
       <div class="modal-header">
-        <h3><i data-lucide="key" style="margin-right: 0.5rem; color: var(--accent);"></i> API Key 설정</h3>
-        <button class="btn-text" onclick="closeSettingsModal()"><i data-lucide="x"></i></button>
+        <h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="key"
+            style="margin-right: 0.5rem; color: var(--accent);" class="lucide lucide-key">
+            <path d="m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4"></path>
+            <path d="m21 2-9.6 9.6"></path>
+            <circle cx="7.5" cy="15.5" r="5.5"></circle>
+          </svg> API Key 설정</h3>
+        <button class="btn-text" onclick="closeSettingsModal()"><svg xmlns="http://www.w3.org/2000/svg" width="24"
+            height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" data-lucide="x" class="lucide lucide-x">
+            <path d="M18 6 6 18"></path>
+            <path d="m6 6 12 12"></path>
+          </svg></button>
       </div>
       <div class="modal-body" style="flex-direction: column; padding: 1.5rem;">
         <div style="width: 100%;">
@@ -614,10 +886,15 @@
 
           <div style="display: flex; gap: 0.5rem; align-items: center;">
             <div class="api-key-wrapper" style="flex-grow: 1; position: relative; padding-right: 2.5rem;">
-              <input type="text" id="apiKeyInput" class="api-key-input" placeholder="AIza..." readonly>
+              <input type="text" id="apiKeyInput" class="api-key-input" placeholder="AIza..." readonly="">
               <button id="btnCopyApiKey" class="btn-icon" title="복사"
                 style="position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%);">
-                <i data-lucide="copy" style="width: 1.2rem;"></i>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                  data-lucide="copy" style="width: 1.2rem;" class="lucide lucide-copy">
+                  <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
+                  <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+                </svg>
               </button>
             </div>
 
@@ -647,8 +924,8 @@
       </div>
     </div>
   </div>
-  </div>
-  </div>
+
+
 
   <script src="/static/js/script.js?v=3.14"></script>
   <script>
@@ -786,6 +1063,38 @@
       });
     });
   </script>
-</body>
+
+
+</body><text-blaze-app-reference style="display: contents !important;" role="none"><template shadowrootmode="closed">
+    <style>
+      div:before {
+        content: attr(data-content);
+      }
+
+      div {
+        all: initial;
+        position: absolute;
+        border: 0;
+        margin: -1px;
+        padding: 0;
+        width: 0.1px;
+        height: 0.1px;
+        user-select: none;
+        overflow: hidden;
+        font-size: 0px;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        pointer-events: none;
+      }
+
+      @media print {
+        * {
+          display: none !important;
+        }
+      }
+    </style>
+    <div aria-label="text-blaze-integration" role="group" tabindex="-1"
+      data-content="{&quot;extensionEnabled&quot;:true,&quot;text&quot;:true}" dir="ltr"></div>
+  </template></text-blaze-app-reference>
 
 </html>

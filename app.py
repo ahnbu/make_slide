@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 import asyncio
 import urllib.request
 import urllib.error
+import requests
 import mimetypes
 
 from src.analyzer import Analyzer
@@ -1059,71 +1060,58 @@ async def remove_text_photoroom(
     mode: str = Form("ai.all")
 ):
     try:
-        # Check for Sandbox Key first as requested, then Fallback
+        # 1. API Key Check
         api_key = os.environ.get("PHOTOROOM_API_KEY_SANDBOX") or os.environ.get("PHOTOROOM_API_KEY")
         if not api_key:
-             return JSONResponse(status_code=500, content={"message": "PHOTOROOM_API_KEY_SANDBOX not found in environment"})
+             return JSONResponse(status_code=500, content={"message": "API Key not found"})
              
-        # Generate paths
+        # 2. Basic setup
         timestamp = generate_timestamp()
         original_name = os.path.splitext(file.filename)[0]
-        
         target_dir = os.path.join(OUTPUT_DIR, batch_folder)
         ensure_directory(target_dir)
         
-        # Read file content
         file_content = await file.read()
         
-        boundary = '----WebKitFormBoundary' + uuid.uuid4().hex
+        # 3. Request (cleaner with requests)
+        url = "https://image-api.photoroom.com/v2/edit"
+        headers = {"x-api-key": api_key}
         
-        # Construct Body
-        body = []
-        # Image Part
-        body.append(f'--{boundary}'.encode())
-        body.append(f'Content-Disposition: form-data; name="imageFile"; filename="{file.filename}"'.encode())
-        mime_type = mimetypes.guess_type(file.filename)[0] or 'application/octet-stream'
-        body.append(f'Content-Type: {mime_type}'.encode())
-        body.append(b'')
-        body.append(file_content)
-        
-        # End Boundary
-        body.append(f'--{boundary}--'.encode())
-        body.append(b'')
-        
-        payload = b'\r\n'.join(body)
-        
-        # Use user-provided mode
-        url = f"https://image-api.photoroom.com/v2/edit?textRemoval.mode={mode}"
-        req = urllib.request.Request(url, data=payload)
-        req.add_header('x-api-key', api_key)
-        req.add_header('Content-Type', f'multipart/form-data; boundary={boundary}')
-        
-        try:
-            # Execute Request (blocking, so maybe wrap in thread if heavy traffic, but okay for single use)
-            def _execute_request(request):
-                with urllib.request.urlopen(request) as response:
-                    return response.read()
+        # Files and Data
+        files = {
+            'imageFile': (file.filename, file_content, file.content_type)
+        }
+        data = {
+            "textRemoval.mode": mode,
+            "removeBackground": "false",     # Remove background: false (Keep BG)
+            "referenceBox": "originalImage"  # Keep original dimensions
+        }
 
-            result_data = await asyncio.to_thread(_execute_request, req)
-                
-            # Save result
-            output_filename = f"{original_name}_photoroom_{timestamp}.png"
-            output_path = os.path.join(target_dir, output_filename)
+        # Execute in thread
+        def _post_request():
+            return requests.post(url, headers=headers, files=files, data=data)
             
-            with open(output_path, "wb") as f:
-                f.write(result_data)
-                
-            return JSONResponse({
-                "status": "success",
-                "data": {
-                    "bg_url": f"/output/{batch_folder}/{output_filename}"
-                }
-            })
+        response = await asyncio.to_thread(_post_request)
+        
+        if response.status_code != 200:
+             logger.error(f"Photoroom API Error: {response.text}")
+             return JSONResponse(status_code=response.status_code, content={"message": f"API Error: {response.text}"})
+
+        result_data = response.content
+        
+        # 4. Save
+        output_filename = f"{original_name}_photoroom_{timestamp}.png"
+        output_path = os.path.join(target_dir, output_filename)
+        
+        with open(output_path, "wb") as f:
+            f.write(result_data)
             
-        except urllib.error.HTTPError as e:
-            err_content = e.read().decode()
-            logger.error(f"Photoroom API Error: {err_content}")
-            return JSONResponse(status_code=e.code, content={"message": f"Photoroom API Failed: {err_content}"})
+        return JSONResponse({
+            "status": "success",
+            "data": {
+                "bg_url": f"/output/{batch_folder}/{output_filename}"
+            }
+        })
             
     except Exception as e:
         logger.error(f"Remove Text Photoroom Error: {e}")
