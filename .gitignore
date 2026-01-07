@@ -1,4 +1,5 @@
 .env
+docs/temp/
 docs/colab_success.py
 __pyca# Exclude output directory
 
@@ -10,3 +11,5 @@ output/
 test/
 logs/
 logs/execution_log.txt
+.agent/
+.agent/agent.log

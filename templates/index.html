@@ -56,99 +56,101 @@
     <!-- Main Content -->
     <main>
       <!-- Tab: IMG to PPTX/HTML -->
-      <!-- Reconstruct Settings Panel (Separated) -->
-      <section id="reconstructSettings" class="glass-panel" style="margin-bottom: 2rem; padding: 1.5rem;">
-        <!-- <div class="settings-header" style="margin-bottom: 1rem;">
+      <section id="reconstructSection">
+        <!-- Reconstruct Settings Panel (Separated) -->
+        <section id="reconstructSettings" class="glass-panel" style="margin-bottom: 2rem; padding: 1.5rem;">
+          <!-- <div class="settings-header" style="margin-bottom: 1rem;">
           <h3 style="font-size: 1.1rem; color: var(--text-primary);"><i data-lucide="settings-2"
               style="vertical-align: middle; margin-right: 0.5rem;"></i> 재구성 환경 설정</h3>
         </div> -->
-        <div class="settings-grid"
-          style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem;">
-          <!-- Vision Model -->
-          <div class="setting-group">
-            <label>비전모델(분석)</label>
-            <select id="visionModel_reconstruct" class="vision-model-select">
-              <option value="gemini-3-flash-preview" selected>Gemini 3.0 Flash (Preview)</option>
-              <option value="gemini-2.5-flash">Gemini 2.5 Flash (Experimental)</option>
-            </select>
+          <div class="settings-grid"
+            style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem;">
+            <!-- Vision Model -->
+            <div class="setting-group">
+              <label>비전모델(분석)</label>
+              <select id="visionModel_reconstruct" class="vision-model-select">
+                <option value="gemini-3-flash-preview" selected>Gemini 3.0 Flash (Preview)</option>
+                <option value="gemini-2.5-flash">Gemini 2.5 Flash (Experimental)</option>
+              </select>
+            </div>
+            <!-- Inpainting -->
+            <div class="setting-group">
+              <label>인페인팅(배경복원)</label>
+              <select id="inpaintingModel_reconstruct">
+                <option value="opencv-telea">OpenCV Telea (빠름)</option>
+                <option value="opencv-ns">OpenCV NS (고품질)</option>
+              </select>
+            </div>
+            <!-- Codegen -->
+            <div class="setting-group">
+              <label>HTML생성</label>
+              <select id="codegenModel_reconstruct">
+                <option value="algorithmic">알고리즘 기반 (정밀함)</option>
+                <option value="gemini-3-flash-preview">Gemini 3.0 Flash (Preview)</option>
+                <option value="gemini-2.5-flash">Gemini 2.5 Flash (Experimental)</option>
+              </select>
+            </div>
+            <!-- Refine -->
+            <div class="setting-group">
+              <label>정밀 분석 모드 (Refine)</label>
+              <select id="refineLayout_reconstruct">
+                <option value="false" selected>OFF (빠름)</option>
+                <option value="true">ON (정밀 보정)</option>
+              </select>
+            </div>
+            <!-- Output Format -->
+            <div class="setting-group">
+              <label>출력 포맷</label>
+              <select id="outputFormat_reconstruct">
+                <option value="html">HTML Only</option>
+                <option value="pptx">PPTX Only</option>
+                <option value="both" selected>Both (HTML+PPTX)</option>
+              </select>
+            </div>
+            <!-- Font -->
+            <div class="setting-group">
+              <label>글꼴 (Font)</label>
+              <select id="fontFamily_reconstruct">
+                <option value="Malgun Gothic" selected>맑은 고딕 (기본)</option>
+                <option value="Pretendard Medium">Pretendard Medium (프리텐다드)</option>
+                <option value="Noto Sans KR">Noto Sans KR (구글 폰트)</option>
+                <option value="Apple SD Gothic Neo">Apple SD Gothic Neo</option>
+                <option value="Arial">Arial (영문)</option>
+              </select>
+            </div>
+            <!-- Batch -->
+            <div class="setting-group">
+              <label>동시 처리 개수 (Batch)</label>
+              <select id="maxConcurrent_reconstruct">
+                <option value="2">2개</option>
+                <option value="3" selected>3개</option>
+                <option value="4">4개</option>
+                <option value="5">5개</option>
+                <option value="8">8개</option>
+                <option value="10">10개</option>
+                <option value="15">15개</option>
+              </select>
+            </div>
           </div>
-          <!-- Inpainting -->
-          <div class="setting-group">
-            <label>인페인팅(배경복원)</label>
-            <select id="inpaintingModel_reconstruct">
-              <option value="opencv-telea">OpenCV Telea (빠름)</option>
-              <option value="opencv-ns">OpenCV NS (고품질)</option>
-            </select>
+          <div class="settings-actions" style="margin-top: 1rem; text-align: right;">
+            <button class="btn-secondary small" onclick="saveSettings()">
+              <i data-lucide="save"></i> 현재 설정을 기본값으로 저장
+            </button>
           </div>
-          <!-- Codegen -->
-          <div class="setting-group">
-            <label>HTML생성</label>
-            <select id="codegenModel_reconstruct">
-              <option value="algorithmic">알고리즘 기반 (정밀함)</option>
-              <option value="gemini-3-flash-preview">Gemini 3.0 Flash (Preview)</option>
-              <option value="gemini-2.5-flash">Gemini 2.5 Flash (Experimental)</option>
-            </select>
-          </div>
-          <!-- Refine -->
-          <div class="setting-group">
-            <label>정밀 분석 모드 (Refine)</label>
-            <select id="refineLayout_reconstruct">
-              <option value="false" selected>OFF (빠름)</option>
-              <option value="true">ON (정밀 보정)</option>
-            </select>
-          </div>
-          <!-- Output Format -->
-          <div class="setting-group">
-            <label>출력 포맷</label>
-            <select id="outputFormat_reconstruct">
-              <option value="html">HTML Only</option>
-              <option value="pptx">PPTX Only</option>
-              <option value="both" selected>Both (HTML+PPTX)</option>
-            </select>
-          </div>
-          <!-- Font -->
-          <div class="setting-group">
-            <label>글꼴 (Font)</label>
-            <select id="fontFamily_reconstruct">
-              <option value="Malgun Gothic" selected>맑은 고딕 (기본)</option>
-              <option value="Pretendard Medium">Pretendard Medium (프리텐다드)</option>
-              <option value="Noto Sans KR">Noto Sans KR (구글 폰트)</option>
-              <option value="Apple SD Gothic Neo">Apple SD Gothic Neo</option>
-              <option value="Arial">Arial (영문)</option>
-            </select>
-          </div>
-          <!-- Batch -->
-          <div class="setting-group">
-            <label>동시 처리 개수 (Batch)</label>
-            <select id="maxConcurrent_reconstruct">
-              <option value="2">2개</option>
-              <option value="3" selected>3개</option>
-              <option value="4">4개</option>
-              <option value="5">5개</option>
-              <option value="8">8개</option>
-              <option value="10">10개</option>
-              <option value="15">15개</option>
-            </select>
-          </div>
-        </div>
-        <div class="settings-actions" style="margin-top: 1rem; text-align: right;">
-          <button class="btn-secondary small" onclick="saveSettings()">
-            <i data-lucide="save"></i> 현재 설정을 기본값으로 저장
-          </button>
-        </div>
-      </section>
+        </section>
 
-      <!-- Upload Section (Reconstruct Tab) -->
-      <section id="uploadSection" class="glass-panel upload-zone" style="margin-bottom: 2rem; padding: 1.5rem;">
-        <div class="upload-content">
-          <div class="icon-cloud"><i data-lucide="upload-cloud" size="48"></i></div>
-          <h2 id="uploadTitle">슬라이드 이미지 업로드</h2>
-          <p id="uploadDesc">이미지를 이곳에 드래그하거나 클릭하여 선택하세요. (여러 장 가능)</p>
-          <input type="file" id="fileInput" accept="image/*" multiple hidden>
-          <button class="btn-primary" onclick="document.getElementById('fileInput').click()">
-            파일 선택 (다중 가능)
-          </button>
-        </div>
+        <!-- Upload Section (Reconstruct Tab) -->
+        <section id="uploadSection" class="glass-panel upload-zone" style="margin-bottom: 2rem; padding: 1.5rem;">
+          <div class="upload-content">
+            <div class="icon-cloud"><i data-lucide="upload-cloud" size="48"></i></div>
+            <h2 id="uploadTitle">슬라이드 이미지 업로드</h2>
+            <p id="uploadDesc">이미지를 이곳에 드래그하거나 클릭하여 선택하세요. (여러 장 가능)</p>
+            <input type="file" id="fileInput" accept="image/*" multiple hidden>
+            <button class="btn-primary" onclick="document.getElementById('fileInput').click()">
+              파일 선택 (다중 가능)
+            </button>
+          </div>
+        </section>
       </section>
 
       <!-- Tab: PDF to PPTX & PDF to PNG -->

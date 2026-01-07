@@ -1177,78 +1177,76 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Handle Tab Switch for PDF
   tabButtons.forEach(btn => {
-    tabButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        // Update Active State
-        tabButtons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentTab = btn.dataset.tab;
+    btn.addEventListener('click', () => {
+      // Update Active State
+      tabButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentTab = btn.dataset.tab;
 
-        // 1. HIDDEN ALL SECTIONS (Reset)
-        const reconstructSection = document.getElementById('reconstructSection');
-        const removeTextPhotoroomSection = document.getElementById('removeTextPhotoroomSection');
+      // 1. HIDDEN ALL SECTIONS (Reset)
+      const reconstructSection = document.getElementById('reconstructSection');
+      const removeTextPhotoroomSection = document.getElementById('removeTextPhotoroomSection');
 
-        if (reconstructSection) reconstructSection.classList.add('hidden');
-        if (pdfSection) pdfSection.classList.add('hidden');
-        if (combineSection) combineSection.classList.add('hidden');
-        if (removeTextPhotoroomSection) removeTextPhotoroomSection.classList.add('hidden');
+      if (reconstructSection) reconstructSection.classList.add('hidden');
+      if (pdfSection) pdfSection.classList.add('hidden');
+      if (combineSection) combineSection.classList.add('hidden');
+      if (removeTextPhotoroomSection) removeTextPhotoroomSection.classList.add('hidden');
 
-        if (batchControlPanel) batchControlPanel.classList.add('hidden');
-        if (jobListContainer) jobListContainer.classList.add('hidden');
+      if (batchControlPanel) batchControlPanel.classList.add('hidden');
+      if (jobListContainer) jobListContainer.classList.add('hidden');
 
-        // Update Title (Legacy support)
-        const titles = {
-          'reconstruct': '재구성을 위한 슬라이드 이미지 업로드',
-          'pdf-to-pptx': 'PDF 업로드 -> 이미지 변환 -> 슬라이드 재구성',
-          'pdf-to-png': 'PDF to PNG 변환 (단순 변환)',
-          'remove-text': '텍스트 제거를 위한 이미지 업로드 (OpenCV)',
-          'remove-text-ai': '텍스트 제거를 위한 이미지 업로드 (AI)',
-          'remove-text-photoroom': '이미지 텍스트 제거 (Photoroom)',
-          'extract-text': '텍스트 추출을 위한 이미지 업로드'
-        };
-        const titleEl = document.getElementById('uploadTitle');
-        if (titleEl) titleEl.textContent = titles[currentTab] || '이미지 업로드';
+      // Update Title (Legacy support)
+      const titles = {
+        'reconstruct': '재구성을 위한 슬라이드 이미지 업로드',
+        'pdf-to-pptx': 'PDF 업로드 -> 이미지 변환 -> 슬라이드 재구성',
+        'pdf-to-png': 'PDF to PNG 변환 (단순 변환)',
+        'remove-text': '텍스트 제거를 위한 이미지 업로드 (OpenCV)',
+        'remove-text-ai': '텍스트 제거를 위한 이미지 업로드 (AI)',
+        'remove-text-photoroom': '이미지 텍스트 제거 (Photoroom)',
+        'extract-text': '텍스트 추출을 위한 이미지 업로드'
+      };
+      const titleEl = document.getElementById('uploadTitle');
+      if (titleEl) titleEl.textContent = titles[currentTab] || '이미지 업로드';
 
 
-        // 2. SHOW CURRENT SECTION
-        if (currentTab === 'pdf-to-png') {
-          // PDF Mode
-          pdfSection.classList.remove('hidden');
-          if (btnPptxStart) btnPptxStart.classList.add('hidden');
+      // 2. SHOW CURRENT SECTION
+      if (currentTab === 'pdf-to-png') {
+        // PDF Mode
+        pdfSection.classList.remove('hidden');
+        if (btnPptxStart) btnPptxStart.classList.add('hidden');
 
-        } else if (currentTab === 'pdf-to-pptx') {
-          // PDF to PPTX Mode
-          pdfSection.classList.remove('hidden');
-          if (btnPptxStart) btnPptxStart.classList.remove('hidden');
+      } else if (currentTab === 'pdf-to-pptx') {
+        // PDF to PPTX Mode
+        pdfSection.classList.remove('hidden');
+        if (btnPptxStart) btnPptxStart.classList.remove('hidden');
 
-        } else if (currentTab === 'combine') {
-          combineSection.classList.remove('hidden');
+      } else if (currentTab === 'combine') {
+        combineSection.classList.remove('hidden');
 
-        } else if (currentTab === 'remove-text-photoroom') {
-          if (removeTextPhotoroomSection) removeTextPhotoroomSection.classList.remove('hidden');
+      } else if (currentTab === 'remove-text-photoroom') {
+        if (removeTextPhotoroomSection) removeTextPhotoroomSection.classList.remove('hidden');
 
+      } else {
+        // Standard Reconstruction (reconstruct)
+        // Ensure Parent is Visible
+        if (reconstructSection) reconstructSection.classList.remove('hidden');
+
+        // Ensure Child Settings is Visible (in case it was hidden previously)
+        const reconstructSettings = document.getElementById('reconstructSettings');
+        if (reconstructSettings) reconstructSettings.classList.remove('hidden');
+
+        // Manage Upload vs Queue Visibility
+        if (jobQueue.queue.length > 0) {
+          // If jobs exist, show Queue, Hide Upload Panel
+          batchControlPanel.classList.remove('hidden');
+          jobListContainer.classList.remove('hidden');
+          if (uploadZone) uploadZone.classList.add('hidden');
         } else {
-          // Standard Reconstruction (reconstruct)
-          // Ensure Parent is Visible
-          if (reconstructSection) reconstructSection.classList.remove('hidden');
-
-          // Ensure Child Settings is Visible (in case it was hidden previously)
-          const reconstructSettings = document.getElementById('reconstructSettings');
-          if (reconstructSettings) reconstructSettings.classList.remove('hidden');
-
-          // Manage Upload vs Queue Visibility
-          if (jobQueue.queue.length > 0) {
-            // If jobs exist, show Queue, Hide Upload Panel
-            batchControlPanel.classList.remove('hidden');
-            jobListContainer.classList.remove('hidden');
-            if (uploadZone) uploadZone.classList.add('hidden');
-          } else {
-            // If no jobs, Show Upload Panel
-            if (uploadZone) uploadZone.classList.remove('hidden');
-            jobListContainer.classList.remove('hidden'); // Keep list visible if empty? or hidden? Previously removed hidden.
-          }
+          // If no jobs, Show Upload Panel
+          if (uploadZone) uploadZone.classList.remove('hidden');
+          jobListContainer.classList.remove('hidden'); // Keep list visible if empty? or hidden? Previously removed hidden.
         }
-      });
+      }
     });
 
     // --- PDF to PPTX Trigger ---
