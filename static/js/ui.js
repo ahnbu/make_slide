@@ -142,12 +142,13 @@ export function switchTab(tabId, jobQueueLength = 0) {
 
     // Manage Upload vs Queue Visibility
     if (jobQueueLength > 0) {
+      if (batchControlPanel) batchControlPanel.style.display = 'flex';
       if (batchControlPanel) batchControlPanel.classList.remove('hidden');
       if (rResult) rResult.classList.remove('hidden');
       if (uploadZone) uploadZone.classList.add('hidden');
     } else {
       if (uploadZone) uploadZone.classList.remove('hidden');
-      if (rResult) rResult.classList.remove('hidden'); // Keep list visible if empty? or hidden?
+      if (rResult) rResult.classList.add('hidden'); // Fix: Hide result section if empty
     }
   }
 
