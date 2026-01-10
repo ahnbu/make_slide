@@ -142,7 +142,10 @@
 │   └── index.html          # 메인 웹 인터페이스 (Jinja2 Template)
 ├── static/
 │   ├── js/
-│   │   └── script.js       # 핵심 UI 동작, 파일 업로드, API 호출, 탭 전환 로직
+│   │   ├── main.js         # 메인 엔트리 포인트: 이벤트 바인딩, JobQueue 관리, 초기화
+│   │   ├── config.js       # 설정 관리: API 호출, 상태 저장/로드, 탭 컨텍스트
+│   │   ├── ui.js           # UI 조작: 탭 전환, 모달/토스트, DOM 업데이트
+│   │   └── pdf_handler.js  # PDF 처리: 업로드, 미리보기, 다운로드 로직
 │   └── css/
 │       └── layout.css      # 탭 간 일관된 레이아웃을 위한 공통 스타일
 ├── settings.json           # 프로젝트 전역 설정 파일 (모델, 폰트, 동시성 제어 등)

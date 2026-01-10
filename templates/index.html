@@ -55,7 +55,7 @@
     <!-- Main Content -->
     <main>
       <!-- Tab: IMG to PPTX/HTML -->
-      <section id="reconstructSection" class="tab-content-wrapper">
+      <section id="reconstructSection" class="tab-content-wrapper hidden">
 
         <!-- Layer 1: Settings (Top) -->
         <div id="reconstructSettings" class="glass-panel panel-settings">
@@ -111,16 +111,10 @@
               <label>글꼴 (Font)</label>
               <select id="fontFamily_reconstruct">
                 <option value="Malgun Gothic" selected>맑은 고딕 (기본)</option>
+                <option value="Pretendard Medium">Pretendard Medium (프리텐다드)</option>
+                <option value="Noto Sans KR">Noto Sans KR (구글 폰트)</option>
+                <option value="Apple SD Gothic Neo">Apple SD Gothic Neo</option>
                 <option value="Arial">Arial (영문)</option>
-              </select>
-            </div>
-            <!-- Batch -->
-            <div class="setting-group">
-              <label>동시 처리 개수</label>
-              <select id="maxConcurrent_reconstruct">
-                <option value="2">2개</option>
-                <option value="3" selected>3개</option>
-                <option value="4">4개</option>
               </select>
             </div>
             <!-- Batch -->
@@ -191,7 +185,7 @@
 
       <!-- Tab: PDF to PPTX & PDF to PNG -->
       <!-- Tab: PDF to PPTX & PDF to PNG -->
-      <section id="pdfSection" class="tab-content-wrapper hidden">
+      <section id="pdfSection" class="tab-content-wrapper">
 
         <!-- Layer 1: Settings (Top) -->
         <div class="glass-panel panel-settings">

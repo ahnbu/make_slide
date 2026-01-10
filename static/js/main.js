@@ -105,7 +105,20 @@ class JobQueue {
 
   async runJob(job) {
     const formData = new FormData();
-    if (job.file) formData.append('file', job.file);
+
+    // 1. PDF to PPTX Handling (Pack all blobs)
+    if (job.type === 'pdf-to-pptx') {
+      const blobs = getAllBlobs();
+      if (blobs && blobs.length > 0) {
+        blobs.forEach((b, i) => {
+          formData.append('files', b, `page_${i + 1}_${Date.now()}.png`);
+        });
+      }
+    }
+    // 2. Standard Handling
+    else if (job.file) {
+      formData.append('file', job.file);
+    }
 
     let tabSuffix = 'reconstruct'; // Default
     const currentTab = getCurrentTab();
@@ -347,11 +360,15 @@ const jobQueue = new JobQueue();
 
 // --- Initialization & Event Binding ---
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
 
-  // 1. Load Settings
-  loadSettings(() => jobQueue.processQueue());
-  initModelSelectors();
+  // 1. Init Models & Load Settings (Sequential to avoid race condition)
+  try {
+    await initModelSelectors();
+    await loadSettings(() => jobQueue.processQueue());
+  } catch (err) {
+    console.error("Initialization failed:", err);
+  }
 
   // 2. Tab Switching
   const tabButtons = document.querySelectorAll('.tab-btn');
@@ -492,17 +509,65 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // PPTX Generation (PDF)
+  // [main.js 수정] PDF to PPTX 버튼 로직 구현
   const btnPptxStart = document.getElementById('btnPptxStart');
   if (btnPptxStart) {
     btnPptxStart.addEventListener('click', async () => {
-      // Call PDF Conversion Endpoint
-      // This needs logic similar to handlePdf but trigger server conversion?
-      // Or upload images?
-      // Original logic was: uploadPdfImages(currentPdfBlobs) -> POST /upload
-      // We need to implement that.
-      // Since I didn't port `uploadPdfImages` to pdf_handler.js, I should probably do it here or add it.
-      showToast('PPTX 생성 기능은 pdf_handler.js 업데이트 필요');
-      // For now, placeholder.
+      const blobs = getAllBlobs();
+
+      if (blobs.length === 0) {
+        showToast('변환된 PDF 이미지가 없습니다.');
+        return;
+      }
+
+      showToast('PPTX 생성을 시작합니다...');
+
+      const job = {
+        id: 'pdf-pptx-' + Date.now(),
+        file: null,
+        status: 'pending',
+        type: 'pdf-to-pptx',
+        batchFolder: 'pdf_project_' + Date.now(),
+        element: jobQueue.createJobCard('pdf-job', 'PDF → PPTX 변환 작업')
+      };
+
+      const list = document.getElementById('reconstructJobList');
+      if (list) list.appendChild(job.element);
+
+      jobQueue.queue.push(job);
+      jobQueue.processQueue();
+    });
+  }
+
+  // [main.js 추가] Combine 탭 시작 버튼 연결
+  const btnCombineStart = document.getElementById('btnCombineStart');
+  if (btnCombineStart) {
+    btnCombineStart.addEventListener('click', () => {
+      const sourceInput = document.getElementById('combineSourceInput');
+      const bgInput = document.getElementById('combineBgInput');
+
+      if (!sourceInput.files.length || !bgInput.files.length) {
+        showToast('텍스트 원본과 배경 이미지를 모두 선택해주세요.');
+        return;
+      }
+
+      Array.from(bgInput.files).forEach(file => {
+        const job = {
+          id: 'combine-' + Date.now() + Math.random(),
+          file: file,
+          status: 'pending',
+          type: 'combine',
+          batchFolder: 'combine_batch_' + Date.now(),
+          element: jobQueue.createJobCard('combine-' + Date.now(), '[조합] ' + file.name)
+        };
+        jobQueue.queue.push(job);
+        // Combine Job List usually separate, but for now:
+        const cList = document.getElementById('combineJobList');
+        if (cList) cList.appendChild(job.element);
+        else if (document.getElementById('reconstructJobList')) document.getElementById('reconstructJobList').appendChild(job.element);
+      });
+
+      jobQueue.processQueue();
     });
   }
 

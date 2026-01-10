@@ -14,7 +14,7 @@ export const AppSettings = {
 };
 
 // Current Active Tab State
-let currentTab = 'reconstruct';
+let currentTab = 'pdf-to-pptx';
 
 export function getCurrentTab() {
   return currentTab;
