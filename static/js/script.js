@@ -18,15 +18,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const uploadZone = document.getElementById('uploadSection');
   const fileInput = document.getElementById('fileInput');
   const tabButtons = document.querySelectorAll('.tab-btn');
-  const jobListContainer = document.getElementById('jobList');
+  const reconstructJobList = document.getElementById('reconstructJobList');
+  const combineJobList = document.getElementById('combineJobList');
 
   // Batch Controls
   const batchControlPanel = document.getElementById('batchControlPanel');
-  const btnPause = document.getElementById('btnPause');
-  const btnResume = document.getElementById('btnResume');
-  const btnStop = document.getElementById('btnStop');
+  const btnPause = document.getElementById('btnBatchPause');
+  const btnResume = document.getElementById('btnBatchResume');
+  const btnStop = document.getElementById('btnBatchStop');
   const batchProgressBar = document.getElementById('batchProgressBar');
-  const batchStatusText = document.getElementById('batchStatusText');
+  const batchStatusText = document.getElementById('batchProgressText');
 
   // Settings Elements (Legacy Global removed, now dynamic or scoped)
   // We don't need global references anymore for most things, but `loadSettings` will grab them by ID.
@@ -60,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const pdfPageCount = document.getElementById('pdfPageCount');
   const btnPdfReset = document.getElementById('btnPdfReset');
 
-  const pdfToolbar = document.getElementById('pdfToolbar');
+
   const pdfSelectAll = document.getElementById('pdfSelectAll');
   const btnDownloadSelected = document.getElementById('btnDownloadSelected');
   const btnDownloadAll = document.getElementById('btnDownloadAll');
@@ -95,7 +96,8 @@ document.addEventListener('DOMContentLoaded', () => {
     addFiles(files) {
       if (this.queue.length === 0 && this.activeCount === 0) {
         uploadZone.classList.add('hidden');
-        batchControlPanel.classList.remove('hidden');
+        const rResult = document.getElementById('reconstructResultSection');
+        if (rResult) rResult.classList.remove('hidden');
       }
 
       const now = new Date();
@@ -120,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
           batchFolder: batchFolder
         };
         this.queue.push(job);
-        jobListContainer.appendChild(job.element);
+        if (reconstructJobList) reconstructJobList.appendChild(job.element);
       });
       lucide.createIcons();
       this.updateGlobalProgress();
@@ -389,7 +391,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // Show PPTX Download Button if we have completed items
-      const btnPPTX = document.getElementById('btnDownloadBatchPPTX');
+      const btnPPTX = document.getElementById('btnBatchDownloadAll');
       if (completed > 0 && this.latestBatchFolder) {
         btnPPTX.classList.remove('hidden');
       } else {
@@ -403,7 +405,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      const btn = document.getElementById('btnDownloadBatchPPTX');
+      const btn = document.getElementById('btnBatchDownloadAll');
       const originalText = btn.innerHTML;
       btn.innerHTML = `<i data-lucide="loader-2" class="animate-spin"></i> 생성 중...`;
       btn.disabled = true;
@@ -466,6 +468,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const jobQueue = new JobQueue();
   window.jobQueue = jobQueue;
+
+  // Batch Control Listeners
+  if (btnPause) btnPause.addEventListener('click', () => jobQueue.pause());
+  if (btnResume) btnResume.addEventListener('click', () => jobQueue.resume());
+  if (btnStop) btnStop.addEventListener('click', () => jobQueue.stop());
+
+  // Add direct reference for DownloadAll since it wasn't in top vars
+  const btnBatchDownloadAll = document.getElementById('btnBatchDownloadAll');
+  if (btnBatchDownloadAll) {
+    btnBatchDownloadAll.addEventListener('click', () => jobQueue.downloadBatchPPTX());
+  }
 
   // --- 2. State Sync Logic ---
 
@@ -846,9 +859,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function processCombinePairs(pairs) {
     if (jobQueue.queue.length === 0 && jobQueue.activeCount === 0) {
-      combineSection.classList.add('hidden');
-      batchControlPanel.classList.remove('hidden');
-      jobListContainer.classList.remove('hidden');
+      // Unhide Combine Result Section
+      const cResult = document.getElementById('combineResultSection');
+      if (cResult) cResult.classList.remove('hidden');
     }
 
     // Batch Folder Name
@@ -856,6 +869,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const timeStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
     const batchFolder = `combine_${timeStr}`;
     jobQueue.latestBatchFolder = batchFolder;
+
+    const listContainer = document.getElementById('combineJobList');
 
     pairs.forEach(pair => {
       const jobId = 'job-c-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
@@ -870,7 +885,7 @@ document.addEventListener('DOMContentLoaded', () => {
         batchFolder: batchFolder
       };
       jobQueue.queue.push(job);
-      jobListContainer.appendChild(job.element);
+      if (listContainer) listContainer.appendChild(job.element);
     });
 
     lucide.createIcons();
@@ -1078,7 +1093,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function handlePdf(file) {
     pdfDropZone.classList.add('hidden');
-    pdfResultContainer.innerHTML = '<div class="loader"></div><p style="text-align:center">PDF 변환 중...</p>';
+
+    // Find Grid
+    const grid = document.getElementById('pdfPreviewGrid');
+    if (grid) {
+      grid.innerHTML = '<div class="loader"></div><p style="text-align:center">PDF 변환 중...</p>';
+    }
     pdfResultContainer.classList.remove('hidden');
 
     try {
@@ -1087,10 +1107,10 @@ document.addEventListener('DOMContentLoaded', () => {
       // Fixed: Default to 3.0 (HD) if element is hidden/removed
       const scale = pdfQualitySelect ? parseFloat(pdfQualitySelect.value) : 3.0;
 
-      pdfResultContainer.innerHTML = '';
-      const grid = document.createElement('div');
-      grid.className = 'pdf-grid';
-      pdfResultContainer.appendChild(grid);
+      if (grid) grid.innerHTML = '';
+      // const grid = document.createElement('div'); // Do not create new div, use existing one
+      // grid.className = 'pdf-grid'; // Use existing class 'result-grid-gallery'
+      // pdfResultContainer.appendChild(grid); // Already there
 
       // Reset State
       currentPdfBlobs = [];
@@ -1145,8 +1165,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
 
-      // Show Toolbar
-      pdfToolbar.classList.remove('hidden');
+      // Show Result Container (includes Header Toolbar and Grid)
+      if (pdfResultContainer) pdfResultContainer.classList.remove('hidden');
       lucide.createIcons();
       updateSelectionState(); // Init state
 
@@ -1308,7 +1328,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (removeTextPhotoroomSection) removeTextPhotoroomSection.classList.add('hidden');
 
       if (batchControlPanel) batchControlPanel.classList.add('hidden');
-      if (jobListContainer) jobListContainer.classList.add('hidden');
+
+      const rResult = document.getElementById('reconstructResultSection');
+      const cResult = document.getElementById('combineResultSection');
+
+      if (rResult) rResult.classList.add('hidden');
+      if (cResult) cResult.classList.add('hidden');
 
       // Update Title (Legacy support)
       const titles = {
@@ -1337,6 +1362,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
       } else if (currentTab === 'combine') {
         combineSection.classList.remove('hidden');
+        // Restore Combine Result if jobs exist?
+        // Basic check: if we have combine jobs, maybe show it? 
+        // For now, rely on default hidden unless active.
 
       } else if (currentTab === 'remove-text-photoroom') {
         if (removeTextPhotoroomSection) removeTextPhotoroomSection.classList.remove('hidden');
@@ -1353,13 +1381,13 @@ document.addEventListener('DOMContentLoaded', () => {
         // Manage Upload vs Queue Visibility
         if (jobQueue.queue.length > 0) {
           // If jobs exist, show Queue, Hide Upload Panel
-          batchControlPanel.classList.remove('hidden');
-          jobListContainer.classList.remove('hidden');
+          if (batchControlPanel) batchControlPanel.classList.remove('hidden');
+          if (rResult) rResult.classList.remove('hidden');
           if (uploadZone) uploadZone.classList.add('hidden');
         } else {
           // If no jobs, Show Upload Panel
           if (uploadZone) uploadZone.classList.remove('hidden');
-          jobListContainer.classList.remove('hidden'); // Keep list visible if empty? or hidden? Previously removed hidden.
+          // if (rResult) rResult.classList.remove('hidden'); 
         }
       }
     });
@@ -1383,10 +1411,14 @@ document.addEventListener('DOMContentLoaded', () => {
         jobQueue.addFiles(files);
 
         // Switch View similar to "reconstruct" tab
-        // Note: we stay on "pdf-to-pptx" tab visually, but show the queue
+        // Note: we switch to Reconstruct Main View
         pdfSection.classList.add('hidden');
-        batchControlPanel.classList.remove('hidden');
-        jobListContainer.classList.remove('hidden');
+        if (reconstructSection) reconstructSection.classList.remove('hidden');
+
+        const rResult = document.getElementById('reconstructResultSection');
+        if (rResult) rResult.classList.remove('hidden');
+
+        if (batchControlPanel) batchControlPanel.classList.remove('hidden');
 
         showToast('슬라이드 재구성 작업이 시작되었습니다.');
       });

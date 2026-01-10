@@ -1,67 +1,39 @@
-/* Common Tab Layout Components */
+/* layout.css - The 4-Layer Stack Standard */
 
-/* 1. Main Wrapper for each Tab Content */
+/* Layer 0: Main Wrapper */
 .tab-content-wrapper {
+  width: 100%;
+  max-width: 1000px;
+  /* Limit width for readability */
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 0;
-  /* Children handle their own spacing if needed, or we use margins */
-  width: 100%;
-  max-width: 1200px;
-  /* Optional constraint */
-  margin: 0 auto;
-}
-
-/* 2. Top Control Group (Settings + Upload) */
-/* This replaces 'pdf-top-area' and provides the background wrapper */
-/* 2. Control Panel Container (Grid Layout) */
-/* Replaces 'control-panel-group' with a strict Grid system */
-.control-panel-container {
-  display: grid;
-  grid-template-columns: 350px 1fr;
-  /* Fixed Settings(Left) : Flexible Upload(Right) */
   gap: 1.5rem;
-  align-items: start;
-  padding: 0;
-  /* Container itself has no padding */
-  margin-bottom: 2rem;
+  /* Vertical spacing between layers */
 }
 
-/* Mobile Responsiveness */
-@media (max-width: 900px) {
-  .control-panel-container {
-    grid-template-columns: 1fr;
-    /* Stack vertically on small screens */
-  }
-
-  .panel-upload {
-    min-height: 200px;
-    /* Smaller height on mobile */
-  }
-}
-
-/* 3. Settings Panel (Left/Top) */
+/* Layer 1: Settings Panel */
 .panel-settings {
-  /* Inherits glass-panel styles but enforces specific padding */
   padding: 1.5rem;
-  height: 100%;
-  /* Match height if needed, or auto */
+  /* glass-panel styles are inherited from style.css */
 }
 
-/* 4. Upload Panel (Right/Bottom) */
+/* Layer 2: Upload Panel */
 .panel-upload {
-  /* Inherits glass-panel styles */
-  padding: 1.5rem;
-  min-height: 300px;
-  /* Enforce minimum height for balance */
+  padding: 2rem;
+  min-height: 320px;
+  /* Unified height for all upload boxes */
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
+
+  /* Unified Design Language: Dashed Border */
   border: 2px dashed var(--border-color);
   background: rgba(30, 41, 59, 0.4);
-  transition: all 0.3s;
+  border-radius: 1rem;
+  transition: all 0.3s ease;
 }
 
 .panel-upload:hover,
@@ -70,24 +42,103 @@
   background: rgba(99, 102, 241, 0.1);
 }
 
-/* 5. Result/Grid Area */
-.result-area {
-  padding: 1.5rem;
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 0 0 1rem 1rem;
-  min-height: 100px;
+/* Combine Tab Specific: Grid for Dual Upload Panels */
+.combine-upload-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  width: 100%;
 }
 
-/* Helper for hidden state consistency */
+@media (max-width: 768px) {
+  .combine-upload-grid {
+    grid-template-columns: 1fr;
+    /* Stack vertically on mobile */
+  }
+}
+
+/* Layer 3: Action Container (Transparent) */
+.action-container {
+  display: flex;
+  justify-content: center;
+  /* Center buttons */
+  align-items: center;
+  margin-top: 0.5rem;
+  /* Slight spacing from upload panel */
+  margin-bottom: 1rem;
+  /* No background color */
+}
+
+.action-container button {
+  min-width: 220px;
+  /* Substantial button width */
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+  /* Elevated feel */
+}
+
+/* Layer 4: Result Section Standard */
+.result-section {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  animation: fadeIn 0.5s ease-out;
+  border-radius: 0 0 1rem 1rem;
+  /* Optional rounding at bottom */
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.result-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.result-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Tab-specific Result Layouts */
+
+/* Compare Grid (Photoroom, Combine) */
+.result-grid-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+@media (max-width: 768px) {
+  .result-grid-compare {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Vertical List Stack (Reconstruct) */
+.result-list-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Gallery Grid (PDF to PNG) */
+.result-grid-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+/* Utilities */
 .hidden {
   display: none !important;
-}
-
-/* Mobile responsive for combine upload grid */
-@media (max-width: 900px) {
-  .combine-upload-grid {
-    grid-template-columns: 1fr !important;
-    /* Stack vertically on mobile */
-    min-height: 400px;
-  }
 }
