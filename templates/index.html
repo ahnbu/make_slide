@@ -56,109 +56,111 @@
     <!-- Main Content -->
     <main>
       <!-- Tab: IMG to PPTX/HTML -->
-      <section id="reconstructSection">
-        <!-- Reconstruct Settings Panel (Separated) -->
-        <section id="reconstructSettings" class="glass-panel" style="margin-bottom: 2rem; padding: 1.5rem;">
-          <!-- <div class="settings-header" style="margin-bottom: 1rem;">
-          <h3 style="font-size: 1.1rem; color: var(--text-primary);"><i data-lucide="settings-2"
-              style="vertical-align: middle; margin-right: 0.5rem;"></i> 재구성 환경 설정</h3>
-        </div> -->
-          <div class="settings-grid"
-            style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem;">
-            <!-- Vision Model -->
-            <div class="setting-group">
-              <label>비전모델(분석)</label>
-              <select id="visionModel_reconstruct" class="vision-model-select">
-                <option value="gemini-3-flash-preview" selected>Gemini 3.0 Flash (Preview)</option>
-                <option value="gemini-2.5-flash">Gemini 2.5 Flash (Experimental)</option>
-              </select>
-            </div>
-            <!-- Inpainting -->
-            <div class="setting-group">
-              <label>인페인팅(배경복원)</label>
-              <select id="inpaintingModel_reconstruct">
-                <option value="opencv-telea">OpenCV Telea (빠름)</option>
-                <option value="opencv-ns">OpenCV NS (고품질)</option>
-              </select>
-            </div>
-            <!-- Codegen -->
-            <div class="setting-group">
-              <label>HTML생성</label>
-              <select id="codegenModel_reconstruct">
-                <option value="algorithmic">알고리즘 기반 (정밀함)</option>
-                <option value="gemini-3-flash-preview">Gemini 3.0 Flash (Preview)</option>
-                <option value="gemini-2.5-flash">Gemini 2.5 Flash (Experimental)</option>
-              </select>
-            </div>
-            <!-- Refine -->
-            <div class="setting-group">
-              <label>정밀 분석 모드 (Refine)</label>
-              <select id="refineLayout_reconstruct">
-                <option value="false" selected>OFF (빠름)</option>
-                <option value="true">ON (정밀 보정)</option>
-              </select>
-            </div>
-            <!-- Output Format -->
-            <div class="setting-group">
-              <label>출력 포맷</label>
-              <select id="outputFormat_reconstruct">
-                <option value="html">HTML Only</option>
-                <option value="pptx">PPTX Only</option>
-                <option value="both" selected>Both (HTML+PPTX)</option>
-              </select>
-            </div>
-            <!-- Font -->
-            <div class="setting-group">
-              <label>글꼴 (Font)</label>
-              <select id="fontFamily_reconstruct">
-                <option value="Malgun Gothic" selected>맑은 고딕 (기본)</option>
-                <option value="Pretendard Medium">Pretendard Medium (프리텐다드)</option>
-                <option value="Noto Sans KR">Noto Sans KR (구글 폰트)</option>
-                <option value="Apple SD Gothic Neo">Apple SD Gothic Neo</option>
-                <option value="Arial">Arial (영문)</option>
-              </select>
-            </div>
-            <!-- Batch -->
-            <div class="setting-group">
-              <label>동시 처리 개수 (Batch)</label>
-              <select id="maxConcurrent_reconstruct">
-                <option value="2">2개</option>
-                <option value="3" selected>3개</option>
-                <option value="4">4개</option>
-                <option value="5">5개</option>
-                <option value="10">10개</option>
-                <option value="15">15개</option>
-              </select>
-            </div>
-          </div>
-          <div class="settings-actions" style="margin-top: 1rem; text-align: right;">
-            <button class="btn-secondary small" onclick="saveSettings()">
-              <i data-lucide="save"></i> 현재 설정을 기본값으로 저장
-            </button>
-          </div>
-        </section>
+      <section id="reconstructSection" class="tab-content-wrapper">
 
-        <!-- Upload Section (Reconstruct Tab) -->
-        <section id="uploadSection" class="glass-panel upload-zone" style="margin-bottom: 2rem; padding: 1.5rem;">
-          <div class="upload-content">
-            <div class="icon-cloud"><i data-lucide="upload-cloud" size="48"></i></div>
-            <h2 id="uploadTitle">슬라이드 이미지 업로드</h2>
-            <p id="uploadDesc">이미지를 이곳에 드래그하거나 클릭하여 선택하세요. (여러 장 가능)</p>
-            <input type="file" id="fileInput" accept="image/*" multiple hidden>
-            <button class="btn-primary" onclick="document.getElementById('fileInput').click()">
-              파일 선택 (다중 가능)
-            </button>
+        <!-- 1. Custom Grid Control Container -->
+        <div class="control-panel-container">
+
+          <!-- 1-A. Settings Panel -->
+          <div id="reconstructSettings" class="glass-panel panel-settings">
+            <div class="settings-grid"
+              style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem;">
+              <!-- Vision Model -->
+              <div class="setting-group">
+                <label>비전모델(분석)</label>
+                <select id="visionModel_reconstruct" class="vision-model-select">
+                  <option value="gemini-3-flash-preview" selected>Gemini 3.0 Flash (Preview)</option>
+                  <option value="gemini-2.5-flash">Gemini 2.5 Flash (Experimental)</option>
+                </select>
+              </div>
+              <!-- Inpainting -->
+              <div class="setting-group">
+                <label>인페인팅(배경복원)</label>
+                <select id="inpaintingModel_reconstruct">
+                  <option value="opencv-telea">OpenCV Telea (빠름)</option>
+                  <option value="opencv-ns">OpenCV NS (고품질)</option>
+                </select>
+              </div>
+              <!-- Codegen -->
+              <div class="setting-group">
+                <label>HTML생성</label>
+                <select id="codegenModel_reconstruct">
+                  <option value="algorithmic">알고리즘 기반 (정밀함)</option>
+                  <option value="gemini-3-flash-preview">Gemini 3.0 Flash (Preview)</option>
+                  <option value="gemini-2.5-flash">Gemini 2.5 Flash (Experimental)</option>
+                </select>
+              </div>
+              <!-- Refine -->
+              <div class="setting-group">
+                <label>정밀 분석 모드 (Refine)</label>
+                <select id="refineLayout_reconstruct">
+                  <option value="false" selected>OFF (빠름)</option>
+                  <option value="true">ON (정밀 보정)</option>
+                </select>
+              </div>
+              <!-- Output Format -->
+              <div class="setting-group">
+                <label>출력 포맷</label>
+                <select id="outputFormat_reconstruct">
+                  <option value="html">HTML Only</option>
+                  <option value="pptx">PPTX Only</option>
+                  <option value="both" selected>Both (HTML+PPTX)</option>
+                </select>
+              </div>
+              <!-- Font -->
+              <div class="setting-group">
+                <label>글꼴 (Font)</label>
+                <select id="fontFamily_reconstruct">
+                  <option value="Malgun Gothic" selected>맑은 고딕 (기본)</option>
+                  <option value="Pretendard Medium">Pretendard Medium (프리텐다드)</option>
+                  <option value="Noto Sans KR">Noto Sans KR (구글 폰트)</option>
+                  <option value="Apple SD Gothic Neo">Apple SD Gothic Neo</option>
+                  <option value="Arial">Arial (영문)</option>
+                </select>
+              </div>
+              <!-- Batch -->
+              <div class="setting-group">
+                <label>동시 처리 개수</label>
+                <select id="maxConcurrent_reconstruct">
+                  <option value="2">2개</option>
+                  <option value="3" selected>3개</option>
+                  <option value="4">4개</option>
+                  <option value="5">5개</option>
+                  <option value="10">10개</option>
+                  <option value="15">15개</option>
+                </select>
+              </div>
+            </div>
+            <div class="settings-actions" style="margin-top: 1rem; text-align: right;">
+              <button class="btn-secondary small" onclick="saveSettings()">
+                <i data-lucide="save"></i> 현재 설정을 기본값으로 저장
+              </button>
+            </div>
           </div>
-        </section>
+
+          <!-- 1-B. Upload Panel -->
+          <div id="uploadSection" class="glass-panel panel-upload upload-zone">
+            <div class="upload-content">
+              <div class="icon-cloud"><i data-lucide="upload-cloud" size="48"></i></div>
+              <h2 id="uploadTitle">슬라이드 이미지 업로드</h2>
+              <p id="uploadDesc">이미지를 이곳에 드래그하거나 클릭하여 선택하세요. (여러 장 가능)</p>
+              <input type="file" id="fileInput" accept="image/*" multiple hidden>
+              <button class="btn-primary" onclick="document.getElementById('fileInput').click()">
+                파일 선택 (다중 가능)
+              </button>
+            </div>
+          </div>
+
+        </div>
       </section>
 
       <!-- Tab: PDF to PPTX & PDF to PNG -->
       <section id="pdfSection" class="tab-content-wrapper hidden">
 
         <!-- 1. Top: Info & Upload -->
-        <div id="pdfTopArea" class="control-panel-group">
+        <div id="pdfTopArea" class="control-panel-container">
           <!-- PDF Settings Panel -->
-          <div class="glass-panel settings-panel">
+          <div class="glass-panel panel-settings">
             <div class="settings-grid"
               style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem;">
               <!-- 1. Quality (Vision equivalent) -->
@@ -236,7 +238,7 @@
           </div>
 
           <!-- PDF Upload Panel -->
-          <div id="pdfDropZone" class="glass-panel upload-panel">
+          <div id="pdfDropZone" class="glass-panel panel-upload">
             <div class="icon-cloud"><i data-lucide="file-text" size="48"></i></div>
             <h2>PDF 파일 업로드</h2>
             <p>여기에 PDF를 드래그하거나 클릭하세요. (서버 전송 없음)</p>
@@ -285,376 +287,376 @@
       </section>
 
       <!-- Tab: 이미지+텍스트 조합 (Combine) -->
-      <!-- Combine Mode Section -->
-      <section id="combineSection" class="combine-zone hidden">
-        <!-- <div class="combine-header"
-          style="margin-bottom: 2rem; padding: 1.5rem; background: rgba(255,255,255,0.05); border-radius: 12px; border: 1px solid var(--border);">
-          <h2 style="margin:0;"><i data-lucide="layers" style="vertical-align: middle; margin-right: 0.5rem;"></i> 이미지 +
-            텍스트 조합</h2>  
-        </div> -->
+      <section id="combineSection" class="tab-content-wrapper hidden">
 
-        <!-- Combine Settings -->
-        <div class="glass-panel" style="margin-bottom: 2rem; padding: 1.5rem;">
-          <!-- <div class="settings-header" style="margin-bottom: 0.5rem;">
-            <h3 style="font-size: 1.1rem; color: var(--text-primary);"><i data-lucide="settings-2"
-                style="vertical-align: middle; margin-right: 0.5rem;"></i> 조합 환경 설정</h3>
-          </div> -->
-          <div class="settings-grid"
-            style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem;">
-            <!-- 1. Vision Model -->
-            <div class="setting-group">
-              <label>비전모델(분석)</label>
-              <select id="visionModel_combine" class="vision-model-select">
-                <option value="gemini-3-flash-preview" selected>Gemini 3.0 Flash (Preview)</option>
-                <option value="gemini-2.5-flash">Gemini 2.5 Flash (Experimental)</option>
-              </select>
+        <!-- 1. Main Grid Layout (좌측: 설정 / 우측: 업로드 영역) -->
+        <div class="control-panel-container">
+
+          <!-- 1-A. Left: Settings Panel -->
+          <div class="glass-panel panel-settings">
+            <div class="settings-grid"
+              style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem;">
+              <!-- 1. Vision Model -->
+              <div class="setting-group">
+                <label>비전모델(분석)</label>
+                <select id="visionModel_combine" class="vision-model-select">
+                  <option value="gemini-3-flash-preview" selected>Gemini 3.0 Flash (Preview)</option>
+                  <option value="gemini-2.5-flash">Gemini 2.5 Flash (Experimental)</option>
+                </select>
+              </div>
+              <!-- 2. Inpainting -->
+              <div class="setting-group">
+                <label>인페인팅(배경복원)</label>
+                <select id="inpaintingModel_combine">
+                  <option value="opencv-telea">OpenCV Telea (빠름)</option>
+                  <option value="opencv-ns">OpenCV NS (고품질)</option>
+                </select>
+              </div>
+              <!-- 3. Codegen -->
+              <div class="setting-group">
+                <label>HTML생성</label>
+                <select id="codegenModel_combine">
+                  <option value="algorithmic">알고리즘 기반 (정밀함)</option>
+                  <option value="gemini-3-flash-preview">Gemini 3.0 Flash (Preview)</option>
+                  <option value="gemini-2.5-flash">Gemini 2.5 Flash (Experimental)</option>
+                </select>
+              </div>
+              <!-- 4. Refine -->
+              <div class="setting-group">
+                <label>정밀 분석 모드 (Refine)</label>
+                <select id="refineLayout_combine">
+                  <option value="false" selected>OFF (빠름)</option>
+                  <option value="true">ON (정밀 보정)</option>
+                </select>
+              </div>
+              <!-- 5. Output Format -->
+              <div class="setting-group">
+                <label>출력 포맷</label>
+                <select id="outputFormat_combine">
+                  <option value="html">HTML Only</option>
+                  <option value="pptx">PPTX Only</option>
+                  <option value="both" selected>Both (HTML+PPTX)</option>
+                </select>
+              </div>
+              <!-- 6. Font -->
+              <div class="setting-group">
+                <label>글꼴 (Font)</label>
+                <select id="fontFamily_combine">
+                  <option value="Malgun Gothic" selected>맑은 고딕 (기본)</option>
+                  <option value="Pretendard Medium">Pretendard Medium (프리텐다드)</option>
+                  <option value="Noto Sans KR">Noto Sans KR (구글 폰트)</option>
+                  <option value="Apple SD Gothic Neo">Apple SD Gothic Neo</option>
+                  <option value="Arial">Arial (영문)</option>
+                </select>
+              </div>
+              <!-- 7. Batch -->
+              <div class="setting-group">
+                <label>동시 처리 개수</label>
+                <select id="maxConcurrent_combine">
+                  <option value="2">2개</option>
+                  <option value="3" selected>3개</option>
+                  <option value="4">4개</option>
+                  <option value="5">5개</option>
+                  <option value="10">10개</option>
+                  <option value="15">15개</option>
+                </select>
+              </div>
             </div>
-            <!-- 2. Inpainting (New) -->
-            <div class="setting-group">
-              <label>인페인팅(배경복원)</label>
-              <select id="inpaintingModel_combine">
-                <option value="opencv-telea">OpenCV Telea (빠름)</option>
-                <option value="opencv-ns">OpenCV NS (고품질)</option>
-              </select>
-            </div>
-            <!-- 3. Codegen -->
-            <div class="setting-group">
-              <label>HTML생성</label>
-              <select id="codegenModel_combine">
-                <option value="algorithmic">알고리즘 기반 (정밀함)</option>
-                <option value="gemini-3-flash-preview">Gemini 3.0 Flash (Preview)</option>
-                <option value="gemini-2.5-flash">Gemini 2.5 Flash (Experimental)</option>
-              </select>
-            </div>
-            <!-- 4. Refine (New) -->
-            <div class="setting-group">
-              <label>정밀 분석 모드 (Refine)</label>
-              <select id="refineLayout_combine">
-                <option value="false" selected>OFF (빠름)</option>
-                <option value="true">ON (정밀 보정)</option>
-              </select>
-            </div>
-            <!-- 5. Output Format (New) -->
-            <div class="setting-group">
-              <label>출력 포맷</label>
-              <select id="outputFormat_combine">
-                <option value="html">HTML Only</option>
-                <option value="pptx">PPTX Only</option>
-                <option value="both" selected>Both (HTML+PPTX)</option>
-              </select>
-            </div>
-            <!-- 6. Font -->
-            <div class="setting-group">
-              <label>글꼴 (Font)</label>
-              <select id="fontFamily_combine">
-                <option value="Malgun Gothic" selected>맑은 고딕 (기본)</option>
-                <option value="Pretendard Medium">Pretendard Medium (프리텐다드)</option>
-                <option value="Noto Sans KR">Noto Sans KR (구글 폰트)</option>
-                <option value="Apple SD Gothic Neo">Apple SD Gothic Neo</option>
-                <option value="Arial">Arial (영문)</option>
-              </select>
-            </div>
-            <!-- 7. Batch -->
-            <div class="setting-group">
-              <label>동시 처리 개수</label>
-              <select id="maxConcurrent_combine">
-                <option value="2">2개</option>
-                <option value="3" selected>3개</option>
-                <option value="4">4개</option>
-                <option value="5">5개</option>
-                <option value="10">10개</option>
-                <option value="15">15개</option>
-              </select>
-            </div>
-          </div>
-          <div class="settings-actions" style="margin-top: 1rem; text-align: right;">
-            <button class="btn-secondary small" onclick="saveSettings()">
-              <i data-lucide="save"></i> 현재 설정을 기본값으로 저장
-            </button>
-          </div>
-        </div>
 
-        <div class="combine-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1.5rem;">
-          <!-- Source Upload -->
-          <div class="glass-panel upload-box" id="combineSourceBox"
-            style="border: 2px dashed var(--border); border-radius: 12px; padding: 3rem 2rem; text-align: center; transition: all 0.2s; background: rgba(255, 255, 255, 0.03);">
-            <!-- <div class="icon-area" style="margin-bottom: 1.5rem; color: var(--accent);"><i data-lucide="type"
-                size="48"></i></div> -->
-            <h3 style="margin-bottom: 0.5rem; font-size: 1.2rem;">
-              <i data-lucide="type" size="48" style="margin-right: 0.3rem; color: var(--accent)"></i> 텍스트 원본 (Source)
-            </h3>
-            <!-- <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 2rem;">텍스트가 포함된 원본 이미지/PDF</p> -->
-
-            <input type="file" id="combineSourceInput" accept="image/*,application/pdf" multiple hidden>
-            <!-- Updated Button Style -->
-            <button class="btn-primary" onclick="document.getElementById('combineSourceInput').click()"
-              style="width: 100%;">
-              파일 선택 (다중 가능)
-            </button>
-
-            <!-- Thumbnail Grid Container -->
-            <div id="combineSourceList" class="file-list-preview"
-              style="margin-top: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; max-height: 1500px; overflow-y: auto;">
-              <!-- Thumbnails will be injected here -->
-            </div>
-          </div>
-
-          <!-- BG Upload -->
-          <div class="glass-panel upload-box" id="combineBgBox"
-            style="border: 2px dashed var(--border); border-radius: 12px; padding: 3rem 2rem; text-align: center; transition: all 0.2s; background: rgba(255, 255, 255, 0.03);">
-            <!-- <div class="icon-area" style="margin-bottom: 1.5rem; color: var(--primary);"><i data-lucide="image"
-                size="48"></i></div> -->
-            <h3 style="margin-bottom: 0.5rem; font-size: 1.2rem;">
-              <i data-lucide="image" size="48" style="margin-right: 0.3rem; color: var(--primary)"></i> 클린 배경 (Clean BG)
-            </h3>
-            <!-- <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 2rem;">텍스트가 제거된 배경 이미지/PDF</p> -->
-
-            <input type="file" id="combineBgInput" accept="image/*,application/pdf" multiple hidden>
-            <!-- Updated Button Style -->
-            <button class="btn-primary" onclick="document.getElementById('combineBgInput').click()"
-              style="width: 100%;">
-              파일 선택 (다중 가능)
-            </button>
-
-            <!-- Thumbnail Grid Container -->
-            <div id="combineBgList" class="file-list-preview"
-              style="margin-top: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; max-height: 1500px; overflow-y: auto;">
-              <!-- Thumbnails will be injected here -->
-            </div>
-          </div>
-        </div>
-
-        <div class="combine-actions" style="margin-top: 2rem; text-align: center;">
-          <button id="btnCombineStart" class="btn-primary" disabled
-            style="width: 50%; padding: 1rem; font-size: 1.1rem;">
-            <i data-lucide="sparkles" style="margin-right: 0.5rem;"></i> 조합 및 생성 시작
-          </button>
-        </div>
-  </div>
-  </section>
-
-  <!-- Photoroom Remove Text Section -->
-  <section id="removeTextPhotoroomSection" class="tab-content-wrapper hidden">
-
-    <!-- Top Group: Settings & Upload -->
-    <div class="control-panel-group">
-      <!-- Settings Panel -->
-      <div class="glass-panel settings-panel">
-        <div class="settings-grid"
-          style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem;">
-          <div class="setting-group">
-            <label>제거 모드 선택 (Mode)</label>
-            <select id="textRemovalMode_photoroom">
-              <option value="ai.all" selected>모든 텍스트 제거 (AI.All)</option>
-              <option value="ai.artificial">인공 텍스트만 (AI.Artificial)</option>
-              <option value="ai.natural">자연 텍스트만 (AI.Natural)</option>
-            </select>
-          </div>
-        </div>
-        <div class="settings-actions" style="margin-top: 1rem; text-align: right;">
-          <button class="btn-secondary small" onclick="saveSettings()">
-            <i data-lucide="save"></i> 현재 설정을 기본값으로 저장
-          </button>
-        </div>
-      </div>
-
-      <!-- Upload Panel -->
-      <div class="glass-panel upload-panel">
-        <div id="photoroomDropZone" class="upload-content">
-          <div class="icon-cloud"><i data-lucide="eraser"></i></div>
-          <h2>이미지 텍스트 제거 (Photoroom AI)</h2>
-          <p>이미지를 드래그하거나 클릭하세요. (Sandbox Key 사용 시 워터마크 포함)</p>
-          <input type="file" id="photoroomInput" accept="image/*" hidden>
-        </div>
-
-        <div id="photoroomFileInfo" class="file-info hidden" style="margin-top: 1rem;">
-          <i data-lucide="image" style="margin-right: 0.5rem;"></i>
-          <span id="photoroomFileName" class="file-name">filename.png</span>
-          <button id="btnPhotoroomReset" class="btn-text small">다른 파일 업로드</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Action Button -->
-    <div style="margin: 1.5rem 0; text-align: center;">
-      <button id="btnRunPhotoroom" class="btn-primary">
-        <i data-lucide="wand-2"></i> 텍스트 제거 실행
-      </button>
-    </div>
-
-    <!-- Result Preview -->
-    <div id="photoroomResultContainer" class="pdf-results hidden glass-panel"
-      style="padding: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-      <div class="pdf-page-card">
-        <div class="page-info" style="text-align: center; font-weight: bold; background: rgba(0,0,0,0.3);">원본 이미지</div>
-        <div class="pdf-thumb-container" style="background: transparent;">
-          <img id="imgPrOriginal" class="pdf-thumb-img" src="" style="max-height: 400px; object-fit: contain;">
-        </div>
-      </div>
-
-      <div class="pdf-page-card">
-        <div class="page-info" style="text-align: center; font-weight: bold; background: rgba(0,0,0,0.3);">결과 이미지</div>
-        <div class="pdf-thumb-container" style="background: transparent;">
-          <img id="imgPrResult" class="pdf-thumb-img" src="" style="max-height: 400px; object-fit: contain;">
-        </div>
-        <div class="page-info">
-          <a id="btnDlPrResult" class="btn-primary small" href="#" download
-            style="width: 100%; justify-content: center;">
-            <i data-lucide="download"></i> 다운로드
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Batch Control Panel (New) -->
-  <section id="batchControlPanel" class="glass-panel batch-controls hidden">
-    <div class="batch-header">
-      <div class="batch-info">
-        <h3><i data-lucide="package-open" style="vertical-align: middle; margin-right: 0.5rem;"></i> 일괄 작업 </h3>
-        <span id="batchStatusText">완료: 0 / 0</span>
-      </div>
-      <div class="batch-actions">
-        <button id="btnPause" class="btn-secondary" title="일시정지" onclick="jobQueue.pause()"><i data-lucide="pause"></i>
-          일시정지</button>
-        <button id="btnResume" class="btn-secondary hidden" title="재개" onclick="jobQueue.resume()"><i
-            data-lucide="play"></i> 재개</button>
-        <button id="btnStop" class="btn-secondary" title="중단" onclick="jobQueue.stop()">
-          <!-- <i data-lucide="square" style="color: #ef4444;"></i> 작업 중단 -->
-          <i data-lucide="square"></i> 작업 중단
-        </button>
-        <button id="btnDownloadBatchPPTX" class="btn-secondary hidden" title="PPTX 다운"
-          onclick="jobQueue.downloadBatchPPTX()">
-          <i data-lucide="file-text"></i> PPTX 다운
-        </button>
-      </div>
-    </div>
-    <div class="progress-container">
-      <div id="batchProgressBar" class="progress-bar" style="width: 0%"></div>
-    </div>
-  </section>
-
-  <!-- Job List (Replaces Single Result View for Batch) -->
-  <div id="jobList" class="job-list-container"></div>
-
-  <!-- Loading Section (Legacy/Single - keep hidden or reuse for single) -->
-  <section id="loadingSection" class="glass-panel loading-zone hidden">
-    <div class="loader"></div>
-    <h2 id="loadingText">처리 중입니다...</h2>
-    <p class="loading-subtext">잠시만 기다려주세요.</p>
-  </section>
-
-
-
-  <!-- Result: Remove Text -->
-  <section id="resultRemoveText" class="result-zone hidden">
-    <div class="glass-panel preview-header">
-      <div class="header-left">
-        <h2>배경 복원 완료</h2>
-        <p>텍스트가 제거된 클린 배경입니다.</p>
-      </div>
-      <div class="actions">
-        <a id="btnDownloadBgOnly" href="#" class="btn-secondary" download><i data-lucide="image"></i> 이미지 다운로드</a>
-        <button class="btn-text btn-retry">다른 파일 작업</button>
-      </div>
-    </div>
-    <div class="preview-container">
-      <img id="resultBgImage" src="" alt="Clean Background" style="max-width: 100%; border-radius: 8px;">
-    </div>
-  </section>
-
-  <!-- Result: Extract Text -->
-  <section id="resultExtractText" class="result-zone hidden">
-    <div class="glass-panel preview-header">
-      <div class="header-left">
-        <h2>텍스트 추출 완료</h2>
-        <p>이미지 내 텍스트 내용입니다.</p>
-      </div>
-      <div class="actions">
-        <button id="btnCopyText" class="btn-secondary"><i data-lucide="copy"></i> 클립보드 복사</button>
-        <button class="btn-text btn-retry">다른 파일 작업</button>
-      </div>
-    </div>
-    <div class="glass-panel text-preview">
-      <textarea id="extractedTextArea" readonly></textarea>
-    </div>
-  </section>
-  </main>
-
-  <div id="toast" class="toast hidden">알림 메시지</div>
-
-  <!-- Preview Modal -->
-  <div id="previewModal" class="modal-overlay hidden">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 id="modalTitle">Slide Preview</h3>
-        <button class="btn-text" onclick="closeModal()"><i data-lucide="x"></i></button>
-      </div>
-      <div class="modal-body">
-        <div id="modalPreviewContainer" class="modal-preview-container">
-          <!-- Content injected by JS -->
-        </div>
-      </div>
-      <div class="modal-footer">
-        <a id="modalBtnDownloadHtml" href="#" class="btn-primary small" download><i data-lucide="file-code-2"></i>
-          HTML</a>
-        <a id="modalBtnDownloadPptx" href="#" class="btn-primary small hidden" download><i data-lucide="file-text"></i>
-          PPTX</a>
-        <a id="modalBtnDownloadBg" href="#" class="btn-secondary small" download><i data-lucide="image"></i> 배경 </a>
-        <button class="btn-secondary small" onclick="closeModal()">닫기</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- API Key Settings Modal -->
-  <div id="settingsModal" class="modal-overlay hidden">
-    <div class="modal-content" style="max-width: 500px;">
-      <div class="modal-header">
-        <h3><i data-lucide="key" style="margin-right: 0.5rem; color: var(--accent);"></i> API Key 설정</h3>
-        <button class="btn-text" onclick="closeSettingsModal()"><i data-lucide="x"></i></button>
-      </div>
-      <div class="modal-body" style="flex-direction: column; padding: 1.5rem;">
-        <div style="width: 100%;">
-          <p style="margin-bottom: 1.5rem; color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6;">
-            <!-- <strong style="color: var(--text-primary); display: block; margin-bottom: 0.25rem;">API Key 설정</strong> -->
-            Google Gemini API Key를 입력하세요. 키는 서버의 환경 변수(.env)에 안전하게 저장됩니다.
-          </p>
-
-          <div style="display: flex; gap: 0.5rem; align-items: center;">
-            <div class="api-key-wrapper" style="flex-grow: 1; position: relative; padding-right: 2.5rem;">
-              <input type="text" id="apiKeyInput" class="api-key-input" placeholder="AIza..." readonly>
-              <button id="btnCopyApiKey" class="btn-icon" title="복사"
-                style="position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%);">
-                <i data-lucide="copy" style="width: 1.2rem;"></i>
+            <!-- Settings Save Button -->
+            <div class="settings-actions" style="margin-top: 2rem; text-align: right;">
+              <button class="btn-secondary small" onclick="saveSettings()">
+                <i data-lucide="save"></i> 현재 설정을 기본값으로 저장
               </button>
             </div>
 
-            <button id="btnModEdit" class="btn-secondary small" style="white-space: nowrap;">수정</button>
-            <button id="btnModTest" class="btn-secondary small" style="white-space: nowrap;">API테스트</button>
-            <button id="btnModSave" class="btn-primary small hidden" style="white-space: nowrap;">저장</button>
-            <button id="btnModCancel" class="btn-secondary small hidden" style="white-space: nowrap;">취소</button>
-          </div>
-
-          <!-- Copy Feedback Message -->
-          <p id="apiKeyCopyMsg"
-            style="color: var(--success); font-size: 0.85rem; margin-top: 0.5rem; min-height: 1.2rem; opacity: 0; transition: opacity 0.3s;">
-          </p>
-
-          <!-- API Test Result -->
-          <div id="apiTestResult" class="hidden"
-            style="margin-top: 0.5rem; padding: 0.8rem; background: rgba(255, 255, 255, 0.05); border-radius: 8px; font-size: 0.85rem;">
-            <div id="testStatusIcon" style="margin-bottom: 0.3rem; font-weight: bold;"></div>
-            <div id="testResponseText" style="color: var(--text-secondary); max-height: 100px; overflow-y: auto;">
+            <!-- Combine Action Button (Moved here for better UX in Grid layout) -->
+            <div class="combine-actions"
+              style="margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
+              <button id="btnCombineStart" class="btn-primary" disabled
+                style="width: 100%; padding: 0.8rem; font-size: 1rem;">
+                <i data-lucide="sparkles" style="margin-right: 0.5rem;"></i> 조합 및 생성 시작
+              </button>
             </div>
           </div>
 
-          <p id="apiKeyStatus"
-            style="font-size: 0.8rem; margin-top: 0.2rem; color: var(--text-secondary); min-height: 1.2rem; text-align: right;">
-          </p>
+          <!-- 1-B. Right: Upload Area (Split into 2) -->
+          <!-- Note: We don't use 'panel-upload' class here to avoid double borders. instead we use a grid container. -->
+          <div class="combine-upload-grid"
+            style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; height: 100%;">
+
+            <!-- Source Upload -->
+            <div class="glass-panel upload-box" id="combineSourceBox"
+              style="border: 2px dashed var(--border-color); border-radius: 12px; padding: 1.5rem; text-align: center; transition: all 0.2s; background: rgba(30, 41, 59, 0.4); display: flex; flex-direction: column; align-items: center;">
+
+              <h3
+                style="margin-bottom: 0.5rem; font-size: 1.1rem; display: flex; align-items: center; justify-content: center;">
+                <i data-lucide="type" size="24" style="margin-right: 0.5rem; color: var(--accent)"></i> 텍스트 원본
+              </h3>
+              <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1rem;">텍스트가 포함된 파일</p>
+
+              <input type="file" id="combineSourceInput" accept="image/*,application/pdf" multiple hidden>
+              <button class="btn-secondary small" onclick="document.getElementById('combineSourceInput').click()">
+                파일 선택
+              </button>
+
+              <!-- List -->
+              <div id="combineSourceList" class="file-list-preview"
+                style="margin-top: 1rem; width: 100%; flex-grow: 1; display: flex; flex-direction: column; gap: 0.5rem; max-height: 400px; overflow-y: auto;">
+              </div>
+            </div>
+
+            <!-- BG Upload -->
+            <div class="glass-panel upload-box" id="combineBgBox"
+              style="border: 2px dashed var(--border-color); border-radius: 12px; padding: 1.5rem; text-align: center; transition: all 0.2s; background: rgba(255, 255, 255, 0.03); display: flex; flex-direction: column; align-items: center;">
+
+              <h3
+                style="margin-bottom: 0.5rem; font-size: 1.1rem; display: flex; align-items: center; justify-content: center;">
+                <i data-lucide="image" size="24" style="margin-right: 0.5rem; color: var(--primary)"></i> 클린 배경
+              </h3>
+              <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1rem;">배경만 있는 파일</p>
+
+              <input type="file" id="combineBgInput" accept="image/*,application/pdf" multiple hidden>
+              <button class="btn-secondary small" onclick="document.getElementById('combineBgInput').click()">
+                파일 선택
+              </button>
+
+              <!-- List -->
+              <div id="combineBgList" class="file-list-preview"
+                style="margin-top: 1rem; width: 100%; flex-grow: 1; display: flex; flex-direction: column; gap: 0.5rem; max-height: 400px; overflow-y: auto;">
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- Photoroom Remove Text Section -->
+      <section id="removeTextPhotoroomSection" class="tab-content-wrapper hidden">
+
+        <!-- Top Group: Settings & Upload -->
+        <div class="control-panel-container">
+          <!-- Settings Panel -->
+          <div class="glass-panel panel-settings">
+            <div class="settings-grid"
+              style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem;">
+              <div class="setting-group">
+                <label>제거 모드 선택 (Mode)</label>
+                <select id="textRemovalMode_photoroom">
+                  <option value="ai.all" selected>모든 텍스트 제거 (AI.All)</option>
+                  <option value="ai.artificial">인공 텍스트만 (AI.Artificial)</option>
+                  <option value="ai.natural">자연 텍스트만 (AI.Natural)</option>
+                </select>
+              </div>
+            </div>
+            <div class="settings-actions" style="margin-top: 1rem; text-align: right;">
+              <button class="btn-secondary small" onclick="saveSettings()">
+                <i data-lucide="save"></i> 현재 설정을 기본값으로 저장
+              </button>
+            </div>
+          </div>
+
+          <!-- Upload Panel -->
+          <div class="glass-panel panel-upload">
+            <div id="photoroomDropZone" class="upload-content">
+              <div class="icon-cloud"><i data-lucide="eraser"></i></div>
+              <h2>이미지 텍스트 제거 (Photoroom AI)</h2>
+              <p>이미지를 드래그하거나 클릭하세요. (Sandbox Key 사용 시 워터마크 포함)</p>
+              <input type="file" id="photoroomInput" accept="image/*" hidden>
+            </div>
+
+            <div id="photoroomFileInfo" class="file-info hidden" style="margin-top: 1rem;">
+              <i data-lucide="image" style="margin-right: 0.5rem;"></i>
+              <span id="photoroomFileName" class="file-name">filename.png</span>
+              <button id="btnPhotoroomReset" class="btn-text small">다른 파일 업로드</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Button -->
+        <div style="margin: 1.5rem 0; text-align: center;">
+          <button id="btnRunPhotoroom" class="btn-primary">
+            <i data-lucide="wand-2"></i> 텍스트 제거 실행
+          </button>
+        </div>
+
+        <!-- Result Preview -->
+        <div id="photoroomResultContainer" class="pdf-results hidden glass-panel"
+          style="padding: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+          <div class="pdf-page-card">
+            <div class="page-info" style="text-align: center; font-weight: bold; background: rgba(0,0,0,0.3);">원본 이미지
+            </div>
+            <div class="pdf-thumb-container" style="background: transparent;">
+              <img id="imgPrOriginal" class="pdf-thumb-img" src="" style="max-height: 400px; object-fit: contain;">
+            </div>
+          </div>
+
+          <div class="pdf-page-card">
+            <div class="page-info" style="text-align: center; font-weight: bold; background: rgba(0,0,0,0.3);">결과 이미지
+            </div>
+            <div class="pdf-thumb-container" style="background: transparent;">
+              <img id="imgPrResult" class="pdf-thumb-img" src="" style="max-height: 400px; object-fit: contain;">
+            </div>
+            <div class="page-info">
+              <a id="btnDlPrResult" class="btn-primary small" href="#" download
+                style="width: 100%; justify-content: center;">
+                <i data-lucide="download"></i> 다운로드
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Batch Control Panel (New) -->
+      <section id="batchControlPanel" class="glass-panel batch-controls hidden">
+        <div class="batch-header">
+          <div class="batch-info">
+            <h3><i data-lucide="package-open" style="vertical-align: middle; margin-right: 0.5rem;"></i> 일괄 작업 </h3>
+            <span id="batchStatusText">완료: 0 / 0</span>
+          </div>
+          <div class="batch-actions">
+            <button id="btnPause" class="btn-secondary" title="일시정지" onclick="jobQueue.pause()"><i
+                data-lucide="pause"></i>
+              일시정지</button>
+            <button id="btnResume" class="btn-secondary hidden" title="재개" onclick="jobQueue.resume()"><i
+                data-lucide="play"></i> 재개</button>
+            <button id="btnStop" class="btn-secondary" title="중단" onclick="jobQueue.stop()">
+              <!-- <i data-lucide="square" style="color: #ef4444;"></i> 작업 중단 -->
+              <i data-lucide="square"></i> 작업 중단
+            </button>
+            <button id="btnDownloadBatchPPTX" class="btn-secondary hidden" title="PPTX 다운"
+              onclick="jobQueue.downloadBatchPPTX()">
+              <i data-lucide="file-text"></i> PPTX 다운
+            </button>
+          </div>
+        </div>
+        <div class="progress-container">
+          <div id="batchProgressBar" class="progress-bar" style="width: 0%"></div>
+        </div>
+      </section>
+
+      <!-- Job List (Replaces Single Result View for Batch) -->
+      <div id="jobList" class="job-list-container"></div>
+
+      <!-- Loading Section (Legacy/Single - keep hidden or reuse for single) -->
+      <section id="loadingSection" class="glass-panel loading-zone hidden">
+        <div class="loader"></div>
+        <h2 id="loadingText">처리 중입니다...</h2>
+        <p class="loading-subtext">잠시만 기다려주세요.</p>
+      </section>
+
+
+
+      <!-- Result: Remove Text -->
+      <section id="resultRemoveText" class="result-zone hidden">
+        <div class="glass-panel preview-header">
+          <div class="header-left">
+            <h2>배경 복원 완료</h2>
+            <p>텍스트가 제거된 클린 배경입니다.</p>
+          </div>
+          <div class="actions">
+            <a id="btnDownloadBgOnly" href="#" class="btn-secondary" download><i data-lucide="image"></i> 이미지 다운로드</a>
+            <button class="btn-text btn-retry">다른 파일 작업</button>
+          </div>
+        </div>
+        <div class="preview-container">
+          <img id="resultBgImage" src="" alt="Clean Background" style="max-width: 100%; border-radius: 8px;">
+        </div>
+      </section>
+
+      <!-- Result: Extract Text -->
+      <section id="resultExtractText" class="result-zone hidden">
+        <div class="glass-panel preview-header">
+          <div class="header-left">
+            <h2>텍스트 추출 완료</h2>
+            <p>이미지 내 텍스트 내용입니다.</p>
+          </div>
+          <div class="actions">
+            <button id="btnCopyText" class="btn-secondary"><i data-lucide="copy"></i> 클립보드 복사</button>
+            <button class="btn-text btn-retry">다른 파일 작업</button>
+          </div>
+        </div>
+        <div class="glass-panel text-preview">
+          <textarea id="extractedTextArea" readonly></textarea>
+        </div>
+      </section>
+    </main>
+
+    <div id="toast" class="toast hidden">알림 메시지</div>
+
+    <!-- Preview Modal -->
+    <div id="previewModal" class="modal-overlay hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="modalTitle">Slide Preview</h3>
+          <button class="btn-text" onclick="closeModal()"><i data-lucide="x"></i></button>
+        </div>
+        <div class="modal-body">
+          <div id="modalPreviewContainer" class="modal-preview-container">
+            <!-- Content injected by JS -->
+          </div>
+        </div>
+        <div class="modal-footer">
+          <a id="modalBtnDownloadHtml" href="#" class="btn-primary small" download><i data-lucide="file-code-2"></i>
+            HTML</a>
+          <a id="modalBtnDownloadPptx" href="#" class="btn-primary small hidden" download><i
+              data-lucide="file-text"></i>
+            PPTX</a>
+          <a id="modalBtnDownloadBg" href="#" class="btn-secondary small" download><i data-lucide="image"></i> 배경 </a>
+          <button class="btn-secondary small" onclick="closeModal()">닫기</button>
         </div>
       </div>
     </div>
-  </div>
+
+    <!-- API Key Settings Modal -->
+    <div id="settingsModal" class="modal-overlay hidden">
+      <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header">
+          <h3><i data-lucide="key" style="margin-right: 0.5rem; color: var(--accent);"></i> API Key 설정</h3>
+          <button class="btn-text" onclick="closeSettingsModal()"><i data-lucide="x"></i></button>
+        </div>
+        <div class="modal-body" style="flex-direction: column; padding: 1.5rem;">
+          <div style="width: 100%;">
+            <p style="margin-bottom: 1.5rem; color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6;">
+              <!-- <strong style="color: var(--text-primary); display: block; margin-bottom: 0.25rem;">API Key 설정</strong> -->
+              Google Gemini API Key를 입력하세요. 키는 서버의 환경 변수(.env)에 안전하게 저장됩니다.
+            </p>
+
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+              <div class="api-key-wrapper" style="flex-grow: 1; position: relative; padding-right: 2.5rem;">
+                <input type="text" id="apiKeyInput" class="api-key-input" placeholder="AIza..." readonly>
+                <button id="btnCopyApiKey" class="btn-icon" title="복사"
+                  style="position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%);">
+                  <i data-lucide="copy" style="width: 1.2rem;"></i>
+                </button>
+              </div>
+
+              <button id="btnModEdit" class="btn-secondary small" style="white-space: nowrap;">수정</button>
+              <button id="btnModTest" class="btn-secondary small" style="white-space: nowrap;">API테스트</button>
+              <button id="btnModSave" class="btn-primary small hidden" style="white-space: nowrap;">저장</button>
+              <button id="btnModCancel" class="btn-secondary small hidden" style="white-space: nowrap;">취소</button>
+            </div>
+
+            <!-- Copy Feedback Message -->
+            <p id="apiKeyCopyMsg"
+              style="color: var(--success); font-size: 0.85rem; margin-top: 0.5rem; min-height: 1.2rem; opacity: 0; transition: opacity 0.3s;">
+            </p>
+
+            <!-- API Test Result -->
+            <div id="apiTestResult" class="hidden"
+              style="margin-top: 0.5rem; padding: 0.8rem; background: rgba(255, 255, 255, 0.05); border-radius: 8px; font-size: 0.85rem;">
+              <div id="testStatusIcon" style="margin-bottom: 0.3rem; font-weight: bold;"></div>
+              <div id="testResponseText" style="color: var(--text-secondary); max-height: 100px; overflow-y: auto;">
+              </div>
+            </div>
+
+            <p id="apiKeyStatus"
+              style="font-size: 0.8rem; margin-top: 0.2rem; color: var(--text-secondary); min-height: 1.2rem; text-align: right;">
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
   </div>
 

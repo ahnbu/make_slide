@@ -24,6 +24,9 @@
       --border-color: #334155;
       --primary: #6366f1;
       --primary-hover: #4f46e5;
+      /* Grid Layout Variables */
+      --panel-gap: 1.5rem;
+      --settings-width: 350px;
       --text-primary: #f8fafc;
       --text-secondary: #94a3b8;
       --accent: #38bdf8;
@@ -113,6 +116,45 @@
       box-shadow: var(--shadow-lg);
     }
 
+    /* Grid Layout System */
+    .control-panel-container {
+      display: grid;
+      grid-template-columns: var(--settings-width) 1fr;
+      gap: var(--panel-gap);
+      align-items: start;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 900px) {
+      .control-panel-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel-settings {
+      padding: 1.5rem;
+      height: 100%;
+    }
+
+    .panel-upload {
+      padding: 1.5rem;
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      border: 2px dashed var(--border-color);
+      background: rgba(30, 41, 59, 0.4);
+      transition: all 0.3s;
+    }
+
+    .panel-upload:hover,
+    .panel-upload.dragover {
+      border-color: var(--primary);
+      background: rgba(99, 102, 241, 0.1);
+    }
+
     .upload-content {
       text-align: center;
       padding: 3rem;
@@ -199,21 +241,11 @@
 
     /* Specific PDF Tool Styles */
     .pdf-top-area {
-      padding: 1.5rem;
-      border-bottom: 1px solid var(--border-color);
+      /* Removed legacy padding/border styles as we are moving to grid */
     }
 
-    .pdf-drop {
-      border: 2px dashed var(--border-color);
-      border-radius: 0.75rem;
-      transition: all 0.2s;
-      cursor: pointer;
-    }
-
-    .pdf-drop:hover {
-      border-color: var(--primary);
-      background-color: rgba(99, 102, 241, 0.1);
-    }
+    /* Legacy classes removal or adaptation if needed */
+    /* .pdf-drop styles are now consolidated into .panel-upload */
 
     .file-info {
       display: flex;
@@ -489,22 +521,40 @@
     </header>
 
     <main>
-      <section id="pdfSection" class="glass-panel">
-        <!-- Top: Info & Upload -->
-        <div id="pdfTopArea" class="pdf-top-area">
-          <div id="pdfDropZone" class="upload-content pdf-drop">
+      <section id="pdfSection">
+
+        <!-- Grid Structure -->
+        <div class="control-panel-container">
+
+          <!-- Left: Info & Actions Panel -->
+          <div class="glass-panel panel-settings">
+            <div class="icon-area" style="margin-bottom: 1rem; color: var(--text-secondary);">
+              <i data-lucide="info" size="24"></i>
+            </div>
+            <h3>파일 정보</h3>
+            <div id="pdfFileInfo" class="file-info hidden"
+              style="flex-direction: column; gap: 0.5rem; margin-top: 1rem;">
+              <div style="font-weight: bold; word-break: break-all;" id="pdfFileName">filename.pdf</div>
+              <div class="badge" id="pdfPageCount">0 pages</div>
+              <button id="btnPdfReset" class="btn-secondary small"
+                style="margin-top: 1rem; width: 100%; justify-content: center;">
+                <i data-lucide="refresh-cw"></i> 초기화 / 재업로드
+              </button>
+            </div>
+            <div id="pdfIntroText" style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 1rem;">
+              <p>PDF 파일을 업로드하면<br>페이지별 이미지 추출 및<br>PPTX 변환이 가능합니다.</p>
+              <p style="margin-top:0.5rem; font-size: 0.8rem; opacity: 0.7;">(100% 로컬 브라우저 처리)</p>
+            </div>
+          </div>
+
+          <!-- Right: Upload Zone -->
+          <div id="pdfDropZone" class="glass-panel panel-upload">
             <div class="icon-cloud"><i data-lucide="file-text"></i></div>
             <h2>PDF 파일 업로드</h2>
-            <p>여기에 PDF를 드래그하거나 클릭하세요. (서버 전송 없음, 100% 로컬 처리)</p>
+            <p>여기에 PDF를 드래그하거나 클릭하세요.</p>
             <input type="file" id="pdfInput" accept="application/pdf" hidden>
           </div>
 
-          <div id="pdfFileInfo" class="file-info hidden">
-            <i data-lucide="file" style="margin-right: 0.5rem;"></i>
-            <span id="pdfFileName" class="file-name">filename.pdf</span>
-            <span id="pdfPageCount" class="badge">0 pages</span>
-            <button id="btnPdfReset" class="btn-text small">다른 파일 업로드</button>
-          </div>
         </div>
 
         <!-- Toolbar -->
@@ -615,6 +665,7 @@
       resultContainer.classList.add('hidden');
       toolbar.classList.add('hidden');
       fileInfo.classList.add('hidden');
+      document.getElementById('pdfIntroText').classList.remove('hidden'); // Show intro
       dropZone.classList.remove('hidden');
       fileInput.value = '';
     });
@@ -629,6 +680,7 @@
         showToast('PDF를 로딩 중입니다...');
         dropZone.classList.add('hidden');
         fileInfo.classList.remove('hidden');
+        document.getElementById('pdfIntroText').classList.add('hidden'); // Hide intro
         fileNameEl.textContent = file.name;
 
         const arrayBuffer = await file.arrayBuffer();
@@ -643,6 +695,7 @@
         showToast('PDF 로드 실패: ' + e.message);
         dropZone.classList.remove('hidden');
         fileInfo.classList.add('hidden');
+        document.getElementById('pdfIntroText').classList.remove('hidden'); // Show intro on error
       }
     }
 

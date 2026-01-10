@@ -14,32 +14,46 @@
 
 /* 2. Top Control Group (Settings + Upload) */
 /* This replaces 'pdf-top-area' and provides the background wrapper */
-.control-panel-group {
-  display: flex;
-  flex-direction: column;
-  padding: 1.5rem;
-  /* Removed background to match user preference for 'Clean' look, 
-     but structure is kept for alignment. 
-     If we want the PDF-style background back later, we add it here. */
-  border-bottom: 1px solid var(--border-color);
-  border-radius: 1rem 1rem 0 0;
-  gap: 2rem;
-  /* Spacing between Settings and Upload */
+/* 2. Control Panel Container (Grid Layout) */
+/* Replaces 'control-panel-group' with a strict Grid system */
+.control-panel-container {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  /* Fixed Settings(Left) : Flexible Upload(Right) */
+  gap: 1.5rem;
+  align-items: start;
+  padding: 0;
+  /* Container itself has no padding */
+  margin-bottom: 2rem;
 }
 
-/* 3. Settings Panel (The visual box for controls) */
-.settings-panel {
-  /* Inherits glass-panel styles but enforces specific padding/margin */
-  padding: 1.5rem;
-  margin-bottom: 0;
-  /* Group handles gap */
+/* Mobile Responsiveness */
+@media (max-width: 900px) {
+  .control-panel-container {
+    grid-template-columns: 1fr;
+    /* Stack vertically on small screens */
+  }
+
+  .panel-upload {
+    min-height: 200px;
+    /* Smaller height on mobile */
+  }
 }
 
-/* 4. Upload Panel (The visual box for file drop) */
-.upload-panel {
+/* 3. Settings Panel (Left/Top) */
+.panel-settings {
+  /* Inherits glass-panel styles but enforces specific padding */
+  padding: 1.5rem;
+  height: 100%;
+  /* Match height if needed, or auto */
+}
+
+/* 4. Upload Panel (Right/Bottom) */
+.panel-upload {
   /* Inherits glass-panel styles */
   padding: 1.5rem;
-  min-height: 200px;
+  min-height: 300px;
+  /* Enforce minimum height for balance */
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -50,8 +64,8 @@
   transition: all 0.3s;
 }
 
-.upload-panel:hover,
-.upload-panel.dragover {
+.panel-upload:hover,
+.panel-upload.dragover {
   border-color: var(--primary);
   background: rgba(99, 102, 241, 0.1);
 }
@@ -67,4 +81,13 @@
 /* Helper for hidden state consistency */
 .hidden {
   display: none !important;
+}
+
+/* Mobile responsive for combine upload grid */
+@media (max-width: 900px) {
+  .combine-upload-grid {
+    grid-template-columns: 1fr !important;
+    /* Stack vertically on mobile */
+    min-height: 400px;
+  }
 }

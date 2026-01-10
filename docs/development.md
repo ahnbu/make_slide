@@ -126,16 +126,30 @@
     - 필요 시 응답 문자열에서 ```json 및 ```를 제거하는 전처리 로직(`strip`)이 유효한지 확인.
     - 재시도(Retry) 로직을 추가하는 것도 고려할 수 있음.
 
-## 6. 폴더 구조 (Directory Structure)
+## 6. 핵심 파일 구조 (Core File Structure)
+
+프로젝트 파악을 위한 핵심 파일 리스트와 설명입니다.
+
 ```
 /
-├── src/                # 핵심 로직 (Analyzer, ImageProcessor, CodeGenerator)
-├── docs/               # 개발/기획 문서 (processing_details.md, colab code 등)
-├── templates/          # HTML 템플릿 (Jinja2)
-├── static/             # CSS, JS, 업로드된 이미지
-│   ├── uploads/            # 사용자 업로드 원본
-├── output/             # 결과물 저장소 (HTML, Inpainted Image)
-├── app.py              # FastAPI 메인 애플리케이션
-├── requirements.txt    # 의존성 목록
-└── .env                # 환경 변수 (GOOGLE_API_KEY)
+├── app.py                  # FastAPI 메인 애플리케이션 (엔드포인트 및 전체 흐름 제어)
+├── src/
+│   ├── analyzer.py         # Gemini Vision API: 이미지 분석 및 레이아웃 추출
+│   ├── image_processor.py  # OpenCV: 이미지 전처리 및 텍스트 제거(Inpainting)
+│   ├── code_generator.py   # 분석 데이터를 바탕으로 HTML/CSS 코드 생성
+│   └── pptx_generator.py   # 분석 데이터를 바탕으로 PPTX 파일 생성
+├── templates/
+│   └── index.html          # 메인 웹 인터페이스 (Jinja2 Template)
+├── static/
+│   ├── js/
+│   │   └── script.js       # 핵심 UI 동작, 파일 업로드, API 호출, 탭 전환 로직
+│   └── css/
+│       └── layout.css      # 탭 간 일관된 레이아웃을 위한 공통 스타일
+├── settings.json           # 프로젝트 전역 설정 파일 (모델, 폰트, 동시성 제어 등)
+├── requirements.txt        # 프로젝트 의존성 패키지 목록
+└── standalone_pdf_tool.html # [Standalone] 서버 없이 동작하는 클라이언트 사이드 PDF 변환 도구
 ```
+
+### 문서 (Documentation)
+- `README.md`: 프로젝트 개요, 설치 및 실행 방법
+- `docs/development.md`: 개발자 가이드 (아키텍처, 파이프라인 상세, 트러블슈팅)
