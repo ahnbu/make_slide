@@ -1,9 +1,8 @@
-
 // static/js/main.js
 // 메인 엔트리 포인트, 이벤트 바인딩, JobQueue 정의
 
 import { AppSettings, loadSettings, saveSettings, getCurrentTab, setCurrentTab, getTabSuffix } from './config.js';
-import { showToast, openModal, closeModal, switchTab, showCombineMismatchModal, toggleDetails } from './ui.js';
+import { showToast, openModal, closeModal, switchTab, showCombineMismatchModal, toggleDetails, initModelSelectors } from './ui.js';
 import { handlePdfUpload, getSelectedBlobs, getAllBlobs, downloadImages, toggleSelectAll, updateSelectionState } from './pdf_handler.js';
 
 // --- JobQueue Class Definition ---
@@ -352,6 +351,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 1. Load Settings
   loadSettings(() => jobQueue.processQueue());
+  initModelSelectors();
 
   // 2. Tab Switching
   const tabButtons = document.querySelectorAll('.tab-btn');

@@ -65,9 +65,12 @@
             <div class="setting-group">
               <label>비전모델(분석)</label>
               <select id="visionModel_reconstruct" class="vision-model-select">
-                <option value="gemini-3-flash-preview" selected>Gemini 3.0 Flash (Preview)</option>
-                <option value="gemini-2.5-flash">Gemini 2.5 Flash (Experimental)</option>
+                <option value="" disabled selected>모델 목록 로딩 중...</option>
               </select>
+              <!-- 직접 입력을 위한 숨겨진 인풋 -->
+              <input type="text" id="visionModel_custom_reconstruct" class="hidden custom-model-input"
+                style="margin-top: 0.25rem; width: 100%; border: 1px solid var(--border-color); background: rgba(255, 255, 255, 0.05); color: var(--text-primary); padding: 0.4rem; border-radius: 6px; font-size: 0.9rem;"
+                placeholder="모델명 직접 입력 (예: gemini-ultra)">
             </div>
             <!-- Inpainting -->
             <div class="setting-group">
@@ -108,10 +111,16 @@
               <label>글꼴 (Font)</label>
               <select id="fontFamily_reconstruct">
                 <option value="Malgun Gothic" selected>맑은 고딕 (기본)</option>
-                <option value="Pretendard Medium">Pretendard Medium (프리텐다드)</option>
-                <option value="Noto Sans KR">Noto Sans KR (구글 폰트)</option>
-                <option value="Apple SD Gothic Neo">Apple SD Gothic Neo</option>
                 <option value="Arial">Arial (영문)</option>
+              </select>
+            </div>
+            <!-- Batch -->
+            <div class="setting-group">
+              <label>동시 처리 개수</label>
+              <select id="maxConcurrent_reconstruct">
+                <option value="2">2개</option>
+                <option value="3" selected>3개</option>
+                <option value="4">4개</option>
               </select>
             </div>
             <!-- Batch -->
@@ -195,6 +204,13 @@
                 <option value="1.5">화면용 (Standard)</option>
                 <option value="2.0">고화질 (HD - Slide)</option>
                 <option value="3.0" selected>인쇄용 (Ultra HD)</option>
+              </select>
+            </div>
+            <!-- 1-2. Vision Model (Recovered) -->
+            <div class="setting-group">
+              <label>비전모델(분석)</label>
+              <select id="visionModel_pdf" class="vision-model-select">
+                <option value="" disabled selected>모델 목록 로딩 중...</option>
               </select>
             </div>
             <!-- 2. Inpainting (New) -->

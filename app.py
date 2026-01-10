@@ -60,6 +60,7 @@ DEFAULT_SETTINGS = {
         "refine_layout": False
     },
     "pdf_pptx": {
+        "pdf_quality": "3.0",
         "vision_model": "gemini-3-flash-preview",
         "inpainting_model": "opencv-telea",
         "codegen_model": "algorithmic",
@@ -87,7 +88,7 @@ SETTINGS_FILE = os.path.join(BASE_DIR, "settings.json")
 def load_settings():
     try:
         if os.path.exists(SETTINGS_FILE):
-            with open(SETTINGS_FILE, "r") as f:
+            with open(SETTINGS_FILE, "r", encoding="utf-8") as f:
                 return json.load(f)
     except Exception as e:
         logger.error(f"Failed to load settings: {e}")
@@ -115,6 +116,15 @@ pptx_generator = PPTXGenerator()
 @app.get("/settings")
 async def get_settings():
     return JSONResponse(load_settings())
+
+@app.get("/system/models")
+async def get_system_models():
+    settings = load_settings()
+    system_conf = settings.get("system", {})
+    return JSONResponse({
+        "models": system_conf.get("allowed_vision_models", []),
+        "default": system_conf.get("default_vision_model", "gemini-3-flash-preview")
+    })
 
 @app.post("/settings")
 async def update_settings(request: Request):

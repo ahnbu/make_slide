@@ -124,13 +124,21 @@ class Analyzer:
         ]
         """
 
-        response = self.client.models.generate_content(
-            model=self.model_name,
-            contents=[prompt_text, pil_image],
-            config=types.GenerateContentConfig(
-                response_mime_type="application/json"
+        try:
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=[prompt_text, pil_image],
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json"
+                )
             )
-        )
+        except Exception as e:
+            error_msg = str(e)
+            # Model mismatch error capture (Google API error message pattern matching)
+            if "404" in error_msg or "Not Found" in error_msg or "Publisher Model" in error_msg:
+                logger.error(f"Model '{self.model_name}' not found.")
+                raise ValueError(f"오류: 설정된 모델 '{self.model_name}'을 찾을 수 없습니다. settings.json에서 모델명을 최신으로 변경해주세요.")
+            raise e
         
         initial_layout_data = json.loads(response.text.strip())
         logger.info(f"Initial detection: {len(initial_layout_data)} text blocks.")

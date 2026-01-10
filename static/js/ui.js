@@ -91,6 +91,53 @@ export function toggleDetails(header) {
   }
 }
 
+// --- Dynamic Model Init ---
+
+export async function initModelSelectors() {
+  try {
+    const res = await fetch('/system/models');
+    const data = await res.json();
+    const selectors = document.querySelectorAll('.vision-model-select');
+
+    selectors.forEach(select => {
+      select.innerHTML = ''; // Clear
+
+      // 1. Add Whitelisted Models
+      data.models.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m.id;
+        opt.textContent = m.label;
+        if (m.id === data.default) opt.selected = true;
+        select.appendChild(opt);
+      });
+
+      // 2. 'Custom' Option
+      const customOpt = document.createElement('option');
+      customOpt.value = 'custom';
+      customOpt.textContent = '직접 입력 (Custom)...';
+      select.appendChild(customOpt);
+
+      // 3. Listener
+      select.addEventListener('change', (e) => {
+        const customInput = e.target.parentElement.querySelector('.custom-model-input');
+        if (customInput) {
+          if (e.target.value === 'custom') {
+            customInput.classList.remove('hidden');
+            customInput.focus();
+          } else {
+            customInput.classList.add('hidden');
+          }
+        }
+      });
+
+      // Check if there's a custom input currently visible (init state)?
+      // Not needed for fresh load, but maybe for saved state. 
+    });
+  } catch (e) {
+    console.error("Failed to load model list:", e);
+  }
+}
+
 // --- Tab Switching ---
 
 export function switchTab(tabId, jobQueueLength = 0) {

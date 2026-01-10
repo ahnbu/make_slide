@@ -135,6 +135,10 @@ export async function saveSettings() {
 
   // Helper to get value from UI
   const getVal = (key) => {
+    // Special case for global IDs or non-suffixed IDs
+    if (key === 'pdfQuality') return document.getElementById('pdfQuality')?.value;
+
+    // Default suffix logic
     const el = document.getElementById(`${key}_${suffix}`);
     return el ? el.value : null;
   };
@@ -159,6 +163,12 @@ export async function saveSettings() {
       font_family: getVal('fontFamily'),
       refine_layout: getVal('refineLayout') === 'true'
     };
+
+    // Add PDF Quality specifically for PDF section
+    if (section === 'pdf_pptx') {
+      sectionData.pdf_quality = getVal('pdfQuality') || "3.0"; // ID is just pdfQuality (no suffix)
+    }
+
     payload[section] = sectionData;
   }
 
