@@ -44,10 +44,14 @@
 - **Visual Grouping**: 유사한 크기의 폰트를 클러스터링하여 스타일 일관성 유지.
 - **Responsive CSS**: Container Query Width(`cqw`) 단위를 사용하여 반응형 구현.
 
-### D. AI 텍스트 제거 (Bonus Feature)
-- **Multimodal GenAI**: OpenCV 방식(알고리즘)보다 더 복잡한 배경의 텍스트 제거 시 Gemini 활용.
-- **Endpoint**: `/remove-text-ai`
-- **Multimodal GenAI**: OpenCV 방식(알고리즘)보다 더 복잡한 배경의 텍스트 제거 시 Gemini 활용.
+### D. AI 텍스트 제거 (Photoroom Integration)
+- **Library**: `requests` (안정성 및 타임아웃 관리 용이).
+- **Endpoint**: `/remove-text-photoroom`
+- **Key Parameters**:
+    - `removeBackground=false`: 텍스트만 제거하고 배경은 유지.
+    - `referenceBox=originalImage`: 원본 해상도 및 비율 유지.
+- **Modes**:
+    - `ai.all` (모든 객체/텍스트 제거), `ai.artificial` (인공 텍스트만 제거), `ai.natural` (자연물 텍스트 제거) 지원.
 
 ### E. 이미지 + 텍스트 조합 (Combine Mode)
 - **Concept**: 사용자가 '텍스트 원본'과 '텍스트가 없는 배경'을 쌍(Pair)으로 제공. Inpainting 단계를 생략하여 고속 처리.
@@ -57,7 +61,11 @@
 - **Processing**:
     - `src/analyzer.py`: 원본 이미지로 텍스트/레이아웃 분석 (Text Exclusion 적용).
     - **Image Resize**: 배경 이미지의 해상도가 원본과 다를 경우, PPTX 생성 시 좌표 오차를 막기 위해 **배경을 원본 크기로 리사이징 (`process_combine_task` 내)**.
-    - **Watermark Removal**: "NotebookLM" 등의 워터마크 텍스트를 분석 단계에서 필터링.
+
+### F. PDF 설정 및 UI 아키텍처
+- **Settings Split**: `settings.json` 내 `pdf_pptx`와 `pdf_png` 설정을 분리하여 탭별 독립적인 설정 관리. `updatePdfUi` 함수로 즉각적인 UI 반영.
+- **Client-Side PPTX**: PDF 탭 및 Standalone 도구는 `pdf.js`로 렌더링된 이미지를 `PptxGenJS`를 통해 브라우저에서 직접 PPTX로 생성. 서버 부하 "Zero".
+- **UI Standardization**: `static/css/layout.css` 도입. `tab-content-wrapper`, `control-panel-group` 클래스로 모든 탭의 레이아웃 일관성 확보.
 
 ---
 

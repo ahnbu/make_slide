@@ -9,9 +9,10 @@ Google Gemini 3.0의 강력한 비전 인식 능력과 OpenCV의 이미지 처�
 - **NotebookLM to PPTX**: 나노바나나 기반의 인포그래픽/PDF를 레이아웃이 살아있는 PPTX로 완벽하게 복원합니다.
 - **Pixel-Perfect Reconstruction**: 원본 슬라이드의 레이아웃, 폰트 크기, 색상을 HTML/PPTX로 정밀하게 구현합니다.
 - **Smart Text Removal**: 배경 이미지에서 텍스트를 깔끔하게 지워(Inpainting), 텍스트와 배경이 분리된 결과물을 제공합니다.
-    - *Advanced*: 워터마크(NotebookLM 등)까지 자동으로 제거하는 정교한 필터링 로직 포함.
+    - *Advanced*: 워터마크(NotebookLM 등) 자동 제거 및 **Photoroom API**(AI.All, Artificial, Natural 모드)를 통한 정교한 텍스트 제거 지원.
 - **Custom Font Support & Multi-Format**:
     - `Pretendard`, `Noto Sans KR` 등 한글 폰트 지원 및 HTML/PPTX/PDF(Ultra HD) 다양한 포맷 출력.
+- **Standalone PDF Tool**: 서버 설치 없이 브라우저 단독으로 실행 가능한 `standalone_pdf_tool.html` 제공 (오프라인 사용 가능).
 
 ## 🛠️ 부가 기능 (Auxiliary Features - for External Integration)
 
@@ -19,10 +20,9 @@ Google Gemini 3.0의 강력한 비전 인식 능력과 OpenCV의 이미지 처�
 
 - **Image + Text Combination**:
     - 텍스트 원본(Source)과 깨끗한 배경(Clean BG)을 각각 업로드하여 고품질 슬라이드를 결합 생성합니다.
-    - 생성형 AI로 만든 이미지 배경에 텍스트를 입히는 등 다양한 외부 툴 워크플로우와 연동 가능합니다.
-- **PDF to PNG**:
-    - PDF 파일을 고화질 이미지(PNG)로 분리 추출하여 다른 그래픽 툴에서 활용할 수 있도록 돕습니다.
-- **Batch Processing**: 여러 장의 슬라이드를 한 번에 변환하고 병합 처리합니다.
+- **PDF to PPTX / PNG (Client-Side)**:
+    - **Client-Side Generation**: 서버 부하 없이 브라우저에서(PptxGenJS) 즉시 고품질 PPTX 및 PNG 변환을 처리합니다.
+    - **Batch Processing**: 여러 장의 슬라이드를 일괄 변환하고 병합 관리합니다.
 
 ## 🛠️ 기술 스택 (Tech Stack)
 
