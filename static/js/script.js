@@ -566,14 +566,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let section = 'reconstruct'; // default
     // Explicit PDF Split
     if (tab === 'pdf-to-pptx') section = 'pdf_pptx';
-    else if (tab === 'pdf-to-png') section = 'pdf_png';
     else if (tab.includes('photoroom') || tab === 'remove-text-photoroom') section = 'photoroom';
 
     // If we are in 'combine', we probably save to 'reconstruct' or 'common'? Let's stick to reconstruct for now.
 
     // Suffix resolution for UI Element ID
     let suffix = 'reconstruct';
-    if (section === 'pdf_pptx' || section === 'pdf_png') suffix = 'pdf';
+    if (section === 'pdf_pptx') suffix = 'pdf';
 
     // Helper to get value from UI
     const getVal = (key) => {
@@ -675,7 +674,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Helper to get suffix from tab name
   function getTabSuffix(tab) {
     if (tab === 'combine') return 'combine';
-    if (tab === 'pdf-to-pptx' || tab === 'pdf-to-png') return 'pdf';
+    if (tab === 'pdf-to-pptx') return 'pdf';
     if (tab === 'remove-text-photoroom') return 'removeText';
     return 'reconstruct';
   }
@@ -1336,10 +1335,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (cResult) cResult.classList.add('hidden');
 
       // Update Title (Legacy support)
+      // Update Title (Legacy support)
       const titles = {
         'reconstruct': '재구성을 위한 슬라이드 이미지 업로드',
         'pdf-to-pptx': 'PDF 업로드 -> 이미지 변환 -> 슬라이드 재구성',
-        'pdf-to-png': 'PDF to PNG 변환 (단순 변환)',
         'remove-text': '텍스트 제거를 위한 이미지 업로드 (OpenCV)',
         'remove-text-ai': '텍스트 제거를 위한 이미지 업로드 (AI)',
         'remove-text-photoroom': '이미지 텍스트 제거 (Photoroom)',
@@ -1350,12 +1349,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
       // 2. SHOW CURRENT SECTION
-      if (currentTab === 'pdf-to-png') {
-        // PDF Mode
-        pdfSection.classList.remove('hidden');
-        if (btnPptxStart) btnPptxStart.classList.add('hidden');
-
-      } else if (currentTab === 'pdf-to-pptx') {
+      if (currentTab === 'pdf-to-pptx') {
         // PDF to PPTX Mode
         pdfSection.classList.remove('hidden');
         if (btnPptxStart) btnPptxStart.classList.remove('hidden');

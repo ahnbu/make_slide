@@ -21,7 +21,7 @@
 /* Layer 2: Upload Panel */
 .panel-upload {
   padding: 2rem;
-  min-height: 320px;
+  min-height: 160px;
   /* Unified height for all upload boxes */
   display: flex;
   flex-direction: column;

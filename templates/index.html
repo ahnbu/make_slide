@@ -44,8 +44,7 @@
 
     <!-- Tabs -->
     <div class="tabs-container">
-      <button class="tab-btn active" data-tab="pdf-to-pptx"><i data-lucide="file-symlink"></i> PDF to PPTX</button>
-      <button class="tab-btn" data-tab="pdf-to-png"><i data-lucide="file-type-2"></i> PDF to PNG</button>
+      <button class="tab-btn active" data-tab="pdf-to-pptx"><i data-lucide="file-symlink"></i> PDF to PPTX/PNG</button>
       <button class="tab-btn" data-tab="reconstruct">IMG to PPTX/HTML</button>
       <button class="tab-btn" data-tab="combine"><i data-lucide="layers"></i> 이미지+텍스트 조합</button>
       <button class="tab-btn" data-tab="remove-text-photoroom"><i data-lucide="eraser"></i> 이미지 텍스트 제거</button>
@@ -130,7 +129,7 @@
           </div>
           <div class="settings-actions" style="margin-top: 1rem; text-align: right;">
             <button class="btn-secondary small" onclick="saveSettings()">
-              <i data-lucide="save"></i> 현재 설정을 기본값으로 저장
+              <i data-lucide="save"></i> 기본값으로 저장
             </button>
           </div>
         </div>
@@ -258,7 +257,7 @@
           </div>
           <div class="settings-actions" style="margin-top: 1rem; text-align: right;">
             <button class="btn-secondary small" onclick="saveSettings()">
-              <i data-lucide="save"></i> 현재 설정을 기본값으로 저장
+              <i data-lucide="save"></i> 기본값으로 저장
             </button>
           </div>
         </div>
@@ -280,7 +279,12 @@
         <!-- Layer 4: Result Section -->
         <div id="pdfResultContainer" class="result-section hidden">
           <div class="result-header">
-            <div class="result-title"><i data-lucide="images"></i> 변환 결과</div>
+            <label class="custom-checkbox">
+              <input type="checkbox" id="pdfSelectAll">
+              <span class="checkmark"></span>
+              <span class="label-text">전체 선택</span>
+            </label>
+            <!-- <div class="result-title"><i data-lucide="images"></i> 변환 결과</div> -->
             <div class="result-actions" style="gap: 0.5rem; display: flex; align-items: center;">
               <!-- Start Button is here if we want it to be part of the result/action flow?
                    Actually, user said "these are not action buttons". 
@@ -288,25 +292,21 @@
                    If we move everything to Layer 4, Layer 3 is gone.
                    We place them here. -->
               <button id="btnPptxStart" class="btn-primary small hidden">
-                <i data-lucide="sparkles"></i> PPTX 생성하기
+                <i data-lucide="sparkles"></i> PPTX 생성
               </button>
               <button id="btnDownloadPptxSimple" class="btn-primary small">
-                <i data-lucide="presentation"></i> PPTX 다운로드
+                <i data-lucide="presentation"></i> PPTX 다운
               </button>
               <button id="btnDownloadSelected" class="btn-secondary small" disabled>
-                <i data-lucide="check-square"></i> 선택 다운로드 (0)
+                <i data-lucide="check-square"></i> 선택 이미지 다운 (0)
               </button>
               <button id="btnDownloadAll" class="btn-primary small">
-                <i data-lucide="archive"></i> 전체 다운로드
+                <i data-lucide="archive"></i> 전체 이미지 다운
               </button>
 
-              <div style="width: 1px; height: 20px; background: rgba(255,255,255,0.2); margin: 0 0.5rem;"></div>
+              <!-- <div style="width: 1px; height: 20px; background: rgba(255,255,255,0.2); margin: 0 0.5rem;"></div> -->
 
-              <label class="custom-checkbox">
-                <input type="checkbox" id="pdfSelectAll">
-                <span class="checkmark"></span>
-                <span class="label-text">전체 선택</span>
-              </label>
+
             </div>
           </div>
           <div id="pdfPreviewGrid" class="result-grid-gallery"></div>
@@ -387,7 +387,7 @@
           </div>
           <div class="settings-actions" style="margin-top: 1rem; text-align: right;">
             <button class="btn-secondary small" onclick="saveSettings()">
-              <i data-lucide="save"></i> 현재 설정을 기본값으로 저장
+              <i data-lucide="save"></i> 기본값으로 저장
             </button>
           </div>
         </div>
@@ -467,7 +467,7 @@
           </div>
           <div class="settings-actions" style="margin-top: 1rem; text-align: right;">
             <button class="btn-secondary small" onclick="saveSettings()">
-              <i data-lucide="save"></i> 현재 설정을 기본값으로 저장
+              <i data-lucide="save"></i> 기본값으로 저장
             </button>
           </div>
         </div>
