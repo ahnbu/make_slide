@@ -402,7 +402,7 @@
             </h3>
             <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1rem;">텍스트가 포함된 파일</p>
 
-            <input type="file" id="combineSourceInput" accept="image/*,application/pdf" multiple hidden>
+            <input type="file" id="combineSourceInput" accept=".json" multiple hidden>
             <button class="btn-secondary small" onclick="document.getElementById('combineSourceInput').click()">
               파일 선택
             </button>
@@ -419,7 +419,7 @@
             </h3>
             <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1rem;">배경만 있는 파일</p>
 
-            <input type="file" id="combineBgInput" accept="image/*,application/pdf" multiple hidden>
+            <input type="file" id="combineBgInput" accept="image/*" multiple hidden>
             <button class="btn-secondary small" onclick="document.getElementById('combineBgInput').click()">
               파일 선택
             </button>
@@ -648,7 +648,7 @@
   </div>
   </div>
 
-  <script src="/static/js/script.js?v=3.15"></script>
+  <script type="module" src="/static/js/main.js?v=4.0"></script>
   <script>
     // --- Photoroom Text Removal Logic (Embedded for Quick Update) ---
     document.addEventListener('DOMContentLoaded', () => {
