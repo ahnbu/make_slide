@@ -31,7 +31,7 @@
         "codegen_model": "algorithmic",
         "output_format": "both",
         "max_concurrent": 5,
-        "font_family": "Pretendard Medium",
+        "font_family": "Noto Sans KR",
         "refine_layout": true
     },
     "pdf_png": {

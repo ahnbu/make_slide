@@ -25,6 +25,9 @@ from typing import List
 load_dotenv(override=True)
 logger = get_logger(__name__)
 
+# PPTX MIME 타입 명시적 등록 (브라우저 인식 개선)
+mimetypes.add_type('application/vnd.openxmlformats-officedocument.presentationml.presentation', '.pptx')
+
 app = FastAPI(title="Slide Reconstructor")
 
 # Directory Setup
@@ -1004,8 +1007,9 @@ async def generate_pptx_batch(batch_folder: str):
         if slides_added == 0:
              return JSONResponse(status_code=400, content={"message": "Could not create any slides (missing backgrounds?)"})
 
-        timestamp = generate_timestamp()
-        pptx_filename = f"batch_presentation_{batch_folder}_{timestamp}.pptx"
+        # 깔끔한 파일명 생성 (사용자 요청 반영)
+        timestamp_clean = datetime.now().strftime("%Y%m%d_%H%M%S")
+        pptx_filename = f"PDF_AI_변환_결과_{timestamp_clean}.pptx"
         output_pptx_path = os.path.join(target_dir, pptx_filename)
         
         pptx_gen.save(output_pptx_path)

@@ -14,9 +14,21 @@ class JobQueue {
     this.latestBatchFolder = null;
   }
 
-  // Dynamic Getter for Config from AppSettings
+  // Dynamic Getter regarding Active Tab UI
   get maxConcurrent() {
-    return AppSettings.max_concurrent;
+    const tab = getCurrentTab();
+    let elId = 'maxConcurrent_reconstruct'; // default
+    
+    if (tab === 'pdf-to-pptx') elId = 'maxConcurrent_pdf';
+    else if (tab === 'combine') elId = 'maxConcurrent_combine';
+    
+    const el = document.getElementById(elId);
+    // UI 값이 유효하면 사용, 아니면 기본값 5 (PDF의 경우) 또는 3
+    if (el && el.value) {
+      return parseInt(el.value, 10);
+    }
+    
+    return AppSettings.max_concurrent || 3;
   }
 
   addFiles(files) {
