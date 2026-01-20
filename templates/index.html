@@ -16,11 +16,9 @@
 
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- PDF.js & JSZip -->
-  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@5.4.530/build/pdf.min.js"></script>
+  <!-- PDF.js(ESM) & JSZip -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@4.0.1/dist/pptxgen.bundle.js"></script>
-  <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@5.4.530/build/pdf.worker.min.js';</script>
 </head>
 
 <body>
@@ -131,7 +129,7 @@
             </div>
           </div>
           <div class="settings-actions" style="margin-top: 1rem; text-align: right;">
-            <button class="btn-secondary small" onclick="saveSettings()">
+            <button class="btn-secondary small">
               <i data-lucide="save"></i> 기본값으로 저장
             </button>
           </div>
@@ -266,7 +264,7 @@
             </div>
           </div>
           <div class="settings-actions" style="margin-top: 1rem; text-align: right;">
-            <button class="btn-secondary small" onclick="saveSettings()">
+            <button class="btn-secondary small">
               <i data-lucide="save"></i> 기본값으로 저장
             </button>
           </div>
@@ -301,10 +299,10 @@
                    But btnPptxStart triggers the NEXT process. 
                    If we move everything to Layer 4, Layer 3 is gone.
                    We place them here. -->
-              <button id="btnPptxStart" class="btn-primary small hidden">
+              <button id="btnPptxStart" class="btn-primary small">
                 <i data-lucide="sparkles"></i> PPTX 생성
               </button>
-              <button id="btnDownloadPptxSimple" class="btn-primary small">
+              <button id="btnDownloadPptxSimple" class="btn-primary small hidden">
                 <i data-lucide="presentation"></i> PPTX 다운
               </button>
               <button id="btnDownloadSelected" class="btn-secondary small" disabled>
@@ -320,6 +318,29 @@
             </div>
           </div>
           <div id="pdfPreviewGrid" class="result-grid-gallery"></div>
+        </div>
+
+        <!-- PDF AI 처리 결과 섹션 -->
+        <div id="pdfAiResultSection" class="result-section hidden">
+          <div class="result-header">
+            <div class="result-title"><i data-lucide="sparkles"></i> AI 처리 결과</div>
+            <div class="result-actions" id="pdfBatchControlPanel">
+              <span id="pdfBatchProgressText"
+                style="margin-right: 1rem; align-self: center; font-variant-numeric: tabular-nums;">0/0</span>
+              <button id="btnPdfBatchPause" class="btn-secondary small"><i data-lucide="pause"></i> 일시정지</button>
+              <button id="btnPdfBatchResume" class="btn-primary small hidden"><i data-lucide="play"></i> 재개</button>
+              <button id="btnPdfBatchStop" class="btn-danger small"><i data-lucide="square"></i> 중지</button>
+              <button id="btnPdfBatchDownloadAll" class="btn-primary small"><i data-lucide="download"></i> 전체 PPTX 다운로드</button>
+            </div>
+          </div>
+          <!-- Progress Bar -->
+          <div class="batch-progress hidden" id="pdfBatchProgressContainer" style="margin-bottom: 1rem;">
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" id="pdfBatchProgressBar" style="width: 0%"></div>
+            </div>
+          </div>
+          <!-- Job List -->
+          <div id="pdfJobList" class="result-list-stack"></div>
         </div>
       </section>
 
@@ -396,7 +417,7 @@
             </div>
           </div>
           <div class="settings-actions" style="margin-top: 1rem; text-align: right;">
-            <button class="btn-secondary small" onclick="saveSettings()">
+            <button class="btn-secondary small">
               <i data-lucide="save"></i> 기본값으로 저장
             </button>
           </div>
@@ -476,7 +497,7 @@
             </div>
           </div>
           <div class="settings-actions" style="margin-top: 1rem; text-align: right;">
-            <button class="btn-secondary small" onclick="saveSettings()">
+            <button class="btn-secondary small">
               <i data-lucide="save"></i> 기본값으로 저장
             </button>
           </div>

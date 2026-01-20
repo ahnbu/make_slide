@@ -158,6 +158,11 @@ class JobQueue {
       endpoint = '/upload';
       formData.append('inpainting_model', inpainting_model);
       formData.append('codegen_model', codegen_model);
+    } else if (currentTab === 'pdf-to-pptx' || job.type === 'pdf-page') {
+      // PDF 탭도 동일한 AI 파이프라인 사용 (배경 제거 + 텍스트 매칭)
+      endpoint = '/upload';
+      formData.append('inpainting_model', inpainting_model);
+      formData.append('codegen_model', codegen_model);
     }
     // ... extend for other types if needed
 
@@ -508,8 +513,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+
   // PPTX Generation (PDF)
-  // [main.js 수정] PDF to PPTX 버튼 로직 구현
+  // [main.js 수정] PDF to PPTX 버튼 로직 구현 - 각 페이지를 개별 job으로 처리
   const btnPptxStart = document.getElementById('btnPptxStart');
   if (btnPptxStart) {
     btnPptxStart.addEventListener('click', async () => {
@@ -520,22 +526,132 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
-      showToast('PPTX 생성을 시작합니다...');
+      const now = new Date();
+      const YYYY = now.getFullYear();
+      const MM = String(now.getMonth() + 1).padStart(2, '0');
+      const DD = String(now.getDate()).padStart(2, '0');
+      const HH = String(now.getHours()).padStart(2, '0');
+      const MI = String(now.getMinutes()).padStart(2, '0');
+      const SS = String(now.getSeconds()).padStart(2, '0');
+      const timestamp = `${YYYY}${MM}${DD}_${HH}${MI}${SS}`;
+      
+      const batchFolder = 'pdf_convert_' + timestamp;
+      showToast(`${blobs.length}개 페이지 AI 분석을 시작합니다...`);
 
-      const job = {
-        id: 'pdf-pptx-' + Date.now(),
-        file: null,
-        status: 'pending',
-        type: 'pdf-to-pptx',
-        batchFolder: 'pdf_project_' + Date.now(),
-        element: jobQueue.createJobCard('pdf-job', 'PDF → PPTX 변환 작업')
-      };
+      // PDF AI 처리 결과 섹션 표시
+      const pdfAiResultSection = document.getElementById('pdfAiResultSection');
+      if (pdfAiResultSection) pdfAiResultSection.classList.remove('hidden');
 
-      const list = document.getElementById('reconstructJobList');
-      if (list) list.appendChild(job.element);
+      // 각 blob을 개별 job으로 생성 → JobQueue가 maxConcurrent만큼 동시 처리
+      blobs.forEach((blobInfo, i) => {
+        const blobAsFile = new File([blobInfo.blob], `page_${i + 1}.png`, { type: 'image/png' });
+        const job = {
+          id: `pdf-page-${Date.now()}-${i}`,
+          file: blobAsFile,
+          status: 'pending',
+          type: 'pdf-page',
+          batchFolder: batchFolder,  // 동일 배치 폴더로 그룹화
+          element: jobQueue.createJobCard(`pdf-page-${i}`, `Page ${i + 1}`)
+        };
 
-      jobQueue.queue.push(job);
-      jobQueue.processQueue();
+        const list = document.getElementById('pdfJobList');  // PDF 탭 전용 list
+        if (list) list.appendChild(job.element);
+        jobQueue.queue.push(job);
+      });
+
+      jobQueue.processQueue();  // maxConcurrent만큼 동시 실행
+    });
+  }
+
+  // [PDF 탭] 배치 PPTX 다운로드
+  const btnPdfBatchDownloadAll = document.getElementById('btnPdfBatchDownloadAll');
+  if (btnPdfBatchDownloadAll) {
+    btnPdfBatchDownloadAll.addEventListener('click', async () => {
+      // 첫 번째 완료된 job에서 batchFolder 가져오기
+      const completedJobs = jobQueue.queue.filter(j => j.type === 'pdf-page' && j.status === 'complete');
+      
+      if (completedJobs.length === 0) {
+        showToast('완료된 작업이 없습니다.');
+        return;
+      }
+
+      const batchFolder = completedJobs[0].batchFolder;
+      if (!batchFolder) {
+        showToast('배치 폴더 정보를 찾을 수 없습니다.');
+        return;
+      }
+
+      const originalText = btnPdfBatchDownloadAll.innerHTML;
+      btnPdfBatchDownloadAll.innerHTML = `<i data-lucide="loader-2" class="animate-spin"></i> PPTX 생성 중...`;
+      btnPdfBatchDownloadAll.disabled = true;
+      if (window.lucide) lucide.createIcons({ root: btnPdfBatchDownloadAll });
+
+      try {
+        const response = await fetch(`/generate-pptx-batch/${batchFolder}`, { method: 'POST' });
+        const data = await response.json();
+
+        if (data.status === 'success') {
+          // 자동 다운로드
+          const link = document.createElement('a');
+          link.href = data.download_url;
+          link.download = data.filename;
+          link.click();
+          showToast(`배치 PPTX 다운로드 완료! (${completedJobs.length} 페이지)`);
+        } else {
+          showToast('PPTX 생성 실패: ' + (data.message || '알 수 없는 오류'));
+        }
+      } catch (e) {
+        console.error(e);
+        showToast('PPTX 생성 중 오류가 발생했습니다.');
+      } finally {
+        btnPdfBatchDownloadAll.innerHTML = originalText;
+        btnPdfBatchDownloadAll.disabled = false;
+        if (window.lucide) lucide.createIcons({ root: btnPdfBatchDownloadAll });
+      }
+    });
+  }
+
+  // [main.js 추가] 단순 PPTX 다운로드 (이미지를 슬라이드로 배치)
+  const btnDownloadPptxSimple = document.getElementById('btnDownloadPptxSimple');
+  if (btnDownloadPptxSimple) {
+    btnDownloadPptxSimple.addEventListener('click', async () => {
+      const allBlobs = getAllBlobs();
+      if (allBlobs.length === 0) {
+        showToast('먼저 PDF를 업로드해주세요.');
+        return;
+      }
+
+      // 선택된 것이 있으면 선택된 것만, 없으면 전체
+      const selectedBlobs = getSelectedBlobs();
+      const targetBlobs = selectedBlobs.length > 0 ? selectedBlobs : allBlobs;
+
+      const originalText = btnDownloadPptxSimple.innerHTML;
+      btnDownloadPptxSimple.innerHTML = `<i data-lucide="loader-2" class="animate-spin"></i> 생성 중...`;
+      btnDownloadPptxSimple.disabled = true;
+      if (window.lucide) lucide.createIcons({ root: btnDownloadPptxSimple });
+
+      try {
+        const pptx = new PptxGenJS();
+        for (const item of targetBlobs) {
+          const slide = pptx.addSlide();
+          const imgUrl = URL.createObjectURL(item.blob);
+          slide.addImage({ path: imgUrl, x: 0, y: 0, w: '100%', h: '100%' });
+        }
+
+        const fileNameEl = document.getElementById('pdfFileName');
+        const originalName = fileNameEl ? fileNameEl.textContent.trim() : 'download.pdf';
+        const baseName = originalName.toLowerCase().endsWith('.pdf') ? originalName.slice(0, -4) : originalName;
+        
+        await pptx.writeFile({ fileName: `${baseName}_단순변환.pptx` });
+        showToast(`단순 PPTX 다운로드 완료! (${targetBlobs.length} 페이지)`);
+      } catch (e) {
+        console.error(e);
+        showToast('PPTX 생성 중 오류가 발생했습니다.');
+      } finally {
+        btnDownloadPptxSimple.innerHTML = originalText;
+        btnDownloadPptxSimple.disabled = false;
+        if (window.lucide) lucide.createIcons({ root: btnDownloadPptxSimple });
+      }
     });
   }
 

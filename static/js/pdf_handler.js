@@ -1,8 +1,11 @@
-
 // static/js/pdf_handler.js
-// PDF 처리 로직: pdf.js 사용, 렌더링, 다운로드
+// PDF 처리 로직: pdf.js ESM 사용, 렌더링, 다운로드
 
+import * as pdfjsLib from 'https://cdn.jsdelivr.net/npm/pdfjs-dist@5.4.530/build/pdf.min.mjs';
 import { openModal, showToast } from './ui.js';
+
+// Worker 설정 (v5 ESM 버전 필수)
+pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@5.4.530/build/pdf.worker.min.mjs`;
 
 let currentPdfBlobs = []; // Array of { blob, filename, index }
 let pdfDoc = null;
@@ -92,7 +95,7 @@ function createPdfCard(index, blob, filename) {
   div.innerHTML = `
     <div class="pdf-card-check">
          <label class="custom-checkbox">
-            <input type="checkbox" class="pdf-check-input" data-index="${index}">
+            <input type="checkbox" class="pdf-check-input" data-index="${index}" checked>
             <span class="checkmark"></span>
          </label>
     </div>
