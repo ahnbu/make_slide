@@ -9,9 +9,9 @@ Google Gemini 3.0의 강력한 비전 인식 능력과 OpenCV의 이미지 처�
 - **NotebookLM to PPTX**: 나노바나나 기반의 인포그래픽/PDF를 레이아웃이 살아있는 PPTX로 완벽하게 복원합니다.
 - **Pixel-Perfect Reconstruction**: 원본 슬라이드의 레이아웃, 폰트 크기, 색상을 HTML/PPTX로 정밀하게 구현합니다.
 - **Smart Text Removal**: 배경 이미지에서 텍스트를 깔끔하게 지워(Inpainting), 텍스트와 배경이 분리된 결과물을 제공합니다.
-    - *Advanced*: 워터마크(NotebookLM 등) 자동 제거 및 **Photoroom API**(AI.All, Artificial, Natural 모드)를 통한 정교한 텍스트 제거 지원.
+  - _Advanced_: 워터마크(NotebookLM 등) 자동 제거 및 **Photoroom API**(AI.All, Artificial, Natural 모드)를 통한 정교한 텍스트 제거 지원.
 - **Custom Font Support & Multi-Format**:
-    - `Pretendard`, `Noto Sans KR` 등 한글 폰트 지원 및 HTML/PPTX/PDF(Ultra HD) 다양한 포맷 출력.
+  - `Pretendard`, `Noto Sans KR` 등 한글 폰트 지원 및 HTML/PPTX/PDF(Ultra HD) 다양한 포맷 출력.
 - **Standalone PDF Tool**: 서버 설치 없이 브라우저 단독으로 실행 가능한 `standalone_pdf_tool.html` 제공 (오프라인 사용 가능).
 
 ## 🛠️ 부가 기능 (Auxiliary Features - for External Integration)
@@ -19,23 +19,71 @@ Google Gemini 3.0의 강력한 비전 인식 능력과 OpenCV의 이미지 처�
 외부 툴과의 유연한 결합을 위해 다음 기능들을 별도로 제공합니다.
 
 - **Image + Text Combination**:
-    - 텍스트 원본(Source)과 깨끗한 배경(Clean BG)을 각각 업로드하여 고품질 슬라이드를 결합 생성합니다.
+  - 텍스트 원본(Source)과 깨끗한 배경(Clean BG)을 각각 업로드하여 고품질 슬라이드를 결합 생성합니다.
 - **PDF to PPTX / PNG (Client-Side)**:
-    - **Client-Side Generation**: 서버 부하 없이 브라우저에서(PptxGenJS) 즉시 고품질 PPTX 및 PNG 변환을 처리합니다.
-    - **Batch Processing**: 여러 장의 슬라이드를 일괄 변환하고 병합 관리합니다.
+  - **Client-Side Generation**: 서버 부하 없이 브라우저에서(PptxGenJS) 즉시 고품질 PPTX 및 PNG 변환을 처리합니다.
+  - **Batch Processing**: 여러 장의 슬라이드를 일괄 변환하고 병합 관리합니다.
 
 ## 🛠️ 기술 스택 (Tech Stack)
 
 - **Backend**: Python 3.10+, FastAPI
-- **AI/ML**: Google Gemini 3.0 Flash Preview, OpenCV (Telea Inpainting)
+- **AI/ML**: Google Gemini 3.0 Series (Flash/Pro), OpenCV (Telea Inpainting)
 - **Frontend**: Vanilla JavaScript, HTML5, CSS3
 - **DevOps**: Local Server (`uvicorn`)
+
+---
+
+# 🚀 작업 분류별 프로세스 및 기술 스펙
+
+## 1. NotebookLM to PPTX (재구성 플로우)
+
+원본 이미지/PDF를 분석하여 텍스트와 배경을 분리하고, 편집 가능한 HTML 및 PPTX 파일로 복원하는 핵심 프로세스입니다.
+
+| 단계                     | 작업 내용                               | 기술 스펙                 | Input                   | Output                |
+| :----------------------- | :-------------------------------------- | :------------------------ | :---------------------- | :-------------------- |
+| **1단계: 레이아웃 분석** | 이미지 내 텍스트 위치, 폰트, 색상 감지  | Gemini 3.0 Series         | Image (PNG/JPG)         | Layout Data (JSON)    |
+| **2단계: 정밀 보정**     | 분석 결과의 논리적 오류 수정 및 최적화  | Gemini 3.0 Series         | Layout Data + Image     | Refined Layout (JSON) |
+| **3단계: 배경 복원**     | 분석된 텍스트 영역을 지우고 배경 채우기 | OpenCV (Telea Inpainting) | Original Image + Layout | Clean BG (PNG)        |
+| **4단계: HTML/CSS 생성** | 웹 기반 슬라이드 코드로 변환            | Algorithmic Generator     | Layout + Clean BG       | HTML/CSS File         |
+| **5단계: PPTX 생성**     | PowerPoint 파일로 최종 변환             | Python-pptx               | Layout + Clean BG       | PPTX File             |
+
+## 2. Image + Text Combination (조합 플로우)
+
+이미 분석된 텍스트 레이아웃 정보 또는 원본 이미지와 별도의 깨끗한 배경 이미지를 결합하여 고품질 결과물을 생성합니다.
+
+| 단계          | 작업 내용                               | 기술 스펙            | Input               | Output             |
+| :------------ | :-------------------------------------- | :------------------- | :------------------ | :----------------- |
+| **분석 단계** | 원본 이미지의 텍스트 레이아웃 정보 추출 | Gemini 3.0 Series    | Source Image        | Layout Data (JSON) |
+| **정합 단계** | 제공된 배경 이미지를 원본 크기에 맞춤   | Pillow (PIL)         | Clean BG Image      | Resized BG (PNG)   |
+| **결합 단계** | 레이아웃 데이터와 새 배경을 결합        | Python-pptx / Jinja2 | Layout + Resized BG | HTML & PPTX        |
+
+## 3. 스마트 텍스트 제거 (Inpainting 플로우)
+
+이미지에서 텍스트만 깔끔하게 제거하여 배경 이미지만 추출하는 작업입니다.
+
+| 종류               | 기술 스펙          | 특징                          | Input | Output         |
+| :----------------- | :----------------- | :---------------------------- | :---- | :------------- |
+| **OpenCV 방식**    | OpenCV (Telea)     | 로컬 환경 실행, 빠르고 무료   | Image | Clean BG (PNG) |
+| **Gemini AI 방식** | Gemini Vision API  | AI가 직접 픽셀 생성, 고품질   | Image | Clean BG (PNG) |
+| **Photoroom API**  | Photoroom Edit API | 상용 솔루션, 최고의 제거 품질 | Image | Clean BG (PNG) |
+
+## 4. 일괄 처리 (Batch Processing)
+
+여러 장의 슬라이드를 하나의 PPTX 파일로 병합하거나 대량 변환을 수행합니다.
+
+| 작업 내용           | 기술 스펙            | 프로세스                                           | Output          |
+| :------------------ | :------------------- | :------------------------------------------------- | :-------------- |
+| **일괄 PPTX 병합**  | Python-pptx          | 지정된 모든 JSON/PNG를 매칭하여 슬라이드 추가      | Merged PPTX     |
+| **PDF 이미지 추출** | Client-side (PDF.js) | 브라우저에서 PDF 페이지를 고해상도 이미지로 렌더링 | Individual PNGs |
+
+---
 
 ## 🔰 초보자를 위한 사용 가이드 (with Antigravity Project)
 
 **Google Antigravity**는 단순한 코딩 도구가 아닌, 스스로 계획하고 실행하는 **AI 에이전트 IDE**입니다. 복잡한 명령어 없이 AI와 대화하며 프로젝트를 진행해보세요.
 
 ### 0. 필수 준비물 (Prerequisites)
+
 이 프로그램은 **Python**으로 만들어졌으며, **Git**을 통해 다운로드됩니다. 시작 전 꼭 설치해주세요!
 
 1.  **Python 설치 (실행기)**
@@ -43,7 +91,7 @@ Google Gemini 3.0의 강력한 비전 인식 능력과 OpenCV의 이미지 처�
     - ⚠️ **중요**: 설치 화면 맨 아래 **Running `Add python.exe to PATH`** 체크박스를 **반드시** 선택해야 합니다. (이걸 안 하면 실행이 안 됩니다!)
 2.  **Git 설치 (배달부)**
     - [Git for Windows](https://git-scm.com/download/win)를 다운로드하여 기본 설정대로 쭉 설치하세요.
-    - *팁: GitHub 회원가입은 필요 없습니다! 설치만 하면 바로 쓸 수 있습니다.*
+    - _팁: GitHub 회원가입은 필요 없습니다! 설치만 하면 바로 쓸 수 있습니다._
 
 ---
 
@@ -55,7 +103,7 @@ Google Gemini 3.0의 강력한 비전 인식 능력과 OpenCV의 이미지 처�
 2.  **프로젝트 가져오기 (Git Clone)**:
     - **Why?**: 인터넷에 있는 `NotebookLM to PPTX` 소스 코드를 내 컴퓨터로 가져오는 과정입니다.
     - **Action**: Antigravity 채팅창(`Cmd/Ctrl+I`)에 아래와 같이 입력하세요.
-    > "https://github.com/ahnbu/make_slide.git 주소를 현재 폴더에 복제(clone)해줘."
+      > "https://github.com/ahnbu/make_slide.git 주소를 현재 폴더에 복제(clone)해줘."
     - ⚠️ **문제 발생 시**: "git 명령어를 찾을 수 없다"고 하면, Git이 제대로 설치되지 않은 것입니다. 재부팅 후 다시 시도해보세요.
 
 ### 2단계: AI 설정 및 실행
@@ -63,11 +111,11 @@ Google Gemini 3.0의 강력한 비전 인식 능력과 OpenCV의 이미지 처�
 3.  **Gemini API 키 설정**:
     - **Why?**: AI 모델(Gemini)을 사용하기 위한 무료 이용권입니다.
     - **Action**: [Google AI Studio](https://aistudio.google.com/app/apikey)에서 키를 발급받고, 채팅창에 입력하세요.
-    > "내 API 키는 `AIza...` 야. 이걸로 `.env` 파일을 만들어서 저장해줘."
+      > "내 API 키는 `AIza...` 야. 이걸로 `.env` 파일을 만들어서 저장해줘."
 4.  **바로 실행하기 (Run)**:
     - **Why?**: 필요한 부품(라이브러리)을 조립하고 서버를 켜는 과정입니다.
     - **Action**: 채팅창에 아래 명령어를 복사해서 붙여넣으세요.
-    > "가상환경을 만들고 의존성을 설치(`requirements.txt`)한 뒤, 서버(`app.py`)를 실행하고 브라우저를 띄워줘."
+      > "가상환경을 만들고 의존성을 설치(`requirements.txt`)한 뒤, 서버(`app.py`)를 실행하고 브라우저를 띄워줘."
     - ⚠️ **문제 발생 시**: "`python`을 찾을 수 없다"고 하면, Python 설치 시 **PATH 추가**를 안 한 것입니다. Python을 지우고 다시 설치하며 체크박스를 꼭 확인하세요.
 
 ### 3단계: AI와 함께 사용 및 확장하기
@@ -90,6 +138,7 @@ Google Gemini 3.0의 강력한 비전 인식 능력과 OpenCV의 이미지 처�
    Python 3.10 이상이 설치되어 있어야 합니다.
 
 2. **클론 및 패키지 설치**:
+
    ```bash
    git clone https://github.com/your-repo/make-slide.git
    cd make-slide
@@ -98,6 +147,7 @@ Google Gemini 3.0의 강력한 비전 인식 능력과 OpenCV의 이미지 처�
 
 3. **API 키 설정**:
    `.env` 파일을 생성하고 Google Gemini API 키를 입력하세요.
+
    ```
    GOOGLE_API_KEY=your_api_key_here
    ```
