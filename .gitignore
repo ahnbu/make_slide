@@ -9,6 +9,7 @@ sample_image/
 docs/antigravity-workflow-ppt-main
 output/
 test/
+tests/
 logs/
 logs/execution_log.txt
 .agent/

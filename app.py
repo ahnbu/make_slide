@@ -21,6 +21,8 @@ from datetime import datetime
 import json
 import uuid
 from typing import List
+from src.security_utils import validate_safe_path
+
 
 load_dotenv(override=True)
 logger = get_logger(__name__)
@@ -313,12 +315,7 @@ async def upload_file(
     font_family: str = Form("Malgun Gothic"), # Default font
     refine_layout: bool = Form(False)
 ):
-    # Dynamic Concurrency Update (Runtime)
-    global MAX_CONCURRENT_TASKS, semaphore
-    if max_concurrent != MAX_CONCURRENT_TASKS:
-        MAX_CONCURRENT_TASKS = max_concurrent
-        semaphore = asyncio.Semaphore(MAX_CONCURRENT_TASKS)
-        logger.info(f"Runtime Concurrency Updated to: {MAX_CONCURRENT_TASKS}")
+    # Concurrency controlled by global semaphore (fixed at startup)
 
     timestamp = generate_timestamp()
     task_id = str(uuid.uuid4()) # Use UUID for unique task tracking
@@ -328,12 +325,16 @@ async def upload_file(
     input_filename = f"{original_name}_{timestamp}{ext}"
     
     # SAVE DIRECTLY TO OUTPUT DIR (User Request)
-    target_dir = os.path.join(OUTPUT_DIR, batch_folder)
+    target_dir = validate_safe_path(OUTPUT_DIR, batch_folder)
     ensure_directory(target_dir)
     input_path = os.path.join(target_dir, input_filename)
     
-    with open(input_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+    # Function to run in thread
+    def save_file_sync(infile, outpath):
+        with open(outpath, "wb") as buffer:
+            shutil.copyfileobj(infile, buffer)
+
+    await asyncio.to_thread(save_file_sync, file.file, input_path)
         
     logger.info(f"File uploaded to Output Dir: {input_path}")
     
@@ -421,7 +422,7 @@ async def process_combine_task(task_id, source_path, bg_path, original_name, vis
             return
 
         logger.info(f"Starting process_combine_task for {task_id} (Refine: {refine_layout})")
-        target_dir = os.path.join(OUTPUT_DIR, batch_folder)
+        target_dir = validate_safe_path(OUTPUT_DIR, batch_folder)
         ensure_directory(target_dir)
 
         try:
@@ -534,6 +535,53 @@ async def process_combine_task(task_id, source_path, bg_path, original_name, vis
             logger.error(f"Combine Task Error: {e}")
             progress_store[task_id] = {"status": "error", "message": str(e), "percent": 0}
 
+# --- Refactored Helpers ---
+async def _perform_analysis(input_path, task_id, vision_model, refine_layout, exclude_text):
+    # Update model
+    analyzer.model_name = vision_model
+    logger.info(f"Analyzer model set to: {analyzer.model_name}")
+
+    # 1.1 Initial Detection
+    layout_data, width, height = await asyncio.to_thread(analyzer.detect_initial_layout, input_path)
+    logger.info(f"Initial Analysis complete for {task_id}. Width: {width}, Height: {height}")
+
+    # 1.2 Refinement
+    if refine_layout:
+         layout_data = await asyncio.to_thread(analyzer.refine_layout, input_path, layout_data)
+
+    # 1.3 Pixel Convert
+    layout_data = analyzer.convert_to_pixels(layout_data, width, height)
+
+    # 1.4 Normalize
+    layout_data = code_generator.normalize_font_sizes(layout_data, width)
+    
+    # 1.5 Text Exclusion
+    full_layout_data = layout_data
+    filtered_layout_data = analyzer.apply_text_exclusion(layout_data, exclude_text)
+    
+    return full_layout_data, filtered_layout_data, width, height
+
+async def _perform_inpainting(input_path, layout_data, bg_path):
+    # CRITICAL: Use full_layout_data here to ensure Watermarks are ERASED from background
+    await asyncio.to_thread(image_processor.create_clean_background, input_path, layout_data, bg_path)
+
+async def _generate_html_slide(layout_data, w, h, bg_path, html_path, font_family, codegen_model):
+    await asyncio.to_thread(code_generator.generate_html, layout_data, w, h, bg_path, html_path, normalize=False, font_family=font_family, model_name=codegen_model)
+
+async def _generate_pptx_slide(layout_data, bg_path, w, h, pptx_path, font_family):
+    def _gen():
+        try:
+            pptx_gen_single = PPTXGenerator()
+            pptx_gen_single.add_slide(layout_data, bg_path, w, h, font_family=font_family)
+            pptx_gen_single.save(pptx_path)
+            return True
+        except Exception as e:
+            logger.error(f"PPTX Gen Error: {e}")
+            return False
+            
+    return await asyncio.to_thread(_gen)
+
+
 async def process_slide_task(task_id, input_path, original_name, vision_model, inpainting_model, codegen_model, batch_folder, exclude_text=None, font_family="Malgun Gothic", refine_layout=False):
     async with semaphore:
         if task_id in cancelled_tasks:
@@ -541,167 +589,78 @@ async def process_slide_task(task_id, input_path, original_name, vision_model, i
             cancelled_tasks.discard(task_id)
             return
 
-        logger.info(f"Starting process_slide_task for {task_id} with model {vision_model} (Active Tasks: {MAX_CONCURRENT_TASKS - semaphore._value})")
+        logger.info(f"Starting process_slide_task for {task_id} with model {vision_model}")
         
         # Determine Output Directory
-        target_dir = os.path.join(OUTPUT_DIR, batch_folder)
+        target_dir = validate_safe_path(OUTPUT_DIR, batch_folder)
         ensure_directory(target_dir)
         
         try:
-            await wait_if_paused(task_id) # Check pause at start
+            await wait_if_paused(task_id)
             if task_id in cancelled_tasks: return
 
-            current_vision_model = vision_model
-            if "gemini-2.5-flash-image" in vision_model:
-                 pass 
-                 
-            # Update model name
-            analyzer.model_name = current_vision_model
-            logger.info(f"Analyzer model set to: {analyzer.model_name}")
-
-            # Generate timestamp ID for filenames (User preferred)
+            # Generate timestamp ID
             file_id = generate_timestamp()
 
-            # Step 1: Layout Analysis (Split for Pause support)
-            progress_store[task_id] = {"status": "processing", "message": "[1단계 of 4단계] 이미지 레이아웃 1차 분석 중...", "percent": 10}
+            # Step 1: Layout Analysis
+            progress_store[task_id] = {"status": "processing", "message": "[1단계] 이미지 레이아웃 분석 중...", "percent": 10}
             
-            # Check Cancellation
-            if task_id in cancelled_tasks:
-                logger.info(f"Task {task_id} cancelled during Step 1.")
-                cancelled_tasks.discard(task_id)
-                progress_store[task_id] = {"status": "cancelled", "message": "사용자에 의해 작업이 취소되었습니다.", "percent": 0}
-                return
+            full_layout_data, filtered_layout_data, width, height = await _perform_analysis(
+                input_path, task_id, vision_model, refine_layout, exclude_text
+            )
 
-            # 1.1 Initial Detection
-            layout_data, width, height = await asyncio.to_thread(analyzer.detect_initial_layout, input_path)
-            logger.info(f"Initial Analysis complete for {task_id}. Width: {width}, Height: {height}")
-
-            # --- PAUSE CHECK (User Request: Pause between calls) ---
-            await wait_if_paused(task_id) 
-            if task_id in cancelled_tasks:
-                 progress_store[task_id] = {"status": "cancelled", "message": "취소됨", "percent": 0}
-                 return
-            # -------------------------------------------------------
-
-            progress_store[task_id] = {"status": "processing", "message": "[2단계 of 4단계] 디자인 전문가 피드백 루프 수행 중...", "percent": 30}
-
-            # 1.2 Refinement (Feedback Loop)
-            if refine_layout:
-                 layout_data = await asyncio.to_thread(analyzer.refine_layout, input_path, layout_data)
-            
-            # 1.3 Pixel Conversion
-            layout_data = analyzer.convert_to_pixels(layout_data, width, height)
-            
-            # --- Pre-Normalize Layout (New Step) ---
-            # Ensure HTML and PPTX usage consistent font sizes
-            layout_data = code_generator.normalize_font_sizes(layout_data, width)
-            
-            # 1.4 Text Exclusion Strategy
-            # Strategy: We need FULL layout for Inpainting (to erase the watermark pixels)
-            #           But FILTERED layout for Generation (to not re-render the watermark text)
-            full_layout_data = layout_data
-            filtered_layout_data = analyzer.apply_text_exclusion(layout_data, exclude_text)
-            
-            # Save things
-            # 1. Save FULL Original Layout (for debugging and inpainting reference)
+            # Save JSONs
             json_filename_raw = f"{original_name}_layout_{file_id}.json"
             json_path_raw = os.path.join(target_dir, json_filename_raw)
             with open(json_path_raw, "w", encoding="utf-8") as f:
                 json.dump(full_layout_data, f, indent=4, ensure_ascii=False)
 
-            # 2. Save FILTERED Layout (which is used for generation)
             json_filename_filtered = f"{original_name}_layout_{file_id}_filtered.json"
             json_path_filtered = os.path.join(target_dir, json_filename_filtered)
             with open(json_path_filtered, "w", encoding="utf-8") as f:
                 json.dump(filtered_layout_data, f, indent=4, ensure_ascii=False)
                 
-            # Check Cancellation
+            # Check Pause/Cancel
             if task_id in cancelled_tasks:
-                logger.info(f"Task {task_id} cancelled before Step 2.")
-                cancelled_tasks.discard(task_id)
-                progress_store[task_id] = {"status": "cancelled", "message": "사용자에 의해 작업이 취소되었습니다.", "percent": 0}
-                return
-            
-            await wait_if_paused(task_id) # PAUSE CHECK
+                progress_store[task_id] = {"status": "cancelled", "message": "취소됨", "percent": 0}; return
+            await wait_if_paused(task_id)
             if task_id in cancelled_tasks: return
 
-            # Step 2: Inpaint
-            progress_store[task_id] = {"status": "processing", "message": "[3단계 of 4단계] 텍스트 제거 및 배경 복원 중...", "percent": 60}
+            # Step 2: Inpainting
+            progress_store[task_id] = {"status": "processing", "message": "[2단계] 배경 복원 중...", "percent": 60}
             bg_filename = f"{original_name}_bg_{file_id}.png"
             bg_path = os.path.join(target_dir, bg_filename) 
             
-            # Run blocking inpainting in thread pool
-            # CRITICAL: Use full_layout_data here to ensure Watermarks are ERASED from background
-            await asyncio.to_thread(image_processor.create_clean_background, input_path, full_layout_data, bg_path)
+            await _perform_inpainting(input_path, full_layout_data, bg_path)
             
-            # Check Cancellation
+            # Check Pause/Cancel
             if task_id in cancelled_tasks:
-                logger.info(f"Task {task_id} cancelled before Step 3.")
-                cancelled_tasks.discard(task_id)
-                progress_store[task_id] = {"status": "cancelled", "message": "사용자에 의해 작업이 취소되었습니다.", "percent": 0}
-                return
-
-            await wait_if_paused(task_id) # PAUSE CHECK
+                progress_store[task_id] = {"status": "cancelled", "message": "취소됨", "percent": 0}; return
+            await wait_if_paused(task_id)
             if task_id in cancelled_tasks: return
 
             # Step 3: Generate HTML
-            progress_store[task_id] = {"status": "processing", "message": "[4단계 of 4단계] HTML 코드 생성 중...", "percent": 80}
+            progress_store[task_id] = {"status": "processing", "message": "[3단계] HTML 생성 중...", "percent": 80}
             html_filename = f"{original_name}_slide_{file_id}.html"
             html_path = os.path.join(target_dir, html_filename)
-            # bg_url = bg_filename # No longer used for generation, only for return
             
-            # Run blocking HTML generation in thread pool
-            # Now passing bg_path (absolute) instead of relative filename
-            # normalize=False because we already did it
-            # USE FILTERED LAYOUT
-            # PASS FONT FAMILY
-            await asyncio.to_thread(code_generator.generate_html, filtered_layout_data, width, height, bg_path, html_path, normalize=False, font_family=font_family, model_name=codegen_model)
+            await _generate_html_slide(filtered_layout_data, width, height, bg_path, html_path, font_family, codegen_model)
             
-            # Log execution
-            log_execution(original_name, current_vision_model, inpainting_model, codegen_model)
+            log_execution(original_name, vision_model, inpainting_model, codegen_model)
 
-            # --- PPTX Generation (New Step) ---
-            # Check settings for output format
-            # We can reload settings or use what was passed? 
-            # ideally we should have passed it, but for now let's load or assume "both" if not present
-            # But wait, app.py has `current_settings` global? No, it loads at top.
-            # Best is to reload settings here or pass it. 
-            # Let's read from the settings file to be sure (since user might have changed it)
-            # Or better, read from global since we update it.
-            # actually `process_slide_task` is async background.
-            
-            # Let's read the latest settings safely
+            # Step 4: PPTX Generation
             current_settings_local = load_settings() 
             output_fmt = current_settings_local.get("output_format", "both")
-            
             pptx_url = None
+            
             if output_fmt in ["pptx", "both"]:
-                try:
-                    progress_store[task_id]["message"] = "[추가 작업] PPTX 생성 중..."
-                    
-                    pptx_filename = f"{original_name}_slide_{file_id}.pptx"
-                    pptx_path = os.path.join(target_dir, pptx_filename)
-                    
-                    # Need original width/height. We have them from Step 1.
-                    # layout_data, width, height
-                    
-                    pptx_gen_single = PPTXGenerator()
-                    # We need to recreate the generator or use a method that adds one slide and saves.
-                    # Current PPTXGenerator is designed for multi-slide if we call add_slide multiple times.
-                    # Here we just want one slide.
-                    
-                    # USE FILTERED LAYOUT
-                    # PASS FONT FAMILY
-                    pptx_gen_single.add_slide(filtered_layout_data, bg_path, width, height, font_family=font_family)
-                    pptx_gen_single.save(pptx_path)
-                    
-                    pptx_url = f"/output/{batch_folder}/{pptx_filename}"
-                    logger.info(f"PPTX generated: {pptx_path}")
-                    
-                except Exception as e:
-                    logger.error(f"Failed to generate single PPTX: {e}")
-                    # Don't fail the whole task for this optional step
-
+                progress_store[task_id]["message"] = "[완료 단계] PPTX 생성 중..."
+                pptx_filename = f"{original_name}_slide_{file_id}.pptx"
+                pptx_path = os.path.join(target_dir, pptx_filename)
+                
+                if await _generate_pptx_slide(filtered_layout_data, bg_path, width, height, pptx_path, font_family):
+                     pptx_url = f"/output/{batch_folder}/{pptx_filename}"
+                     logger.info(f"PPTX generated: {pptx_path}")
 
             # Complete
             progress_store[task_id] = {
@@ -766,7 +725,7 @@ async def remove_text(
         input_filename = f"{original_name}_{timestamp}{ext}"
         
         # Save to Output Dir directly
-        target_dir = os.path.join(OUTPUT_DIR, batch_folder)
+        target_dir = validate_safe_path(OUTPUT_DIR, batch_folder)
         ensure_directory(target_dir)
         input_path = os.path.join(target_dir, input_filename)
         
@@ -812,7 +771,7 @@ async def remove_text_ai(
         input_filename = f"{original_name}_{timestamp}{ext}"
         
         # Save to Output Dir
-        target_dir = os.path.join(OUTPUT_DIR, batch_folder)
+        target_dir = validate_safe_path(OUTPUT_DIR, batch_folder)
         ensure_directory(target_dir)
         input_path = os.path.join(target_dir, input_filename)
         
@@ -864,7 +823,7 @@ async def remove_text_ai(
             )
         )
         
-        target_dir = os.path.join(OUTPUT_DIR, batch_folder)
+        target_dir = validate_safe_path(OUTPUT_DIR, batch_folder)
         ensure_directory(target_dir)
 
         output_bg_filename = f"{original_name}_bg_ai_{timestamp}.png"
@@ -912,7 +871,7 @@ async def remove_text_ai(
 @app.post("/generate-pptx-batch/{batch_folder}")
 async def generate_pptx_batch(batch_folder: str):
     try:
-        target_dir = os.path.join(OUTPUT_DIR, batch_folder)
+        target_dir = validate_safe_path(OUTPUT_DIR, batch_folder)
         if not os.path.exists(target_dir):
             return JSONResponse(status_code=404, content={"message": "Batch folder not found"})
 
@@ -1077,10 +1036,7 @@ async def combine_upload(
     refine_layout: str = Form("false"), # Receives string 'true'/'false'
     exclude_text: str = Form(None)
 ):
-    global MAX_CONCURRENT_TASKS, semaphore
-    if max_concurrent != MAX_CONCURRENT_TASKS:
-        MAX_CONCURRENT_TASKS = max_concurrent
-        semaphore = asyncio.Semaphore(MAX_CONCURRENT_TASKS)
+    # Concurrency controlled by global semaphore
         
     timestamp = generate_timestamp()
     task_id = str(uuid.uuid4())
@@ -1088,22 +1044,25 @@ async def combine_upload(
     original_name = os.path.splitext(source_file.filename)[0]
     
     # Target Directory
-    target_dir = os.path.join(OUTPUT_DIR, batch_folder)
+    target_dir = validate_safe_path(OUTPUT_DIR, batch_folder)
     ensure_directory(target_dir)
     
-    # Save Source
+    # Save Source (Async)
     source_ext = os.path.splitext(source_file.filename)[1]
     source_filename = f"{original_name}_source_{timestamp}{source_ext}"
     source_path = os.path.join(target_dir, source_filename)
-    with open(source_path, "wb") as buffer:
-        shutil.copyfileobj(source_file.file, buffer)
+    
+    def save_file_sync(infile, outpath):
+        with open(outpath, "wb") as buffer:
+             shutil.copyfileobj(infile, buffer)
+
+    await asyncio.to_thread(save_file_sync, source_file.file, source_path)
         
-    # Save Background
+    # Save Background (Async)
     bg_ext = os.path.splitext(background_file.filename)[1]
     bg_filename = f"{original_name}_bg_clean_{timestamp}{bg_ext}"
     bg_path = os.path.join(target_dir, bg_filename)
-    with open(bg_path, "wb") as buffer:
-        shutil.copyfileobj(background_file.file, buffer)
+    await asyncio.to_thread(save_file_sync, background_file.file, bg_path)
         
     # Init Progress
     progress_store[task_id] = {"status": "starting", "message": "조합 작업 대기 중...", "percent": 0}
@@ -1141,7 +1100,7 @@ async def remove_text_photoroom(
         # 2. Basic setup
         timestamp = generate_timestamp()
         original_name = os.path.splitext(file.filename)[0]
-        target_dir = os.path.join(OUTPUT_DIR, batch_folder)
+        target_dir = validate_safe_path(OUTPUT_DIR, batch_folder)
         ensure_directory(target_dir)
         
         file_content = await file.read()
