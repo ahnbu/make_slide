@@ -15,3 +15,5 @@ logs/execution_log.txt
 .agent/
 .agent/agent.log
 pdf2pptx_cloudfare_pages_distribution/
+_handoff/
+
