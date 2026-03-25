@@ -15,5 +15,14 @@ logs/execution_log.txt
 .agent/
 .agent/agent.log
 pdf2pptx_cloudfare_pages_distribution/
-_handoff/
 
+.playwright-cli/
+.bkit/
+.pdca-status
+.pdca-status.json
+.bkit-memory
+.bkit-memory.json
+.pdca-snapshots
+.current-session-id
+temp/
+.temp/
